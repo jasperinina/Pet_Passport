@@ -1,0 +1,77 @@
+.page-header__inner {
+  width: 1214px;
+  height: 80px;
+  background: var(--white);
+  border-radius: 20px;
+  padding: 0 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Левая часть */
+.page-header__left {
+  display: flex;
+  align-items: center;
+  column-gap: 28px;
+}
+
+.page-header__logo {
+  width: 181px;
+  height: 42px;
+  object-fit: contain;
+}
+
+.page-header__divider {
+  width: 1px;
+  height: 24px;
+  background: var(--divider);
+  border-radius: 999px;
+}
+
+.page-header__pet {
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+}
+
+.page-header__pet-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.page-header__pet-name {
+  color: var(--txt);
+}
+
+/* Правая часть — меню */
+.page-header__nav {
+  display: flex;
+  align-items: center;
+  column-gap: 28px;
+}
+
+.page-header__nav-item {
+  display: flex;
+  align-items: center;
+  column-gap: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.page-header__nav-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.page-header__nav-label {
+  color: var(--black);
+}
+
+.page-header__nav-label:hover{
+  color: #5E40A5;
+}

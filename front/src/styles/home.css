@@ -1,0 +1,127 @@
+.main-page {
+  margin-top: 50px;
+}
+
+/* Общий контейнер блока: фото + правая часть */
+.pet-block {
+  display: flex;
+  height: 367px;
+}
+
+/* Фото */
+.pet-block__photo-wrapper {
+  width: 500px;
+  height: 367px;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.pet-block__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Правая карточка */
+.pet-block__info {
+  width: 704px;
+  height: 367px;
+  margin-left: 10px;
+  background: var(--white);
+  border-radius: 20px;
+  padding: 0 36px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Верхний ряд: имя + вид животного */
+.pet-block__top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-top: 29px;
+}
+
+.pet-block__name {
+  margin: 0;
+}
+
+.pet-block__species {
+  margin-top: 10px;
+  color: var(--txt);
+}
+
+/* Линия-разделитель */
+.pet-block__divider {
+  margin-top: 20px;
+  width: 100%;
+  height: 1px;
+  background: var(--divider);
+  border-radius: 999px;
+}
+
+/* Общий стиль секций */
+.pet-block__section {
+  margin-top: 24px;
+}
+
+.pet-block__section--grid {
+  margin-top: 28px;
+  display: flex;
+  width: auto;
+  column-gap: 40px;
+}
+
+/* Элемент "лейбл + значение" */
+.pet-block__label {
+  display: block;
+  width: auto;
+  margin-bottom: 8px;
+  color: var(--txt);
+}
+
+.pet-block__value {
+  color: var(--black);
+}
+
+/* Поле в сетке */
+.pet-block__field {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* Кнопки */
+.pet-block__actions {
+  margin-top: 28px;
+  display: flex;
+  column-gap: 20px;
+}
+
+/* Предстоящие процедуры" */
+
+.procedures {
+  margin-top: 90px;
+}
+
+.procedures__title {
+  margin: 0;
+}
+
+/* Нет процедур */
+.procedures__card {
+  margin-top: 48px;
+  width: 100%;
+  height: 300px;
+  background: var(--white);
+  border-radius: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.procedures__empty-text {
+  font-size: 20px;
+  color: var(--txt);
+  text-align: center;
+}
