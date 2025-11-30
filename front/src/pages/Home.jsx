@@ -2,14 +2,18 @@ import { useState, useEffect } from "react";
 import "../styles/home.css";
 import PetPhoto from "../assets/images/pet-photo.png";
 import { getPet } from "../api/pets";
+import { getUpcomingEvents } from "../api/events";
 import API_BASE_URL from "../api/config";
 import EditPetModal from "../components/EditPetModal";
+import AddProcedureModal from "../components/AddProcedureModal";
 
 const Home = () => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
 
   // Функция загрузки данных о питомце
   const loadPet = async () => {
@@ -35,9 +39,34 @@ const Home = () => {
     }
   };
 
+  // Функция загрузки предстоящих процедур
+  const loadUpcomingEvents = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const petId = urlParams.get("id") || urlParams.get("Id");
+
+    if (!petId) {
+      return;
+    }
+
+    try {
+      const events = await getUpcomingEvents(parseInt(petId, 10));
+      // Берем только 3 ближайшие
+      setUpcomingEvents(events.slice(0, 3));
+    } catch (err) {
+      console.error("Ошибка загрузки процедур:", err);
+      setUpcomingEvents([]);
+    }
+  };
+
   useEffect(() => {
     loadPet();
+    loadUpcomingEvents();
   }, []);
+
+  // Перезагружаем процедуры после добавления новой
+  const handleProcedureAdded = () => {
+    loadUpcomingEvents();
+  };
 
   // Обработчик успешного обновления данных
   const handleUpdateSuccess = () => {
@@ -101,6 +130,40 @@ const Home = () => {
       return `${API_BASE_URL}${photoUrl}`;
     }
     return PetPhoto; // Дефолтная заглушка
+  };
+
+  // Форматирование даты и времени для процедуры
+  const formatEventDateTime = (dateString) => {
+    if (!dateString) return "";
+    
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate();
+      const month = date.toLocaleString("ru-RU", { month: "long" });
+      const year = date.getFullYear();
+      const time = date.toLocaleTimeString("ru-RU", { 
+        hour: "2-digit", 
+        minute: "2-digit" 
+      });
+      
+      return { date: `${day} ${month}`, time, fullDate: `${day} ${month} ${year}` };
+    } catch (e) {
+      return { date: "", time: "", fullDate: "" };
+    }
+  };
+
+  // Получение названия типа процедуры
+  const getEventTypeName = (type) => {
+    switch (type) {
+      case "doctor-visit":
+        return "Прием";
+      case "vaccine":
+        return "Вакцинация";
+      case "treatment":
+        return "Обработка";
+      default:
+        return "Процедура";
+    }
   };
 
   // Состояние загрузки
@@ -186,7 +249,10 @@ const Home = () => {
 
             {/* Кнопки */}
             <div className="pet-block__actions">
-              <button className="btn btn-primary">
+              <button 
+                className="btn btn-primary"
+                onClick={() => setIsAddProcedureModalOpen(true)}
+              >
                 Добавить процедуру
               </button>
               <button 
@@ -201,11 +267,53 @@ const Home = () => {
         <section className="procedures">
           <h2 className="h1 procedures__title">Предстоящие процедуры</h2>
 
-          <div className="procedures__card">
-            <p className="txt1 procedures__empty-text">
-              Нет предстоящих процедур
-            </p>
-          </div>
+          {upcomingEvents.length === 0 ? (
+            <div className="procedures__card">
+              <p className="txt1 procedures__empty-text">
+                Нет предстоящих процедур
+              </p>
+            </div>
+          ) : (
+            <div className="procedures__list">
+              {upcomingEvents.map((event) => {
+                const { date, time, fullDate } = formatEventDateTime(event.eventDate);
+                return (
+                  <div 
+                    key={event.id} 
+                    className="procedure-card"
+                    onClick={() => {
+                      // TODO: Переход на страницу процедуры
+                      console.log("Переход к процедуре", event.id);
+                    }}
+                  >
+                    <div className="procedure-card__header">
+                      <div className="procedure-card__tags">
+                        <span className="procedure-card__tag">
+                          <span className="procedure-card__tag-icon">📅</span>
+                          {fullDate} | {time}
+                        </span>
+                        <span className="procedure-card__tag">
+                          {getEventTypeName(event.type)}
+                        </span>
+                      </div>
+                      {event.reminderEnabled && (
+                        <span className="procedure-card__reminder-icon">🔔</span>
+                      )}
+                    </div>
+                    <div className="procedure-card__content">
+                      <div className="procedure-card__main">
+                        <h3 className="procedure-card__title">{event.title || "Процедура"}</h3>
+                        <div className="procedure-card__date-time">
+                          <span className="procedure-card__date">{date}</span>
+                          <span className="procedure-card__time">{time}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </div>
 
@@ -215,6 +323,14 @@ const Home = () => {
         onClose={() => setIsEditModalOpen(false)}
         pet={pet}
         onSuccess={handleUpdateSuccess}
+      />
+
+      {/* Модальное окно добавления процедуры */}
+      <AddProcedureModal
+        isOpen={isAddProcedureModalOpen}
+        onClose={() => setIsAddProcedureModalOpen(false)}
+        petId={pet?.id}
+        onSuccess={handleProcedureAdded}
       />
     </main>
   );

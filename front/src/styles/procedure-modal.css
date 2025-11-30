@@ -1,0 +1,130 @@
+/* Модальное окно для процедур - более широкое */
+.modal-content--wide {
+  max-width: 800px;
+}
+
+/* Двухколоночная сетка */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-field--half {
+  margin-bottom: 0;
+}
+
+/* Текстовое поле */
+.form-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: var(--font-main);
+}
+
+/* Select dropdown */
+.form-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b90a6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2336187d' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+}
+
+/* Toggle switch */
+.form-toggle-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.form-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.form-toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--divider);
+  border-radius: 24px;
+  transition: background-color 0.3s ease;
+}
+
+.form-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--white);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.form-toggle input:checked + .form-toggle-slider {
+  background-color: var(--blue);
+}
+
+.form-toggle input:checked + .form-toggle-slider:before {
+  transform: translateX(24px);
+}
+
+.form-toggle input:disabled + .form-toggle-slider {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Группа кнопок для выбора */
+.form-button-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.form-button-option {
+  padding: 10px 20px;
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  background: var(--white);
+  color: var(--black);
+  font-size: var(--font-size-txt2);
+  font-weight: var(--font-weight-txt2);
+  font-family: var(--font-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-button-option:hover:not(:disabled) {
+  border-color: var(--black);
+  background: var(--grey);
+}
+
+.form-button-option--active {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
+
+.form-button-option:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
