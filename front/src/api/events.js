@@ -1,4 +1,5 @@
 import API_BASE_URL from './config.js';
+import { USE_MOCK_API, mockGetUpcomingEvents } from './mockApi.js';
 
 /**
  * Создание посещения врача
@@ -75,6 +76,11 @@ export async function createTreatment(data) {
  * @returns {Promise<Array>} Массив предстоящих событий
  */
 export async function getUpcomingEvents(petId) {
+  // Используем моковые данные, если включен режим моков
+  if (USE_MOCK_API) {
+    return await mockGetUpcomingEvents(petId);
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/events/upcoming/${petId}`, {
     method: 'GET',
     headers: {

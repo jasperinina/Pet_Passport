@@ -1,4 +1,5 @@
 import API_BASE_URL from './config.js';
+import { USE_MOCK_API, mockGetPet } from './mockApi.js';
 
 /**
  * Создание нового питомца
@@ -34,6 +35,11 @@ export async function createPet(petData) {
  * @returns {Promise<Object>} Данные питомца
  */
 export async function getPet(id) {
+  // Используем моковые данные, если включен режим моков
+  if (USE_MOCK_API) {
+    return await mockGetPet(id);
+  }
+
   const response = await fetch(`${API_BASE_URL}/api/pets/${id}`, {
     method: 'GET',
     headers: {
