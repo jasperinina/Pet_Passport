@@ -3,14 +3,16 @@ import "../styles/home.css";
 import PetPhoto from "../assets/images/pet-photo.png";
 import { getPet } from "../api/pets";
 import API_BASE_URL from "../api/config";
+import EditPetModal from "../components/EditPetModal";
 
 const Home = () => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  useEffect(() => {
-    // Получаем ID питомца из параметров URL
+  // Функция загрузки данных о питомце
+  const loadPet = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const petId = urlParams.get("id") || urlParams.get("Id");
 
@@ -20,23 +22,30 @@ const Home = () => {
       return;
     }
 
-    // Загружаем данные о питомце
-    const loadPet = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const petData = await getPet(parseInt(petId, 10));
-        setPet(petData);
-      } catch (err) {
-        setError(err.message || "Ошибка загрузки данных о питомце");
-        console.error("Ошибка загрузки питомца:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    try {
+      setLoading(true);
+      setError(null);
+      const petData = await getPet(parseInt(petId, 10));
+      setPet(petData);
+    } catch (err) {
+      setError(err.message || "Ошибка загрузки данных о питомце");
+      console.error("Ошибка загрузки питомца:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadPet();
   }, []);
+
+  // Обработчик успешного обновления данных
+  const handleUpdateSuccess = () => {
+    // Перезагружаем данные питомца
+    loadPet();
+    // Уведомляем App о необходимости обновить данные в Header
+    window.dispatchEvent(new CustomEvent('petUpdated'));
+  };
 
   // Форматирование даты
   const formatDate = (dateString) => {
@@ -180,7 +189,10 @@ const Home = () => {
               <button className="btn btn-primary">
                 Добавить процедуру
               </button>
-              <button className="btn btn-secondary">
+              <button 
+                className="btn btn-secondary"
+                onClick={() => setIsEditModalOpen(true)}
+              >
                 Изменить данные
               </button>
             </div>
@@ -196,6 +208,14 @@ const Home = () => {
           </div>
         </section>
       </div>
+
+      {/* Модальное окно редактирования */}
+      <EditPetModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        pet={pet}
+        onSuccess={handleUpdateSuccess}
+      />
     </main>
   );
 };

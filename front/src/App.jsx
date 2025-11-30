@@ -7,8 +7,8 @@ import { getPet } from "./api/pets";
 function App() {
   const [pet, setPet] = useState(null);
 
-  useEffect(() => {
-    // Получаем ID питомца из параметров URL
+  // Функция загрузки данных о питомце для Header
+  const loadPet = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const petId = urlParams.get("id") || urlParams.get("Id");
 
@@ -16,17 +16,27 @@ function App() {
       return;
     }
 
-    // Загружаем данные о питомце для Header
-    const loadPet = async () => {
-      try {
-        const petData = await getPet(parseInt(petId, 10));
-        setPet(petData);
-      } catch (err) {
-        console.error("Ошибка загрузки питомца для Header:", err);
-      }
+    try {
+      const petData = await getPet(parseInt(petId, 10));
+      setPet(petData);
+    } catch (err) {
+      console.error("Ошибка загрузки питомца для Header:", err);
+    }
+  };
+
+  useEffect(() => {
+    loadPet();
+
+    // Слушаем событие обновления питомца
+    const handlePetUpdate = () => {
+      loadPet();
     };
 
-    loadPet();
+    window.addEventListener('petUpdated', handlePetUpdate);
+
+    return () => {
+      window.removeEventListener('petUpdated', handlePetUpdate);
+    };
   }, []);
 
   return (
