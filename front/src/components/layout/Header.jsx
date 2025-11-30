@@ -4,9 +4,7 @@ import PetIcon from "../../assets/icons/icon-cats.svg";
 import ProcedureIcon from "../../assets/icons/icons-procedures.svg";
 import HistoryIcon from "../../assets/icons/icons-history.svg";
 
-const Header = () => {
-  // Меняются только эти 2 параметра
-  const petName = "Соня";
+const Header = ({ petName }) => {
   const petIcon = PetIcon;
 
   return (
@@ -20,10 +18,12 @@ const Header = () => {
 
             <div className="page-header__divider" />
 
-            <div className="page-header__pet">
-              <img src={petIcon} alt={petName} className="page-header__pet-icon" />
-              <span className="txt2 page-header__pet-name">{petName}</span>
-            </div>
+            {petName && (
+              <div className="page-header__pet">
+                <img src={petIcon} alt={petName} className="page-header__pet-icon" />
+                <span className="txt2 page-header__pet-name">{petName}</span>
+              </div>
+            )}
           </div>
 
           {/* ПРАВАЯ ЧАСТЬ */}
