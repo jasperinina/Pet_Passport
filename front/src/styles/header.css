@@ -20,6 +20,11 @@
   width: 181px;
   height: 42px;
   object-fit: contain;
+  transition: opacity 0.15s ease;
+}
+
+.page-header__logo:hover {
+  opacity: 0.7;
 }
 
 .page-header__divider {
@@ -74,4 +79,14 @@
 
 .page-header__nav-label:hover{
   color: #5E40A5;
+}
+
+.page-header__nav-item {
+  outline: none;
+}
+
+.page-header__nav-item:focus,
+.page-header__nav-item:active {
+  outline: none;
+  box-shadow: none;
 }

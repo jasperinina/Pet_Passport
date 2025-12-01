@@ -34,7 +34,7 @@
   flex-direction: column;
 }
 
-/* Верхний ряд: имя + вид животного */
+/* Верхний ряд: имя + вид животного (вид пока не используем) */
 .pet-block__top-row {
   display: flex;
   justify-content: space-between;
@@ -97,14 +97,53 @@
   column-gap: 20px;
 }
 
-/* Предстоящие процедуры" */
+.pet-block__actions .btn {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.pet-block__actions .btn:focus,
+.pet-block__actions .btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ===== Блок "Предстоящие процедуры" ===== */
 
 .procedures {
   margin-top: 90px;
 }
 
+.procedures__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
 .procedures__title {
   margin: 0;
+}
+
+/* Ссылка "Посмотреть все" */
+.procedures__link {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  text-decoration: underline;
+  color: var(--black);
+}
+
+.procedures__link {
+  outline: none;
+}
+
+.procedures__link:focus,
+.procedures__link:active {
+  outline: none;
+  box-shadow: none;
 }
 
 /* Нет процедур */
@@ -132,88 +171,4 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-/* Карточка процедуры */
-.procedure-card {
-  background: var(--white);
-  border-radius: 20px;
-  padding: 24px 32px;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.procedure-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.procedure-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.procedure-card__tags {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.procedure-card__tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border: 1px solid var(--divider);
-  border-radius: 12px;
-  background: var(--white);
-  font-size: 14px;
-  color: var(--black);
-}
-
-.procedure-card__tag-icon {
-  font-size: 14px;
-}
-
-.procedure-card__reminder-icon {
-  font-size: 20px;
-  color: var(--blue);
-}
-
-.procedure-card__content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-
-.procedure-card__main {
-  flex: 1;
-}
-
-.procedure-card__title {
-  font-size: var(--font-size-h2);
-  font-weight: var(--font-weight-h2);
-  color: var(--black);
-  margin: 0 0 12px 0;
-}
-
-.procedure-card__date-time {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-}
-
-.procedure-card__date {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--black);
-  line-height: 1.2;
-}
-
-.procedure-card__time {
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--txt);
 }

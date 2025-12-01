@@ -25,6 +25,18 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
     }
   }, [isOpen, pet]);
 
+  // Блокируем прокрутку body, пока модалка открыта
+  useEffect(() => {
+    if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isOpen]);
+
   // Обработка закрытия модального окна
   const handleClose = () => {
     if (!loading) {
@@ -48,37 +60,33 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
     setError(null);
 
     try {
-      // Подготавливаем данные для отправки
       const updateData = {};
-      
+
       if (formData.name.trim()) {
         updateData.name = formData.name.trim();
       }
-      
+
       if (formData.breed.trim()) {
         updateData.breed = formData.breed.trim();
       }
-      
+
       if (formData.weightKg) {
         const weight = parseFloat(formData.weightKg);
         if (!isNaN(weight) && weight > 0) {
           updateData.weightKg = weight;
         }
       }
-      
+
       if (formData.birthDate) {
         updateData.birthDate = formData.birthDate;
       }
 
-      // Отправляем запрос на обновление
       await updatePet(pet.id, updateData);
-      
-      // Вызываем callback для обновления данных
+
       if (onSuccess) {
         onSuccess();
       }
-      
-      // Закрываем модальное окно
+
       onClose();
     } catch (err) {
       setError(err.message || "Ошибка при обновлении данных питомца");
@@ -91,8 +99,11 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay">
+      <div
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h2 className="h2 modal-title">Изменить данные</h2>
           <button
@@ -202,4 +213,3 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
 };
 
 export default EditPetModal;
-

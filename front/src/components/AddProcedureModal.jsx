@@ -63,7 +63,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
   useEffect(() => {
     if (isOpen) {
       const now = new Date();
-      const dateStr = now.toISOString().split('T')[0];
+      const dateStr = now.toISOString().split("T")[0];
       setEventDate(dateStr);
       setEventTime("13:00");
       setError(null);
@@ -82,6 +82,18 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
       setReminderEnabled(false);
       setReminderValue(5);
       setReminderUnit(PERIOD_UNITS.MINUTE);
+    }
+  }, [isOpen]);
+
+  // Блокируем скролл страницы, пока модалка открыта
+  useEffect(() => {
+    if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
     }
   }, [isOpen]);
 
@@ -126,9 +138,10 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
         case PROCEDURE_TYPES.VACCINE:
           // Периодичность всегда 1 для предустановленных опций
           const vaccinePeriodValue = periodUnit !== null ? 1 : null;
-          const nextVaccinationDate = vaccinePeriodValue && periodUnit !== null
-            ? calculateNextDate(eventDateTime, vaccinePeriodValue, periodUnit)
-            : null;
+          const nextVaccinationDate =
+            vaccinePeriodValue && periodUnit !== null
+              ? calculateNextDate(eventDateTime, vaccinePeriodValue, periodUnit)
+              : null;
 
           result = await createVaccine({
             ...baseData,
@@ -142,9 +155,10 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
         case PROCEDURE_TYPES.TREATMENT:
           // Периодичность всегда 1 для предустановленных опций
           const treatmentPeriodValue = periodUnit !== null ? 1 : null;
-          const nextTreatmentDate = treatmentPeriodValue && periodUnit !== null
-            ? calculateNextDate(eventDateTime, treatmentPeriodValue, periodUnit)
-            : null;
+          const nextTreatmentDate =
+            treatmentPeriodValue && periodUnit !== null
+              ? calculateNextDate(eventDateTime, treatmentPeriodValue, periodUnit)
+              : null;
 
           result = await createTreatment({
             ...baseData,
@@ -212,8 +226,11 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content modal-content--wide" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay">
+      <div
+        className="modal-content modal-content--wide"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <h2 className="h2 modal-title">Добавить процедуру</h2>
           <button
@@ -234,7 +251,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
             </div>
           )}
 
-          {/* Выбор типа процедуры */}
+          {/* Выберите тип */}
           <div className="form-field">
             <label className="form-label txt2" htmlFor="procedureType">
               Выберите тип
@@ -392,7 +409,9 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
                             ? "form-button-option--active"
                             : ""
                         }`}
-                        onClick={() => handleReminderOptionClick(option.value, option.unit)}
+                        onClick={() =>
+                          handleReminderOptionClick(option.value, option.unit)
+                        }
                         disabled={loading}
                       >
                         {option.label}
@@ -516,7 +535,9 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
                             ? "form-button-option--active"
                             : ""
                         }`}
-                        onClick={() => handleReminderOptionClick(option.value, option.unit)}
+                        onClick={() =>
+                          handleReminderOptionClick(option.value, option.unit)
+                        }
                         disabled={loading}
                       >
                         {option.label}
@@ -656,7 +677,9 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
                             ? "form-button-option--active"
                             : ""
                         }`}
-                        onClick={() => handleReminderOptionClick(option.value, option.unit)}
+                        onClick={() =>
+                          handleReminderOptionClick(option.value, option.unit)
+                        }
                         disabled={loading}
                       >
                         {option.label}
@@ -692,4 +715,3 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
 };
 
 export default AddProcedureModal;
-

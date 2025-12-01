@@ -4,7 +4,7 @@ import PetIcon from "../../assets/icons/icon-cats.svg";
 import ProcedureIcon from "../../assets/icons/icons-procedures.svg";
 import HistoryIcon from "../../assets/icons/icons-history.svg";
 
-const Header = ({ petName }) => {
+const Header = ({ petName, onNavigate }) => {
   const petIcon = PetIcon;
 
   return (
@@ -14,7 +14,13 @@ const Header = ({ petName }) => {
 
           {/* ЛЕВАЯ ЧАСТЬ */}
           <div className="page-header__left">
-            <img src={Logo} alt="PetPassport" className="page-header__logo" />
+            <img
+              src={Logo}
+              alt="PetPassport"
+              className="page-header__logo"
+              onClick={() => onNavigate("home")}
+              style={{ cursor: "pointer" }}
+            />
 
             <div className="page-header__divider" />
 
@@ -29,12 +35,22 @@ const Header = ({ petName }) => {
           {/* ПРАВАЯ ЧАСТЬ */}
           <nav className="page-header__nav">
 
-            <button className="page-header__nav-item" type="button">
+            {/* Предстоящие процедуры */}
+            <button
+              className="page-header__nav-item"
+              type="button"
+              onClick={() => onNavigate("upcoming")}
+            >
               <img src={ProcedureIcon} className="page-header__nav-icon" alt="" />
               <span className="txt2 page-header__nav-label">Предстоящие процедуры</span>
             </button>
 
-            <button className="page-header__nav-item" type="button">
+            {/* Медицинская история */}
+            <button
+              className="page-header__nav-item"
+              type="button"
+              onClick={() => onNavigate("history")}
+            >
               <img src={HistoryIcon} className="page-header__nav-icon" alt="" />
               <span className="txt2 page-header__nav-label">Медицинская история</span>
             </button>

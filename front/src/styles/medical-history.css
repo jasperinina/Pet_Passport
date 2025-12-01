@@ -1,0 +1,33 @@
+.medical-history-page {
+  margin-top: 50px;
+}
+
+.medical-history-header {
+  width: 1214px;
+  height: 95px;
+  background: var(--white);
+  border-radius: 20px;
+  padding: 28px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.medical-history__title {
+  margin: 0;
+}
+
+.medical-history__button {
+  height: 50px;
+  padding: 15px 28px;
+  outline: none;
+  border: none;
+}
+
+.medical-history__button:focus,
+.medical-history__button:active {
+  outline: none;
+  box-shadow: none;
+}

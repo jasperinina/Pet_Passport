@@ -1,0 +1,35 @@
+.upcoming-procedures-page {
+  margin-top: 50px;
+}
+
+/* Блок с заголовком */
+.upcoming-header {
+  width: 1214px;
+  height: 95px;
+  background: var(--white);
+  border-radius: 20px;
+  padding: 28px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  box-sizing: border-box;
+}
+
+.upcoming-header__title {
+  margin: 0;
+}
+
+.upcoming-header__button {
+  height: 50px;
+  padding: 15px 28px;
+  outline: none;
+  border: none;
+}
+
+.upcoming-header__button:focus,
+.upcoming-header__button:active {
+  outline: none;
+  box-shadow: none;
+}
