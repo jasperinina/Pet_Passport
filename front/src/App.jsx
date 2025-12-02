@@ -1,14 +1,17 @@
 import { useState, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+
 import Header from "./components/layout/Header";
 import Home from "./pages/Home";
 import UpcomingProcedures from "./pages/UpcomingProcedures";
 import MedicalHistory from "./pages/MedicalHistory";
+import DoctorVisitPage from "./pages/DoctorVisitPage";
+
 import "./styles/global.css";
 import { getPet } from "./api/pets";
 
 function App() {
   const [pet, setPet] = useState(null);
-  const [page, setPage] = useState("home"); // home | upcoming | history
 
   const loadPet = async () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -37,20 +40,19 @@ function App() {
     };
   }, []);
 
-  const navigateTo = (targetPage) => {
-    setPage(targetPage);
-  };
-
   return (
     <div className="app-wrapper">
-      <Header petName={pet?.name} onNavigate={navigateTo} />
+      {/* Header теперь сам навигирует через useNavigate */}
+      <Header petName={pet?.name} />
 
       <main>
-        {page === "home" && <Home onNavigate={navigateTo} />}
-        {page === "upcoming" && <UpcomingProcedures />}
-        {page === "history" && <MedicalHistory />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/upcoming" element={<UpcomingProcedures />} />
+          <Route path="/history" element={<MedicalHistory />} />
+          <Route path="/doctor-visit/:eventId" element={<DoctorVisitPage />} />
+        </Routes>
       </main>
-
     </div>
   );
 }

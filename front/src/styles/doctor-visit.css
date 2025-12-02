@@ -1,0 +1,254 @@
+.doctor-visit-page {
+  margin-top: 50px;
+}
+
+/* ---------- ШАПКА ---------- */
+
+.doctor-visit-header {
+  width: 1214px;
+  background: var(--white);
+  border-radius: 20px;
+  padding: 28px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.doctor-visit__title {
+  margin: 0;
+  color: var(--black);
+}
+
+.doctor-visit-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Кнопка "Удалить" — своя, без наследования btn */
+.doctor-visit__btn-delete {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  color: var(--txt);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+
+  transition: color 0.2s ease;
+}
+
+.doctor-visit__btn-delete:hover {
+  color: var(--black);
+}
+
+.doctor-visit__btn-delete:focus,
+.doctor-visit__btn-delete:active {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+/* Убираем контур у кнопок в шапке */
+.doctor-visit-header__actions .btn:focus,
+.doctor-visit-header__actions .btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ---------- ВЕРХНИЕ КАРТОЧКИ ---------- */
+
+.doctor-visit-cards {
+  margin-top: 10px;
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+
+  width: 1214px;
+}
+
+.visit-card {
+  position: relative;
+
+  background: var(--white);
+  border-radius: 20px;
+
+  height: 150px;
+  padding: 27px 28px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+}
+
+.visit-card__label {
+  margin: 0;
+}
+
+.visit-card__value {
+  margin: 0;
+}
+
+/* Ряд для даты и времени */
+.visit-card__value-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.visit-card__divider {
+  width: 1px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--divider);
+}
+
+/* Кнопка-карандаш в карточке */
+.visit-card__edit-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  width: 20px;
+  height: 24px;
+
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  color: var(--txt); /* базовый цвет иконки */
+}
+
+/* сама иконка */
+.edit-icon {
+  width: 20px;
+  height: 24px;
+  display: block;
+}
+
+/* Ховер и активная карточка — цвет var(--black) */
+.visit-card__edit-btn:hover,
+.visit-card__edit-btn.active {
+  color: var(--black);
+}
+
+.visit-card__edit-btn:focus,
+.visit-card__edit-btn:active {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+/* Инпуты/текстовые поля в режиме редактирования */
+.visit-card__input,
+.visit-card__textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font: inherit;
+  color: var(--black);
+  padding: 0;
+  line-height: inherit;
+  box-sizing: border-box;
+}
+
+.visit-card__input--time {
+  max-width: 90px;
+}
+
+.visit-card__textarea {
+  resize: none;
+}
+
+/* ---------- НИЖНИЕ БЛОКИ (Диагноз / Рекомендации / Направления) ---------- */
+
+.doctor-visit-section {
+  margin-top: 90px;
+  width: 1214px;
+}
+
+.doctor-visit-section__title {
+  margin: 0 0 36px 0;
+}
+
+.doctor-visit-section__card {
+  position: relative;
+
+  background: var(--white);
+  border-radius: 20px;
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 28px 306px 28px 28px;
+}
+
+.doctor-visit-section__text {
+  margin: 0;
+  color: var(--txt);
+}
+
+/* Кнопка-карандаш для нижних блоков */
+.doctor-visit-section__edit-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  width: 20px;
+  height: 24px;
+
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  color: var(--txt);
+}
+
+.doctor-visit-section__edit-btn:hover,
+.doctor-visit-section__edit-btn.active {
+  color: var(--black);
+}
+
+.doctor-visit-section__edit-btn:focus,
+.doctor-visit-section__edit-btn:active {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+/* textarea для нижних блоков */
+.doctor-visit-section__textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  font: inherit;
+  color: var(--txt);
+  padding: 0;
+  line-height: inherit;
+  box-sizing: border-box;
+  resize: none;
+}

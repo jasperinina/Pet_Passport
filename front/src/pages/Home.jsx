@@ -1,20 +1,31 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+
 import "../styles/home.css";
 import PetPhoto from "../assets/images/pet-photo.png";
 import { getPet } from "../api/pets";
 import { getUpcomingEvents } from "../api/events";
 import API_BASE_URL from "../api/config";
 import EditPetModal from "../components/EditPetModal";
-import AddProcedureModal from "../components/AddProcedureModal";
+import AddProcedureModal from "../components/AddProcedureModal/AddProcedureModal";
+import ProcedureDetailsModal from "../components/ProcedureDetailsModal";
 import ProcedureCard from "../components/ui/ProcedureCard";
 
-const Home = ({ onNavigate }) => {
+const Home = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const search = location.search || "";
+
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
+  const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] =
+    useState(false);
+
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   // загрузка питомца
   const loadPet = async () => {
@@ -81,7 +92,9 @@ const Home = ({ onNavigate }) => {
       const date = new Date(year, month - 1, day);
 
       const formattedDay = day.toString().padStart(2, "0");
-      const formattedMonth = date.toLocaleString("ru-RU", { month: "long" });
+      const formattedMonth = date.toLocaleString("ru-RU", {
+        month: "long",
+      });
       const formattedYear = year;
 
       const today = new Date();
@@ -209,7 +222,6 @@ const Home = ({ onNavigate }) => {
               <h1 className="h1 pet-block__name">
                 {pet.name || "Не указано"}
               </h1>
-              {/* сюда можно добавить вид животного, если понадобится */}
             </div>
 
             <div className="pet-block__divider" />
@@ -276,7 +288,7 @@ const Home = ({ onNavigate }) => {
             <button
               type="button"
               className="txt2 procedures__link"
-              onClick={() => onNavigate && onNavigate("upcoming")}
+              onClick={() => navigate(`/upcoming${search}`)}
             >
               Посмотреть все
             </button>
@@ -304,7 +316,14 @@ const Home = ({ onNavigate }) => {
                     typeName={getEventTypeName(event.type)}
                     reminderEnabled={event.reminderEnabled}
                     onClick={() => {
-                      console.log("Открыть процедуру", event.id);
+                      if (event.type === "doctor-visit") {
+                        // переход на страницу приёма
+                        navigate(`/doctor-visit/${event.id}${search}`);
+                      } else {
+                        // открываем модальное окно с деталями
+                        setSelectedEvent(event);
+                        setIsDetailsModalOpen(true);
+                      }
                     }}
                   />
                 );
@@ -328,6 +347,13 @@ const Home = ({ onNavigate }) => {
         onClose={() => setIsAddProcedureModalOpen(false)}
         petId={pet?.id}
         onSuccess={handleProcedureAdded}
+      />
+
+      {/* Модалка деталей (вакцинация / обработка) */}
+      <ProcedureDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        event={selectedEvent}
       />
     </main>
   );
