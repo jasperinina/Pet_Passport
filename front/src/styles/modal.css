@@ -14,10 +14,10 @@
   z-index: 1000;
 }
 
-/* БАЗОВАЯ модалка: 806 × 729 */
+/* БАЗОВАЯ модалка: 806 × 769, скролл внутри формы */
 .modal-content {
   width: 806px;
-  height: 729px;
+  height: 500px;
 
   background: var(--white);
   border-radius: 20px;
@@ -25,8 +25,8 @@
   display: flex;
   flex-direction: column;
 
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* важный момент: скролл УБРАЛИ отсюда */
+  overflow: hidden;
 
   box-shadow: none;
   padding: 0;
@@ -78,9 +78,13 @@
   cursor: default;
 }
 
-/* Тело модалки (форма) */
+/* Тело модалки (форма) — здесь теперь скролл */
 .modal-form {
+  flex: 1;
   padding: 28px 40px 40px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Ошибка */
@@ -166,16 +170,16 @@
   min-width: 120px;
 }
 
-/* Скролл внутри модалки */
-.modal-content::-webkit-scrollbar {
+/* Скролл внутри модалки (на форме) */
+.modal-form::-webkit-scrollbar {
   width: 4px;
 }
 
-.modal-content::-webkit-scrollbar-track {
+.modal-form::-webkit-scrollbar-track {
   background: var(--grey);
 }
 
-.modal-content::-webkit-scrollbar-thumb {
+.modal-form::-webkit-scrollbar-thumb {
   background: var(--divider);
   border-radius: 2px;
 }
@@ -185,4 +189,22 @@
 .modal-content *:focus {
   outline: none;
   box-shadow: none;
+}
+
+/* ЖЁСТКАЯ фиксация размеров модалок */
+.modal-overlay > .modal-content {
+  width: 806px !important;
+  height: 769px !important;
+  max-height: 769px !important;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Скролл именно внутри формы */
+.modal-overlay > .modal-content .modal-form {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

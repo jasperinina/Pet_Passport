@@ -1,7 +1,8 @@
-/* Широкая модалка для процедур: 806 × 948 */
+/* Широкая модалка для процедур: те же 806 × 769, скролл внутри формы */
 .modal-content--wide {
   width: 806px;
-  height: 948px;
+  height: 769px;
+  max-height: 769px;
 
   background: var(--white);
   border-radius: 20px;
@@ -9,8 +10,8 @@
   display: flex;
   flex-direction: column;
 
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* скролл убираем отсюда — он будет на .modal-form */
+  overflow: hidden;
 
   box-shadow: none;
   padding: 0;
@@ -169,16 +170,40 @@
   cursor: not-allowed;
 }
 
-/* Скролл внутри широкой модалки */
-.modal-content--wide::-webkit-scrollbar {
+/* Скролл внутри широкой модалки — на форме */
+.modal-content--wide .modal-form {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.modal-content--wide .modal-form::-webkit-scrollbar {
   width: 4px;
 }
 
-.modal-content--wide::-webkit-scrollbar-track {
+.modal-content--wide .modal-form::-webkit-scrollbar-track {
   background: var(--grey);
 }
 
-.modal-content--wide::-webkit-scrollbar-thumb {
+.modal-content--wide .modal-form::-webkit-scrollbar-thumb {
   background: var(--divider);
   border-radius: 2px;
+}
+
+/* ЖЁСТКАЯ фиксация размеров широкой модалки (на всякий случай) */
+.modal-overlay > .modal-content--wide {
+  width: 806px !important;
+  height: 769px !important;
+  max-height: 769px !important;
+
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Скролл внутри широкой модалки */
+.modal-overlay > .modal-content--wide .modal-form {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
