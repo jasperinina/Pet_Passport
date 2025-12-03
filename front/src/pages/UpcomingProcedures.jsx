@@ -4,6 +4,8 @@ import "../styles/upcoming-procedures.css";
 import { getUpcomingEvents } from "../api/events";
 import ProcedureCard from "../components/ui/ProcedureCard";
 import AddProcedureModal from "../components/AddProcedureModal/AddProcedureModal";
+import { formatEventDateTime } from "../utils/dateUtils";
+import { getEventTypeName, getEventPath } from "../utils/eventUtils";
 
 const UpcomingProcedures = () => {
   const navigate = useNavigate();
@@ -16,44 +18,6 @@ const UpcomingProcedures = () => {
   const [loading, setLoading] = useState(true);
   const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
 
-  // Форматирование даты/времени процедуры
-  const formatEventDateTime = (dateString) => {
-    if (!dateString) return { date: "", time: "", fullDate: "" };
-
-    try {
-      const date = new Date(dateString);
-      const day = date.getDate();
-      const month = date.toLocaleString("ru-RU", { month: "long" });
-      const year = date.getFullYear();
-      const time = date.toLocaleTimeString("ru-RU", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      return {
-        date: `${day} ${month}`,
-        time,
-        fullDate: `${day} ${month} ${year}`,
-      };
-    } catch {
-      return { date: "", time: "", fullDate: "" };
-    }
-  };
-
-  const getEventTypeName = (type) => {
-    switch (type) {
-      case "doctor-visit":
-        return "Прием";
-      case "vaccine":
-        return "Вакцинация";
-      case "treatment":
-        return "Обработка";
-      default:
-        return "Процедура";
-    }
-  };
-
-  // Загрузка предстоящих процедур
   useEffect(() => {
     if (petId) {
       setLoading(true);
@@ -62,7 +26,6 @@ const UpcomingProcedures = () => {
           setProcedures(events);
         })
         .catch((err) => {
-          console.error("Ошибка загрузки процедур:", err);
           setProcedures([]);
         })
         .finally(() => {
@@ -71,7 +34,6 @@ const UpcomingProcedures = () => {
     }
   }, [petId]);
 
-  // После добавления процедуры перезагружаем список
   const handleProcedureAdded = () => {
     if (petId) {
       getUpcomingEvents(parseInt(petId, 10))
@@ -87,10 +49,8 @@ const UpcomingProcedures = () => {
   return (
     <main className="main-page upcoming-procedures-page">
       <div className="container">
-        {/* Шапка страницы */}
         <section className="upcoming-header">
           <h1 className="h1 upcoming-header__title">Предстоящие процедуры</h1>
-
           <button
             type="button"
             className="btn btn-primary upcoming-header__button"
@@ -100,7 +60,6 @@ const UpcomingProcedures = () => {
           </button>
         </section>
 
-        {/* Список процедур */}
         {loading ? (
           <div style={{ textAlign: "center", padding: "50px" }}>
             <p className="txt1">Загрузка процедур...</p>
@@ -127,12 +86,9 @@ const UpcomingProcedures = () => {
                   typeName={getEventTypeName(event.type)}
                   reminderEnabled={event.reminderEnabled}
                   onClick={() => {
-                    if (event.type === "doctor-visit") {
-                      navigate(`/doctor-visit/${event.id}${search}`);
-                    } else if (event.type === "vaccine") {
-                      navigate(`/vaccine/${event.id}${search}`);
-                    } else if (event.type === "treatment") {
-                      navigate(`/treatment/${event.id}${search}`);
+                    const eventPath = getEventPath(event.type, event.id, search);
+                    if (eventPath) {
+                      navigate(eventPath);
                     }
                   }}
                 />
@@ -142,7 +98,6 @@ const UpcomingProcedures = () => {
         )}
       </div>
 
-      {/* Модалка добавления процедуры */}
       <AddProcedureModal
         isOpen={isAddProcedureModalOpen}
         onClose={() => setIsAddProcedureModalOpen(false)}

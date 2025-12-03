@@ -1,36 +1,19 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "../styles/doctor-visit.css";
 import "../styles/procedure-modal.css";
 import { getVaccine, updateVaccine, deleteVaccine } from "../api/events";
-
-const PERIOD_UNITS = {
-  MINUTE: 0,
-  HOUR: 1,
-  DAY: 2,
-  WEEK: 3,
-  MONTH: 4,
-  YEAR: 5,
-};
-
-const PERIOD_OPTIONS = [
-  { value: PERIOD_UNITS.DAY, label: "Раз в день" },
-  { value: PERIOD_UNITS.WEEK, label: "Раз в неделю" },
-  { value: PERIOD_UNITS.MONTH, label: "Раз в месяц" },
-  { value: PERIOD_UNITS.YEAR, label: "Раз в год" },
-];
-
-const REMINDER_OPTIONS = [
-  { value: 5, unit: PERIOD_UNITS.MINUTE, label: "5 минут" },
-  { value: 1, unit: PERIOD_UNITS.HOUR, label: "1 час" },
-  { value: 1, unit: PERIOD_UNITS.DAY, label: "1 день" },
-];
+import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../constants/eventConstants";
+import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
+import EventPageHeader from "../components/events/EventPageHeader";
+import EventCard from "../components/events/EventCard";
+import ReminderSection from "../components/events/ReminderSection";
+import LoadingState from "../components/events/LoadingState";
+import ErrorState from "../components/events/ErrorState";
 
 const VaccinePage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const search = location.search || "";
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -45,7 +28,6 @@ const VaccinePage = () => {
     periodUnit: PERIOD_UNITS.MONTH,
   });
 
-  // Напоминания
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderValue, setReminderValue] = useState(5);
   const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
@@ -65,25 +47,19 @@ const VaccinePage = () => {
         setVaccineTitle(vaccine.title || "Вакцинация");
         setEventDateRaw(vaccine.eventDate);
 
-        const dateObj = new Date(vaccine.eventDate);
-        const date = dateObj.toLocaleDateString("ru-RU", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-        });
-        const time = dateObj.toLocaleTimeString("ru-RU", {
-          hour: "2-digit",
-          minute: "2-digit",
-        });
+        const { date, time } = formatEventDateTime(vaccine.eventDate);
+        const dateInput = formatDateForInput(vaccine.eventDate);
+        const timeInput = formatTimeForInput(vaccine.eventDate);
 
         setCardsData({
           date,
           time,
+          dateInput,
+          timeInput,
           medicine: vaccine.medicine || "",
           periodUnit: vaccine.periodUnit ?? PERIOD_UNITS.MONTH,
         });
 
-        // Напоминания
         setReminderEnabled(vaccine.reminderEnabled || false);
         setReminderValue(vaccine.reminderValue ?? 5);
         setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.MINUTE);
@@ -120,6 +96,15 @@ const VaccinePage = () => {
         reminderValue: reminderEnabled ? reminderValue : 0,
         reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
       });
+      
+      // Обновляем отображаемые дату и время после сохранения
+      const { date, time } = formatEventDateTime(eventDateRaw);
+      setCardsData((prev) => ({
+        ...prev,
+        date,
+        time,
+      }));
+      
       setIsEditing(false);
     } catch (err) {
       console.error("Ошибка сохранения вакцинации:", err);
@@ -130,10 +115,24 @@ const VaccinePage = () => {
   };
 
   const handleCardFieldChange = (field, value) => {
-    setCardsData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setCardsData((prev) => {
+      const updated = {
+        ...prev,
+        [field]: value,
+      };
+      
+      // Если изменяется дата или время, обновляем eventDateRaw
+      if (field === "dateInput" || field === "timeInput") {
+        const dateInput = field === "dateInput" ? value : prev.dateInput;
+        const timeInput = field === "timeInput" ? value : prev.timeInput;
+        const newEventDate = combineDateTimeToISO(dateInput, timeInput);
+        if (newEventDate) {
+          setEventDateRaw(newEventDate);
+        }
+      }
+      
+      return updated;
+    });
   };
 
   const handleDelete = async () => {
@@ -151,265 +150,81 @@ const VaccinePage = () => {
   };
 
   if (loading && !cardsData.date) {
-    return (
-      <main className="main-page doctor-visit-page">
-        <div className="container">
-          <p
-            className="txt1"
-            style={{ padding: "40px", textAlign: "center" }}
-          >
-            Загрузка данных о вакцинации...
-          </p>
-        </div>
-      </main>
-    );
+    return <LoadingState message="Загрузка данных о вакцинации..." />;
   }
 
   if (error) {
-    return (
-      <main className="main-page doctor-visit-page">
-        <div className="container">
-          <p
-            className="txt1"
-            style={{
-              padding: "40px",
-              textAlign: "center",
-              color: "var(--error, #d32f2f)",
-            }}
-          >
-            {error}
-          </p>
-        </div>
-      </main>
-    );
+    return <ErrorState error={error} />;
   }
 
   return (
     <main className="main-page doctor-visit-page">
       <div className="container">
-        {/* ---------- Шапка ---------- */}
-        <section className="doctor-visit-header">
-          {isEditing ? (
-            <input
-              className="h1 doctor-visit__title"
-              value={vaccineTitle}
-              onChange={(e) => setVaccineTitle(e.target.value)}
-              style={{
-                border: "none",
-                outline: "none",
-                background: "transparent",
-                font: "inherit",
-                color: "var(--black)",
-                padding: 0,
-                width: "100%",
-                maxWidth: "600px",
-              }}
-            />
-          ) : (
-            <h1 className="h1 doctor-visit__title">
-              {vaccineTitle || "Вакцинация"} {eventId ? `#${eventId}` : ""}
-            </h1>
-          )}
+        <EventPageHeader
+          title={vaccineTitle}
+          eventId={eventId}
+          isEditing={isEditing}
+          onEdit={handleEditClick}
+          onSave={handleSaveClick}
+          onDelete={handleDelete}
+          onTitleChange={setVaccineTitle}
+          loading={loading}
+        />
 
-          <div className="doctor-visit-header__actions">
-            {isEditing ? (
-              <>
-                <button className="btn btn-primary" onClick={handleSaveClick}>
-                  Сохранить
-                </button>
-
-                <button
-                  className="doctor-visit__btn-delete"
-                  type="button"
-                  onClick={handleDelete}
-                >
-                  Удалить
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  className="btn btn-primary"
-                  onClick={handleEditClick}
-                >
-                  Редактировать
-                </button>
-
-                <button className="btn btn-secondary" onClick={() => navigate(-1)}>
-                  Назад
-                </button>
-
-                <button
-                  className="doctor-visit__btn-delete"
-                  type="button"
-                  onClick={handleDelete}
-                >
-                  Удалить
-                </button>
-              </>
-            )}
-          </div>
-        </section>
-
-        {/* ---------- Верхние карточки ---------- */}
+        {/* Верхние карточки */}
         <section className="doctor-visit-cards">
-          {/* Дата и время */}
-          <div className="visit-card">
-            <span className="txt2 visit-card__label">Дата и время</span>
+          <EventCard
+            label="Дата и время"
+            value={{
+              displayDate: cardsData.date,
+              displayTime: cardsData.time,
+              dateInput: cardsData.dateInput,
+              timeInput: cardsData.timeInput,
+            }}
+            isEditing={isEditing}
+            onChange={(value) => {
+              if (value.dateInput) {
+                handleCardFieldChange("dateInput", value.dateInput);
+              }
+              if (value.timeInput) {
+                handleCardFieldChange("timeInput", value.timeInput);
+              }
+            }}
+            type="datetime"
+          />
 
-            <div className="visit-card__value-row">
-              {isEditing ? (
-                <>
-                  <input
-                    className="h2 visit-card__value visit-card__input"
-                    value={cardsData.date}
-                    onChange={(e) =>
-                      handleCardFieldChange("date", e.target.value)
-                    }
-                  />
-                  <span className="visit-card__divider"></span>
-                  <input
-                    className="h2 visit-card__value visit-card__input visit-card__input--time"
-                    value={cardsData.time}
-                    onChange={(e) =>
-                      handleCardFieldChange("time", e.target.value)
-                    }
-                  />
-                </>
-              ) : (
-                <>
-                  <span className="h2 visit-card__value">
-                    {cardsData.date}
-                  </span>
-                  <span className="visit-card__divider"></span>
-                  <span className="h2 visit-card__value">
-                    {cardsData.time}
-                  </span>
-                </>
-              )}
-            </div>
-          </div>
+          <EventCard
+            label="Препарат"
+            value={cardsData.medicine}
+            isEditing={isEditing}
+            onChange={(value) => handleCardFieldChange("medicine", value)}
+          />
 
-          {/* Препарат */}
-          <div className="visit-card">
-            <span className="txt2 visit-card__label">Препарат</span>
-
-            {isEditing ? (
-              <input
-                className="h2 visit-card__value visit-card__input"
-                value={cardsData.medicine}
-                onChange={(e) =>
-                  handleCardFieldChange("medicine", e.target.value)
-                }
-              />
-            ) : (
-              <span className="h2 visit-card__value">
-                {cardsData.medicine}
-              </span>
-            )}
-          </div>
-
-          {/* Периодичность */}
-          <div className="visit-card">
-            <span className="txt2 visit-card__label">Периодичность</span>
-
-            {isEditing ? (
-              <select
-                className="h2 visit-card__value visit-card__input"
-                value={cardsData.periodUnit}
-                onChange={(e) =>
-                  handleCardFieldChange("periodUnit", parseInt(e.target.value, 10))
-                }
-                style={{
-                  border: "none",
-                  outline: "none",
-                  background: "transparent",
-                  font: "inherit",
-                  color: "var(--black)",
-                }}
-              >
-                {PERIOD_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <span className="h2 visit-card__value">
-                {PERIOD_OPTIONS.find((opt) => opt.value === cardsData.periodUnit)?.label || "Раз в месяц"}
-              </span>
-            )}
-          </div>
+          <EventCard
+            label="Периодичность"
+            value={cardsData.periodUnit}
+            isEditing={isEditing}
+            onChange={(value) => handleCardFieldChange("periodUnit", value)}
+            type="select"
+            options={PERIOD_OPTIONS}
+          />
         </section>
 
-        {/* ---------- Напоминания ---------- */}
-        <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Напоминание в Telegram</h2>
-          <div className="doctor-visit-section__card">
-            {isEditing ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
-                <div className="form-toggle-group">
-                  <label className="txt2" style={{ margin: 0 }}>
-                    Включить напоминание
-                  </label>
-                  <label className="form-toggle">
-                    <input
-                      type="checkbox"
-                      checked={reminderEnabled}
-                      onChange={(e) => setReminderEnabled(e.target.checked)}
-                    />
-                    <span className="form-toggle-slider"></span>
-                  </label>
-                </div>
-
-                {reminderEnabled && (
-                  <div>
-                    <label className="txt2" style={{ display: "block", marginBottom: "12px" }}>
-                      Напоминать за
-                    </label>
-                    <div className="form-button-group">
-                      {REMINDER_OPTIONS.map((option) => (
-                        <button
-                          key={`${option.value}-${option.unit}`}
-                          type="button"
-                          className={`form-button-option ${
-                            reminderValue === option.value && reminderUnit === option.unit
-                              ? "form-button-option--active"
-                              : ""
-                          }`}
-                          onClick={() => {
-                            setReminderValue(option.value);
-                            setReminderUnit(option.unit);
-                          }}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                <p className="txt1 doctor-visit-section__text">
-                  Напоминание: {reminderEnabled ? "Включено" : "Выключено"}
-                </p>
-                {reminderEnabled && (
-                  <p className="txt1 doctor-visit-section__text">
-                    Напоминать за:{" "}
-                    {REMINDER_OPTIONS.find(
-                      (opt) => opt.value === reminderValue && opt.unit === reminderUnit
-                    )?.label || "5 минут"}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
+        {/* Напоминания */}
+        <ReminderSection
+          reminderEnabled={reminderEnabled}
+          reminderValue={reminderValue}
+          reminderUnit={reminderUnit}
+          isEditing={isEditing}
+          onToggle={setReminderEnabled}
+          onOptionClick={(value, unit) => {
+            setReminderValue(value);
+            setReminderUnit(unit);
+          }}
+        />
       </div>
     </main>
   );
 };
 
 export default VaccinePage;
-

@@ -2,14 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import "../styles/home.css";
-import PetPhoto from "../assets/images/pet-photo.png";
 import { getPet } from "../api/pets";
 import { getUpcomingEvents } from "../api/events";
-import API_BASE_URL from "../api/config";
 import EditPetModal from "../components/EditPetModal";
 import AddProcedureModal from "../components/AddProcedureModal/AddProcedureModal";
 import ProcedureDetailsModal from "../components/ProcedureDetailsModal";
 import ProcedureCard from "../components/ui/ProcedureCard";
+import { formatEventDateTime } from "../utils/dateUtils";
+import { getEventTypeName, getEventPath } from "../utils/eventUtils";
+import PetPhotosGrid from "../components/ui/PetPhotosGrid";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -21,16 +22,17 @@ const Home = () => {
   const [error, setError] = useState(null);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] =
-    useState(false);
-
+  const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-  // загрузка питомца
+  const getPetIdFromUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("id") || params.get("Id");
+  };
+
   const loadPet = async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const petId = urlParams.get("id") || urlParams.get("Id");
+    const petId = getPetIdFromUrl();
 
     if (!petId) {
       setError("ID питомца не указан в URL");
@@ -45,24 +47,19 @@ const Home = () => {
       setPet(petData);
     } catch (err) {
       setError(err.message || "Ошибка загрузки данных о питомце");
-      console.error("Ошибка загрузки питомца:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // загрузка ближайших процедур (3 шт.)
   const loadUpcomingEvents = async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const petId = urlParams.get("id") || urlParams.get("Id");
-
+    const petId = getPetIdFromUrl();
     if (!petId) return;
 
     try {
       const events = await getUpcomingEvents(parseInt(petId, 10));
       setUpcomingEvents(events.slice(0, 3));
     } catch (err) {
-      console.error("Ошибка загрузки процедур:", err);
       setUpcomingEvents([]);
     }
   };
@@ -72,12 +69,8 @@ const Home = () => {
     loadUpcomingEvents();
   }, []);
 
-  // после добавления процедуры перезагружаем список
-  const handleProcedureAdded = () => {
-    loadUpcomingEvents();
-  };
+  const handleProcedureAdded = () => loadUpcomingEvents();
 
-  // после изменения данных питомца перезагружаем + дергаем header
   const handleUpdateSuccess = () => {
     loadPet();
     window.dispatchEvent(new CustomEvent("petUpdated"));
@@ -124,50 +117,6 @@ const Home = () => {
     return "лет";
   };
 
-  // Получение URL фото (только для реальных фото, не заглушка)
-  const getPhotoUrl = (photoUrl) => {
-    if (!photoUrl) return null;
-    if (photoUrl.startsWith("http")) return photoUrl;
-    return `${API_BASE_URL}${photoUrl}`;
-  };
-
-  // формат даты/времени процедуры
-  const formatEventDateTime = (dateString) => {
-    if (!dateString) return { date: "", time: "", fullDate: "" };
-
-    try {
-      const date = new Date(dateString);
-      const day = date.getDate();
-      const month = date.toLocaleString("ru-RU", { month: "long" });
-      const year = date.getFullYear();
-      const time = date.toLocaleTimeString("ru-RU", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-
-      return {
-        date: `${day} ${month}`,
-        time,
-        fullDate: `${day} ${month} ${year}`,
-      };
-    } catch {
-      return { date: "", time: "", fullDate: "" };
-    }
-  };
-
-  const getEventTypeName = (type) => {
-    switch (type) {
-      case "doctor-visit":
-        return "Прием";
-      case "vaccine":
-        return "Вакцинация";
-      case "treatment":
-        return "Обработка";
-      default:
-        return "Процедура";
-    }
-  };
-
   const hasProcedures = upcomingEvents.length > 0;
 
   // состояния загрузки / ошибки
@@ -207,60 +156,7 @@ const Home = () => {
         {/* Блок питомца */}
         <section className="pet-block">
           <div className="pet-block__photo-wrapper">
-            {(() => {
-              // Проверяем наличие реальных фото с URL
-              const validPhotos = pet?.photos && Array.isArray(pet.photos) 
-                ? pet.photos.filter(photo => {
-                    const url = photo?.url;
-                    return url && typeof url === 'string' && url.trim() !== '';
-                  })
-                : [];
-              
-              // Если нет валидных фото, показываем заглушку
-              if (validPhotos.length === 0) {
-                return (
-                  <img
-                    src={PetPhoto}
-                    alt={pet.name}
-                    className="pet-block__photo"
-                  />
-                );
-              }
-              
-              // Есть валидные фото - показываем их
-              return (
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: validPhotos.length === 1 ? "1fr" : "repeat(2, 1fr)",
-                  gap: "10px",
-                  width: "100%",
-                  height: "100%",
-                }}>
-                  {validPhotos.map((photo, index) => {
-                    const photoUrl = getPhotoUrl(photo.url);
-                    if (!photoUrl) return null;
-                    
-                    return (
-                      <img
-                        key={photo.id || index}
-                        src={photoUrl}
-                        alt={`${pet.name} - фото ${index + 1}`}
-                        style={{
-                          width: "100%",
-                          height: validPhotos.length === 1 ? "367px" : "178px",
-                          objectFit: "cover",
-                          borderRadius: "20px",
-                        }}
-                        onError={(e) => {
-                          // Если фото не загрузилось, показываем заглушку
-                          e.target.src = PetPhoto;
-                        }}
-                      />
-                    );
-                  })}
-                </div>
-              );
-            })()}
+            <PetPhotosGrid photos={pet.photos} petName={pet.name} />
           </div>
 
           <div className="pet-block__info">
@@ -353,12 +249,9 @@ const Home = () => {
                     typeName={getEventTypeName(event.type)}
                     reminderEnabled={event.reminderEnabled}
                     onClick={() => {
-                      if (event.type === "doctor-visit") {
-                        navigate(`/doctor-visit/${event.id}${search}`);
-                      } else if (event.type === "vaccine") {
-                        navigate(`/vaccine/${event.id}${search}`);
-                      } else if (event.type === "treatment") {
-                        navigate(`/treatment/${event.id}${search}`);
+                      const eventPath = getEventPath(event.type, event.id, search);
+                      if (eventPath) {
+                        navigate(eventPath);
                       }
                     }}
                   />

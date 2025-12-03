@@ -27,7 +27,6 @@ const ProcedureCard = ({
     <div className="procedure-card" onClick={onClick}>
       <div className="procedure-card__left">
         <div className="procedure-card__top">
-          {/* Иконка уведомления всегда есть, меняется только svg */}
           <img
             src={bellIcon}
             alt={bellAlt}
@@ -35,7 +34,6 @@ const ProcedureCard = ({
           />
 
           <div className="procedure-card__meta">
-            {/* тег даты/времени */}
             <div className="procedure-card__pill procedure-card__pill--datetime">
               <img
                 src={DateIcon}
@@ -61,7 +59,6 @@ const ProcedureCard = ({
               )}
             </div>
 
-            {/* тег типа */}
             <div className="procedure-card__pill procedure-card__pill--type">
               <span className="txt2 procedure-card__type">
                 {typeName}
@@ -75,7 +72,6 @@ const ProcedureCard = ({
         </h3>
       </div>
 
-      {/* кнопка справа */}
       <button
         type="button"
         className="btn btn-secondary procedure-card__button"
@@ -92,6 +88,5 @@ const ProcedureCard = ({
     </div>
   );
 };
-
 
 export default ProcedureCard;

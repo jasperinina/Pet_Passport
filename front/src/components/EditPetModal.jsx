@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "../styles/modal.css";
 import { updatePet, uploadPetPhoto, deletePetPhoto } from "../api/pets";
 import API_BASE_URL from "../api/config";
+import { FILE_UPLOAD, ERROR_MESSAGES } from "../constants/config";
 
 const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -17,69 +18,60 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   const [petPhotos, setPetPhotos] = useState([]);
   const fileInputRef = useRef(null);
 
-  // Заполняем форму данными питомца при открытии
   useEffect(() => {
-    if (isOpen && pet) {
-      setFormData({
-        name: pet.name || "",
-        breed: pet.breed || "",
-        weightKg: pet.weightKg || "",
-        birthDate: pet.birthDate || "",
-      });
-      setPetPhotos(pet.photos || []);
-      setSelectedFile(null);
-      setError(null);
-    }
+    if (!isOpen || !pet) return;
+
+    setFormData({
+      name: pet.name || "",
+      breed: pet.breed || "",
+      weightKg: pet.weightKg || "",
+      birthDate: pet.birthDate || "",
+    });
+    setPetPhotos(pet.photos || []);
+    setSelectedFile(null);
+    setError(null);
   }, [isOpen, pet]);
 
-  // Блокируем прокрутку body, пока модалка открыта
   useEffect(() => {
-    if (isOpen) {
-      const prevOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
+    if (!isOpen) return;
 
-      return () => {
-        document.body.style.overflow = prevOverflow;
-      };
-    }
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
   }, [isOpen]);
 
-  // Обработка закрытия модального окна
   const handleClose = () => {
-    if (!loading) {
-      onClose();
-    }
+    if (!loading) onClose();
   };
 
-  // Обработка изменения полей формы
   const handleChange = (e) => {
-    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      [e.target.name]: e.target.value,
     }));
   };
 
-  // Обработка выбора файла
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Проверяем тип файла
-      if (!file.type.startsWith("image/")) {
-        setError("Выберите файл изображения");
-        return;
-      }
-      // Проверяем размер файла (например, максимум 10 МБ)
-      if (file.size > 10 * 1024 * 1024) {
-        setError("Размер файла не должен превышать 10 МБ");
-        return;
-      }
-      setSelectedFile(file);
-      setError(null);
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError(ERROR_MESSAGES.INVALID_FILE_TYPE);
+      return;
     }
+    
+    if (file.size > FILE_UPLOAD.MAX_SIZE) {
+      setError(ERROR_MESSAGES.FILE_TOO_LARGE);
+      return;
+    }
+    
+    setSelectedFile(file);
+    setError(null);
   };
 
-  // Обработка загрузки фото
   const handlePhotoUpload = async () => {
     if (!selectedFile || !pet?.id) {
       setError("Файл не выбран или питомец не найден");
@@ -90,19 +82,8 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
       setUploadingPhoto(true);
       setError(null);
 
-      console.log("Начинаем загрузку фото:", {
-        petId: pet.id,
-        fileName: selectedFile.name,
-        fileSize: selectedFile.size,
-        fileType: selectedFile.type,
-      });
-
       const result = await uploadPetPhoto(pet.id, selectedFile);
       
-      console.log("Результат загрузки:", result);
-
-      // Обновляем список фото
-      // Проверяем структуру ответа - может быть result.photoUrl или result.url
       const photoUrl = result.photoUrl || result.url;
       const photoId = result.id || result.photoId;
       
@@ -110,53 +91,32 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
         throw new Error("Неверный формат ответа от сервера");
       }
 
-      const newPhoto = {
-        id: photoId,
-        url: photoUrl,
-      };
-      
-      setPetPhotos((prev) => [...prev, newPhoto]);
+      setPetPhotos((prev) => [...prev, { id: photoId, url: photoUrl }]);
       setSelectedFile(null);
       
-      // Очищаем input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
 
-      // Обновляем данные питомца
       if (onSuccess) {
         onSuccess();
       }
     } catch (err) {
       const errorMessage = err.message || "Ошибка загрузки фотографии";
       setError(errorMessage);
-      console.error("Ошибка загрузки фото:", err);
-      alert(errorMessage); // Временно показываем alert для отладки
+      alert(errorMessage);
     } finally {
       setUploadingPhoto(false);
     }
   };
 
-  // Получение URL фото
   const getPhotoUrl = (photoUrl) => {
     if (!photoUrl) return null;
-    if (photoUrl.startsWith("http")) return photoUrl;
-    return `${API_BASE_URL}${photoUrl}`;
+    return photoUrl.startsWith("http") ? photoUrl : `${API_BASE_URL}${photoUrl}`;
   };
 
-  // Обработка удаления фото
   const handleDeletePhoto = async (photoId) => {
-    if (!pet?.id) {
-      setError("ID питомца не найден");
-      return;
-    }
-
-    console.log("Попытка удаления фото:", {
-      petId: pet.id,
-      photoId,
-      photoIdType: typeof photoId,
-      allPhotos: petPhotos,
-    });
+    if (!pet?.id) return;
 
     const confirmed = window.confirm("Точно удалить эту фотографию?");
     if (!confirmed) return;
@@ -165,7 +125,6 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
       setLoading(true);
       setError(null);
 
-      // Убеждаемся, что photoId - это число
       const numericPhotoId = typeof photoId === 'string' ? parseInt(photoId, 10) : photoId;
       
       if (isNaN(numericPhotoId)) {

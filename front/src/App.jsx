@@ -16,8 +16,8 @@ function App() {
   const [pet, setPet] = useState(null);
 
   const loadPet = async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const petId = urlParams.get("id") || urlParams.get("Id");
+    const params = new URLSearchParams(window.location.search);
+    const petId = params.get("id") || params.get("Id");
 
     if (!petId) return;
 
@@ -25,7 +25,7 @@ function App() {
       const petData = await getPet(parseInt(petId, 10));
       setPet(petData);
     } catch (err) {
-      console.error("Ошибка загрузки питомца для Header:", err);
+      console.error("Ошибка загрузки питомца:", err);
     }
   };
 
