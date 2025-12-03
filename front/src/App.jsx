@@ -6,6 +6,8 @@ import Home from "./pages/Home";
 import UpcomingProcedures from "./pages/UpcomingProcedures";
 import MedicalHistory from "./pages/MedicalHistory";
 import DoctorVisitPage from "./pages/DoctorVisitPage";
+import VaccinePage from "./pages/VaccinePage";
+import TreatmentPage from "./pages/TreatmentPage";
 
 import "./styles/global.css";
 import { getPet } from "./api/pets";
@@ -51,6 +53,8 @@ function App() {
           <Route path="/upcoming" element={<UpcomingProcedures />} />
           <Route path="/history" element={<MedicalHistory />} />
           <Route path="/doctor-visit/:eventId" element={<DoctorVisitPage />} />
+          <Route path="/vaccine/:eventId" element={<VaccinePage />} />
+          <Route path="/treatment/:eventId" element={<TreatmentPage />} />
         </Routes>
       </main>
     </div>

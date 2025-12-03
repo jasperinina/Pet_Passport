@@ -1,12 +1,8 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "../styles/doctor-visit.css";
 import "../styles/procedure-modal.css";
-import {
-  getDoctorVisit,
-  updateDoctorVisit,
-  deleteDoctorVisit,
-} from "../api/events";
+import { getVaccine, updateVaccine, deleteVaccine } from "../api/events";
 
 const PERIOD_UNITS = {
   MINUTE: 0,
@@ -17,37 +13,36 @@ const PERIOD_UNITS = {
   YEAR: 5,
 };
 
+const PERIOD_OPTIONS = [
+  { value: PERIOD_UNITS.DAY, label: "Раз в день" },
+  { value: PERIOD_UNITS.WEEK, label: "Раз в неделю" },
+  { value: PERIOD_UNITS.MONTH, label: "Раз в месяц" },
+  { value: PERIOD_UNITS.YEAR, label: "Раз в год" },
+];
+
 const REMINDER_OPTIONS = [
   { value: 5, unit: PERIOD_UNITS.MINUTE, label: "5 минут" },
   { value: 1, unit: PERIOD_UNITS.HOUR, label: "1 час" },
   { value: 1, unit: PERIOD_UNITS.DAY, label: "1 день" },
 ];
 
-const DoctorVisitPage = () => {
+const VaccinePage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const search = location.search || "";
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Заголовок приёма (Title в DTO) — обязателен на бэкенде
-  const [visitTitle, setVisitTitle] = useState("");
-  // Исходная дата/время приёма (нужна, чтобы не сломать EventDate при update)
+  const [vaccineTitle, setVaccineTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
 
-  // Данные верхних карточек
   const [cardsData, setCardsData] = useState({
     date: "",
     time: "",
-    clinic: "",
-    doctor: "",
-  });
-
-  // Данные нижних блоков
-  const [visitData, setVisitData] = useState({
-    diagnosis: "",
-    recommendations: "",
-    directions: "",
+    medicine: "",
+    periodUnit: PERIOD_UNITS.MONTH,
   });
 
   // Напоминания
@@ -55,23 +50,22 @@ const DoctorVisitPage = () => {
   const [reminderValue, setReminderValue] = useState(5);
   const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
 
-  // Режим редактирования
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const loadVisit = async () => {
+    const loadVaccine = async () => {
       if (!eventId) return;
 
       try {
         setLoading(true);
         setError(null);
 
-        const visit = await getDoctorVisit(parseInt(eventId, 10));
+        const vaccine = await getVaccine(parseInt(eventId, 10));
 
-        setVisitTitle(visit.title || "Прием");
-        setEventDateRaw(visit.eventDate); // сохраняем оригинальный EventDate
+        setVaccineTitle(vaccine.title || "Вакцинация");
+        setEventDateRaw(vaccine.eventDate);
 
-        const dateObj = new Date(visit.eventDate);
+        const dateObj = new Date(vaccine.eventDate);
         const date = dateObj.toLocaleDateString("ru-RU", {
           day: "numeric",
           month: "long",
@@ -85,32 +79,26 @@ const DoctorVisitPage = () => {
         setCardsData({
           date,
           time,
-          clinic: visit.clinic || "",
-          doctor: visit.doctor || "",
-        });
-
-        setVisitData({
-          diagnosis: visit.diagnosis || "",
-          recommendations: visit.recommendations || "",
-          directions: visit.referrals || "",
+          medicine: vaccine.medicine || "",
+          periodUnit: vaccine.periodUnit ?? PERIOD_UNITS.MONTH,
         });
 
         // Напоминания
-        setReminderEnabled(visit.reminderEnabled || false);
-        setReminderValue(visit.reminderValue ?? 5);
-        setReminderUnit(visit.reminderUnit ?? PERIOD_UNITS.MINUTE);
+        setReminderEnabled(vaccine.reminderEnabled || false);
+        setReminderValue(vaccine.reminderValue ?? 5);
+        setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.MINUTE);
       } catch (err) {
-        console.error("Ошибка загрузки приема:", err);
+        console.error("Ошибка загрузки вакцинации:", err);
         setError(
           err.message ||
-            "Не удалось загрузить данные о приеме. Попробуйте позже."
+            "Не удалось загрузить данные о вакцинации. Попробуйте позже."
         );
       } finally {
         setLoading(false);
       }
     };
 
-    loadVisit();
+    loadVaccine();
   }, [eventId]);
 
   const handleEditClick = () => {
@@ -123,24 +111,18 @@ const DoctorVisitPage = () => {
     try {
       setLoading(true);
 
-      // Бэкенд требует обязательное поле Title (и фактически EventDate),
-      // поэтому всегда отправляем актуальное значение заголовка и исходную дату приёма.
-      // Также сохраняем изменённые поля клиники / врача / текстовых блоков и напоминаний.
-      await updateDoctorVisit(parseInt(eventId, 10), {
-        title: visitTitle || "Прием",
+      await updateVaccine(parseInt(eventId, 10), {
+        title: vaccineTitle || "Вакцинация",
         eventDate: eventDateRaw,
-        clinic: cardsData.clinic,
-        doctor: cardsData.doctor,
-        diagnosis: visitData.diagnosis,
-        recommendations: visitData.recommendations,
-        referrals: visitData.directions,
+        medicine: cardsData.medicine,
+        periodUnit: cardsData.periodUnit,
         reminderEnabled,
         reminderValue: reminderEnabled ? reminderValue : 0,
         reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
       });
       setIsEditing(false);
     } catch (err) {
-      console.error("Ошибка сохранения приема:", err);
+      console.error("Ошибка сохранения вакцинации:", err);
       alert(err.message || "Не удалось сохранить изменения.");
     } finally {
       setLoading(false);
@@ -154,28 +136,21 @@ const DoctorVisitPage = () => {
     }));
   };
 
-  const handleSectionChange = (field, value) => {
-    setVisitData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const handleDelete = async () => {
     if (!eventId) return;
-    const confirmed = window.confirm("Точно удалить этот прием?");
+    const confirmed = window.confirm("Точно удалить эту вакцинацию?");
     if (!confirmed) return;
 
     try {
-      await deleteDoctorVisit(parseInt(eventId, 10));
+      await deleteVaccine(parseInt(eventId, 10));
       navigate(-1);
     } catch (err) {
-      console.error("Ошибка удаления приема:", err);
-      alert(err.message || "Не удалось удалить прием.");
+      console.error("Ошибка удаления вакцинации:", err);
+      alert(err.message || "Не удалось удалить вакцинацию.");
     }
   };
 
-  if (loading) {
+  if (loading && !cardsData.date) {
     return (
       <main className="main-page doctor-visit-page">
         <div className="container">
@@ -183,7 +158,7 @@ const DoctorVisitPage = () => {
             className="txt1"
             style={{ padding: "40px", textAlign: "center" }}
           >
-            Загрузка данных о приеме...
+            Загрузка данных о вакцинации...
           </p>
         </div>
       </main>
@@ -217,8 +192,8 @@ const DoctorVisitPage = () => {
           {isEditing ? (
             <input
               className="h1 doctor-visit__title"
-              value={visitTitle}
-              onChange={(e) => setVisitTitle(e.target.value)}
+              value={vaccineTitle}
+              onChange={(e) => setVaccineTitle(e.target.value)}
               style={{
                 border: "none",
                 outline: "none",
@@ -232,7 +207,7 @@ const DoctorVisitPage = () => {
             />
           ) : (
             <h1 className="h1 doctor-visit__title">
-              {visitTitle || "Прием"} {eventId ? `#${eventId}` : ""}
+              {vaccineTitle || "Вакцинация"} {eventId ? `#${eventId}` : ""}
             </h1>
           )}
 
@@ -315,105 +290,54 @@ const DoctorVisitPage = () => {
             </div>
           </div>
 
-          {/* Клиника */}
+          {/* Препарат */}
           <div className="visit-card">
-            <span className="txt2 visit-card__label">Клиника</span>
-
-            {isEditing ? (
-              <textarea
-                className="h2 visit-card__value visit-card__textarea"
-                value={cardsData.clinic}
-                onChange={(e) =>
-                  handleCardFieldChange("clinic", e.target.value)
-                }
-                rows={2}
-              />
-            ) : (
-              <span className="h2 visit-card__value">
-                {cardsData.clinic}
-              </span>
-            )}
-          </div>
-
-          {/* Врач */}
-          <div className="visit-card">
-            <span className="txt2 visit-card__label">Врач</span>
+            <span className="txt2 visit-card__label">Препарат</span>
 
             {isEditing ? (
               <input
                 className="h2 visit-card__value visit-card__input"
-                value={cardsData.doctor}
+                value={cardsData.medicine}
                 onChange={(e) =>
-                  handleCardFieldChange("doctor", e.target.value)
+                  handleCardFieldChange("medicine", e.target.value)
                 }
               />
             ) : (
               <span className="h2 visit-card__value">
-                {cardsData.doctor}
+                {cardsData.medicine}
               </span>
             )}
           </div>
-        </section>
 
-        {/* ---------- Диагноз ---------- */}
-        <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Диагноз</h2>
-          <div className="doctor-visit-section__card">
-            {isEditing ? (
-              <textarea
-                className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={visitData.diagnosis}
-                onChange={(e) =>
-                  handleSectionChange("diagnosis", e.target.value)
-                }
-                rows={4}
-              />
-            ) : (
-              <p className="txt1 doctor-visit-section__text">
-                {visitData.diagnosis}
-              </p>
-            )}
-          </div>
-        </section>
+          {/* Периодичность */}
+          <div className="visit-card">
+            <span className="txt2 visit-card__label">Периодичность</span>
 
-        {/* ---------- Рекомендации ---------- */}
-        <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Рекомендации</h2>
-          <div className="doctor-visit-section__card">
             {isEditing ? (
-              <textarea
-                className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={visitData.recommendations}
+              <select
+                className="h2 visit-card__value visit-card__input"
+                value={cardsData.periodUnit}
                 onChange={(e) =>
-                  handleSectionChange("recommendations", e.target.value)
+                  handleCardFieldChange("periodUnit", parseInt(e.target.value, 10))
                 }
-                rows={4}
-              />
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  font: "inherit",
+                  color: "var(--black)",
+                }}
+              >
+                {PERIOD_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             ) : (
-              <p className="txt1 doctor-visit-section__text">
-                {visitData.recommendations}
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* ---------- Направления ---------- */}
-        <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Направления</h2>
-          <div className="doctor-visit-section__card">
-            {isEditing ? (
-              <textarea
-                className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={visitData.directions}
-                onChange={(e) =>
-                  handleSectionChange("directions", e.target.value)
-                }
-                rows={4}
-              />
-            ) : (
-              <p className="txt1 doctor-visit-section__text">
-                {visitData.directions}
-              </p>
+              <span className="h2 visit-card__value">
+                {PERIOD_OPTIONS.find((opt) => opt.value === cardsData.periodUnit)?.label || "Раз в месяц"}
+              </span>
             )}
           </div>
         </section>
@@ -487,4 +411,5 @@ const DoctorVisitPage = () => {
   );
 };
 
-export default DoctorVisitPage;
+export default VaccinePage;
+

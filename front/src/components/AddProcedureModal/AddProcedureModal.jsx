@@ -88,7 +88,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
       setLoading(false);
 
       // Общие
-      setTitle("");
+      setTitle("Приём#");
       setEventDate(dateStr);
       setEventTime("13:00");
       setReminderEnabled(false);
@@ -290,7 +290,18 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
               id="procedureType"
               className="form-input form-select"
               value={procedureType}
-              onChange={(e) => setProcedureType(e.target.value)}
+              onChange={(e) => {
+                const newType = e.target.value;
+                setProcedureType(newType);
+                // Устанавливаем значение по умолчанию для названия
+                if (newType === PROCEDURE_TYPES.DOCTOR_VISIT) {
+                  setTitle("Приём#");
+                } else if (newType === PROCEDURE_TYPES.VACCINE) {
+                  setTitle("");
+                } else if (newType === PROCEDURE_TYPES.TREATMENT) {
+                  setTitle("");
+                }
+              }}
               disabled={loading}
             >
               <option value={PROCEDURE_TYPES.DOCTOR_VISIT}>Прием</option>
@@ -302,6 +313,8 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
           {procedureType === PROCEDURE_TYPES.DOCTOR_VISIT && (
             <DoctorVisitFields
               loading={loading}
+              title={title}
+              setTitle={setTitle}
               eventDate={eventDate}
               setEventDate={setEventDate}
               eventTime={eventTime}

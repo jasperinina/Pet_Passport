@@ -124,14 +124,11 @@ const Home = () => {
     return "лет";
   };
 
-  // фото питомца
-  const getPetPhotoUrl = () => {
-    if (pet?.photos && pet.photos.length > 0) {
-      const photoUrl = pet.photos[0].url;
-      if (photoUrl.startsWith("http")) return photoUrl;
-      return `${API_BASE_URL}${photoUrl}`;
-    }
-    return PetPhoto;
+  // Получение URL фото (только для реальных фото, не заглушка)
+  const getPhotoUrl = (photoUrl) => {
+    if (!photoUrl) return null;
+    if (photoUrl.startsWith("http")) return photoUrl;
+    return `${API_BASE_URL}${photoUrl}`;
   };
 
   // формат даты/времени процедуры
@@ -210,11 +207,60 @@ const Home = () => {
         {/* Блок питомца */}
         <section className="pet-block">
           <div className="pet-block__photo-wrapper">
-            <img
-              src={getPetPhotoUrl()}
-              alt={pet.name}
-              className="pet-block__photo"
-            />
+            {(() => {
+              // Проверяем наличие реальных фото с URL
+              const validPhotos = pet?.photos && Array.isArray(pet.photos) 
+                ? pet.photos.filter(photo => {
+                    const url = photo?.url;
+                    return url && typeof url === 'string' && url.trim() !== '';
+                  })
+                : [];
+              
+              // Если нет валидных фото, показываем заглушку
+              if (validPhotos.length === 0) {
+                return (
+                  <img
+                    src={PetPhoto}
+                    alt={pet.name}
+                    className="pet-block__photo"
+                  />
+                );
+              }
+              
+              // Есть валидные фото - показываем их
+              return (
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: validPhotos.length === 1 ? "1fr" : "repeat(2, 1fr)",
+                  gap: "10px",
+                  width: "100%",
+                  height: "100%",
+                }}>
+                  {validPhotos.map((photo, index) => {
+                    const photoUrl = getPhotoUrl(photo.url);
+                    if (!photoUrl) return null;
+                    
+                    return (
+                      <img
+                        key={photo.id || index}
+                        src={photoUrl}
+                        alt={`${pet.name} - фото ${index + 1}`}
+                        style={{
+                          width: "100%",
+                          height: validPhotos.length === 1 ? "367px" : "178px",
+                          objectFit: "cover",
+                          borderRadius: "20px",
+                        }}
+                        onError={(e) => {
+                          // Если фото не загрузилось, показываем заглушку
+                          e.target.src = PetPhoto;
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              );
+            })()}
           </div>
 
           <div className="pet-block__info">
@@ -234,15 +280,6 @@ const Home = () => {
             )}
 
             <div className="pet-block__section pet-block__section--grid">
-              {pet.weightKg && (
-                <div className="pet-block__field">
-                  <span className="txt2 pet-block__label">Пол</span>
-                  <span className="h2 pet-block__value">
-                    {pet.gender === "female" ? "Женский" : "Мужской"}
-                  </span>
-                </div>
-              )}
-
               {pet.weightKg && (
                 <div className="pet-block__field">
                   <span className="txt2 pet-block__label">Вес</span>
@@ -317,12 +354,11 @@ const Home = () => {
                     reminderEnabled={event.reminderEnabled}
                     onClick={() => {
                       if (event.type === "doctor-visit") {
-                        // переход на страницу приёма
                         navigate(`/doctor-visit/${event.id}${search}`);
-                      } else {
-                        // открываем модальное окно с деталями
-                        setSelectedEvent(event);
-                        setIsDetailsModalOpen(true);
+                      } else if (event.type === "vaccine") {
+                        navigate(`/vaccine/${event.id}${search}`);
+                      } else if (event.type === "treatment") {
+                        navigate(`/treatment/${event.id}${search}`);
                       }
                     }}
                   />

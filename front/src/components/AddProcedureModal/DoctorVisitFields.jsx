@@ -1,5 +1,7 @@
 const DoctorVisitFields = ({
   loading,
+  title,
+  setTitle,
   eventDate,
   setEventDate,
   eventTime,
@@ -23,6 +25,21 @@ const DoctorVisitFields = ({
 }) => {
   return (
     <div className="procedure-section procedure-section--doctor">
+      <div className="form-field">
+        <label className="form-label txt2" htmlFor="title">
+          Название
+        </label>
+        <input
+          type="text"
+          id="title"
+          className="form-input"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Приём#"
+          disabled={loading}
+        />
+      </div>
+
       <div className="form-row">
         <div className="form-field form-field--half">
           <label className="form-label txt2" htmlFor="clinic">

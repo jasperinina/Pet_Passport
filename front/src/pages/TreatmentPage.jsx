@@ -1,12 +1,8 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "../styles/doctor-visit.css";
 import "../styles/procedure-modal.css";
-import {
-  getDoctorVisit,
-  updateDoctorVisit,
-  deleteDoctorVisit,
-} from "../api/events";
+import { getTreatment, updateTreatment, deleteTreatment } from "../api/events";
 
 const PERIOD_UNITS = {
   MINUTE: 0,
@@ -17,37 +13,37 @@ const PERIOD_UNITS = {
   YEAR: 5,
 };
 
+const PERIOD_OPTIONS = [
+  { value: PERIOD_UNITS.DAY, label: "Раз в день" },
+  { value: PERIOD_UNITS.WEEK, label: "Раз в неделю" },
+  { value: PERIOD_UNITS.MONTH, label: "Раз в месяц" },
+  { value: PERIOD_UNITS.YEAR, label: "Раз в год" },
+];
+
 const REMINDER_OPTIONS = [
   { value: 5, unit: PERIOD_UNITS.MINUTE, label: "5 минут" },
   { value: 1, unit: PERIOD_UNITS.HOUR, label: "1 час" },
   { value: 1, unit: PERIOD_UNITS.DAY, label: "1 день" },
 ];
 
-const DoctorVisitPage = () => {
+const TreatmentPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const search = location.search || "";
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Заголовок приёма (Title в DTO) — обязателен на бэкенде
-  const [visitTitle, setVisitTitle] = useState("");
-  // Исходная дата/время приёма (нужна, чтобы не сломать EventDate при update)
+  const [treatmentTitle, setTreatmentTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
 
-  // Данные верхних карточек
   const [cardsData, setCardsData] = useState({
     date: "",
     time: "",
-    clinic: "",
-    doctor: "",
-  });
-
-  // Данные нижних блоков
-  const [visitData, setVisitData] = useState({
-    diagnosis: "",
-    recommendations: "",
-    directions: "",
+    remedy: "",
+    parasite: "",
+    periodUnit: PERIOD_UNITS.MONTH,
   });
 
   // Напоминания
@@ -55,23 +51,22 @@ const DoctorVisitPage = () => {
   const [reminderValue, setReminderValue] = useState(5);
   const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
 
-  // Режим редактирования
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const loadVisit = async () => {
+    const loadTreatment = async () => {
       if (!eventId) return;
 
       try {
         setLoading(true);
         setError(null);
 
-        const visit = await getDoctorVisit(parseInt(eventId, 10));
+        const treatment = await getTreatment(parseInt(eventId, 10));
 
-        setVisitTitle(visit.title || "Прием");
-        setEventDateRaw(visit.eventDate); // сохраняем оригинальный EventDate
+        setTreatmentTitle(treatment.title || "Обработка");
+        setEventDateRaw(treatment.eventDate);
 
-        const dateObj = new Date(visit.eventDate);
+        const dateObj = new Date(treatment.eventDate);
         const date = dateObj.toLocaleDateString("ru-RU", {
           day: "numeric",
           month: "long",
@@ -85,32 +80,27 @@ const DoctorVisitPage = () => {
         setCardsData({
           date,
           time,
-          clinic: visit.clinic || "",
-          doctor: visit.doctor || "",
-        });
-
-        setVisitData({
-          diagnosis: visit.diagnosis || "",
-          recommendations: visit.recommendations || "",
-          directions: visit.referrals || "",
+          remedy: treatment.remedy || "",
+          parasite: treatment.parasite || "",
+          periodUnit: treatment.periodUnit ?? PERIOD_UNITS.MONTH,
         });
 
         // Напоминания
-        setReminderEnabled(visit.reminderEnabled || false);
-        setReminderValue(visit.reminderValue ?? 5);
-        setReminderUnit(visit.reminderUnit ?? PERIOD_UNITS.MINUTE);
+        setReminderEnabled(treatment.reminderEnabled || false);
+        setReminderValue(treatment.reminderValue ?? 5);
+        setReminderUnit(treatment.reminderUnit ?? PERIOD_UNITS.MINUTE);
       } catch (err) {
-        console.error("Ошибка загрузки приема:", err);
+        console.error("Ошибка загрузки обработки:", err);
         setError(
           err.message ||
-            "Не удалось загрузить данные о приеме. Попробуйте позже."
+            "Не удалось загрузить данные об обработке. Попробуйте позже."
         );
       } finally {
         setLoading(false);
       }
     };
 
-    loadVisit();
+    loadTreatment();
   }, [eventId]);
 
   const handleEditClick = () => {
@@ -123,24 +113,19 @@ const DoctorVisitPage = () => {
     try {
       setLoading(true);
 
-      // Бэкенд требует обязательное поле Title (и фактически EventDate),
-      // поэтому всегда отправляем актуальное значение заголовка и исходную дату приёма.
-      // Также сохраняем изменённые поля клиники / врача / текстовых блоков и напоминаний.
-      await updateDoctorVisit(parseInt(eventId, 10), {
-        title: visitTitle || "Прием",
+      await updateTreatment(parseInt(eventId, 10), {
+        title: treatmentTitle || "Обработка",
         eventDate: eventDateRaw,
-        clinic: cardsData.clinic,
-        doctor: cardsData.doctor,
-        diagnosis: visitData.diagnosis,
-        recommendations: visitData.recommendations,
-        referrals: visitData.directions,
+        remedy: cardsData.remedy,
+        parasite: cardsData.parasite,
+        periodUnit: cardsData.periodUnit,
         reminderEnabled,
         reminderValue: reminderEnabled ? reminderValue : 0,
         reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
       });
       setIsEditing(false);
     } catch (err) {
-      console.error("Ошибка сохранения приема:", err);
+      console.error("Ошибка сохранения обработки:", err);
       alert(err.message || "Не удалось сохранить изменения.");
     } finally {
       setLoading(false);
@@ -154,28 +139,21 @@ const DoctorVisitPage = () => {
     }));
   };
 
-  const handleSectionChange = (field, value) => {
-    setVisitData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const handleDelete = async () => {
     if (!eventId) return;
-    const confirmed = window.confirm("Точно удалить этот прием?");
+    const confirmed = window.confirm("Точно удалить эту обработку?");
     if (!confirmed) return;
 
     try {
-      await deleteDoctorVisit(parseInt(eventId, 10));
+      await deleteTreatment(parseInt(eventId, 10));
       navigate(-1);
     } catch (err) {
-      console.error("Ошибка удаления приема:", err);
-      alert(err.message || "Не удалось удалить прием.");
+      console.error("Ошибка удаления обработки:", err);
+      alert(err.message || "Не удалось удалить обработку.");
     }
   };
 
-  if (loading) {
+  if (loading && !cardsData.date) {
     return (
       <main className="main-page doctor-visit-page">
         <div className="container">
@@ -183,7 +161,7 @@ const DoctorVisitPage = () => {
             className="txt1"
             style={{ padding: "40px", textAlign: "center" }}
           >
-            Загрузка данных о приеме...
+            Загрузка данных об обработке...
           </p>
         </div>
       </main>
@@ -217,8 +195,8 @@ const DoctorVisitPage = () => {
           {isEditing ? (
             <input
               className="h1 doctor-visit__title"
-              value={visitTitle}
-              onChange={(e) => setVisitTitle(e.target.value)}
+              value={treatmentTitle}
+              onChange={(e) => setTreatmentTitle(e.target.value)}
               style={{
                 border: "none",
                 outline: "none",
@@ -232,7 +210,7 @@ const DoctorVisitPage = () => {
             />
           ) : (
             <h1 className="h1 doctor-visit__title">
-              {visitTitle || "Прием"} {eventId ? `#${eventId}` : ""}
+              {treatmentTitle || "Обработка"} {eventId ? `#${eventId}` : ""}
             </h1>
           )}
 
@@ -315,104 +293,74 @@ const DoctorVisitPage = () => {
             </div>
           </div>
 
-          {/* Клиника */}
+          {/* Препарат */}
           <div className="visit-card">
-            <span className="txt2 visit-card__label">Клиника</span>
-
-            {isEditing ? (
-              <textarea
-                className="h2 visit-card__value visit-card__textarea"
-                value={cardsData.clinic}
-                onChange={(e) =>
-                  handleCardFieldChange("clinic", e.target.value)
-                }
-                rows={2}
-              />
-            ) : (
-              <span className="h2 visit-card__value">
-                {cardsData.clinic}
-              </span>
-            )}
-          </div>
-
-          {/* Врач */}
-          <div className="visit-card">
-            <span className="txt2 visit-card__label">Врач</span>
+            <span className="txt2 visit-card__label">Препарат</span>
 
             {isEditing ? (
               <input
                 className="h2 visit-card__value visit-card__input"
-                value={cardsData.doctor}
+                value={cardsData.remedy}
                 onChange={(e) =>
-                  handleCardFieldChange("doctor", e.target.value)
+                  handleCardFieldChange("remedy", e.target.value)
                 }
               />
             ) : (
               <span className="h2 visit-card__value">
-                {cardsData.doctor}
+                {cardsData.remedy}
+              </span>
+            )}
+          </div>
+
+          {/* Паразит */}
+          <div className="visit-card">
+            <span className="txt2 visit-card__label">Паразит</span>
+
+            {isEditing ? (
+              <input
+                className="h2 visit-card__value visit-card__input"
+                value={cardsData.parasite}
+                onChange={(e) =>
+                  handleCardFieldChange("parasite", e.target.value)
+                }
+              />
+            ) : (
+              <span className="h2 visit-card__value">
+                {cardsData.parasite}
               </span>
             )}
           </div>
         </section>
 
-        {/* ---------- Диагноз ---------- */}
+        {/* ---------- Периодичность ---------- */}
         <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Диагноз</h2>
+          <h2 className="h1 doctor-visit-section__title">Периодичность</h2>
           <div className="doctor-visit-section__card">
             {isEditing ? (
-              <textarea
+              <select
                 className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={visitData.diagnosis}
+                value={cardsData.periodUnit}
                 onChange={(e) =>
-                  handleSectionChange("diagnosis", e.target.value)
+                  handleCardFieldChange("periodUnit", parseInt(e.target.value, 10))
                 }
-                rows={4}
-              />
+                style={{
+                  border: "none",
+                  outline: "none",
+                  background: "transparent",
+                  font: "inherit",
+                  color: "var(--txt)",
+                  padding: 0,
+                }}
+              >
+                {PERIOD_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             ) : (
               <p className="txt1 doctor-visit-section__text">
-                {visitData.diagnosis}
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* ---------- Рекомендации ---------- */}
-        <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Рекомендации</h2>
-          <div className="doctor-visit-section__card">
-            {isEditing ? (
-              <textarea
-                className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={visitData.recommendations}
-                onChange={(e) =>
-                  handleSectionChange("recommendations", e.target.value)
-                }
-                rows={4}
-              />
-            ) : (
-              <p className="txt1 doctor-visit-section__text">
-                {visitData.recommendations}
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* ---------- Направления ---------- */}
-        <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Направления</h2>
-          <div className="doctor-visit-section__card">
-            {isEditing ? (
-              <textarea
-                className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={visitData.directions}
-                onChange={(e) =>
-                  handleSectionChange("directions", e.target.value)
-                }
-                rows={4}
-              />
-            ) : (
-              <p className="txt1 doctor-visit-section__text">
-                {visitData.directions}
+                {PERIOD_OPTIONS.find((opt) => opt.value === cardsData.periodUnit)?.label || "Раз в месяц"}
               </p>
             )}
           </div>
@@ -487,4 +435,5 @@ const DoctorVisitPage = () => {
   );
 };
 
-export default DoctorVisitPage;
+export default TreatmentPage;
+

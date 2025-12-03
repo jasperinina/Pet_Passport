@@ -31,3 +31,25 @@
   outline: none;
   box-shadow: none;
 }
+
+/* Список процедур */
+.procedures__list {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.procedures__card {
+  margin-top: 48px;
+  background: var(--white);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+}
+
+.procedures__empty-text {
+  font-size: 20px;
+  color: var(--txt);
+  text-align: center;
+}
