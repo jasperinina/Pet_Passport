@@ -1,6 +1,5 @@
 // Базовый URL API
-// В продакшене замените на реальный URL вашего бекенда
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:81';
+// Для продакшена отправляем запросы на /api
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 export default API_BASE_URL;
-
