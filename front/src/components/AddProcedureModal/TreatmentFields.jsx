@@ -1,3 +1,8 @@
+import { useRef } from "react";
+import ArrowIcon from "../../assets/icons/icon-arrow.svg";
+import CalendarIcon from "../../assets/icons/icon-calendar.svg";
+import TimeIcon from "../../assets/icons/icon-time.svg";
+
 const TreatmentFields = ({
   loading,
   title,
@@ -13,22 +18,27 @@ const TreatmentFields = ({
   periodUnit,
   setPeriodUnit,
   periodOptions,
-  reminderEnabled,
-  setReminderEnabled,
-  reminderValue,
-  reminderUnit,
-  reminderOptions,
-  onReminderOptionClick,
 }) => {
+  const dateRef = useRef(null);
+  const timeRef = useRef(null);
+
+  const openPicker = (ref) => {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    el.showPicker?.(); // Chrome/Edge
+    el.click();        // fallback
+  };
+
   return (
     <div className="procedure-section procedure-section--treatment">
       <div className="form-field">
-        <label className="form-label txt2" htmlFor="title">
+        <label className="form-label h3" htmlFor="treatment-title">
           Название
         </label>
         <input
           type="text"
-          id="title"
+          id="treatment-title"
           className="form-input"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -38,27 +48,28 @@ const TreatmentFields = ({
       </div>
 
       <div className="form-row">
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="remedy">
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="treatment-remedy">
             Препарат
           </label>
           <input
             type="text"
-            id="remedy"
+            id="treatment-remedy"
             className="form-input"
             value={remedy}
             onChange={(e) => setRemedy(e.target.value)}
-            placeholder="Введите название"
+            placeholder="Введите препарат"
             disabled={loading}
           />
         </div>
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="parasite">
+
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="treatment-parasite">
             Паразит
           </label>
           <input
             type="text"
-            id="parasite"
+            id="treatment-parasite"
             className="form-input"
             value={parasite}
             onChange={(e) => setParasite(e.target.value)}
@@ -69,94 +80,104 @@ const TreatmentFields = ({
       </div>
 
       <div className="form-row">
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="eventDate">
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="treatment-eventDate">
             Дата
           </label>
-          <input
-            type="date"
-            id="eventDate"
-            className="form-input"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-            disabled={loading}
-            required
-          />
-        </div>
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="eventTime">
-            Время
-          </label>
-          <input
-            type="time"
-            id="eventTime"
-            className="form-input"
-            value={eventTime}
-            onChange={(e) => setEventTime(e.target.value)}
-            disabled={loading}
-            required
-          />
-        </div>
-      </div>
 
-      <div className="form-field">
-        <label className="form-label txt2" htmlFor="periodUnit">
-          Периодичность
-        </label>
-        <select
-          id="periodUnit"
-          className="form-input form-select"
-          value={periodUnit}
-          onChange={(e) => setPeriodUnit(parseInt(e.target.value, 10))}
-          disabled={loading}
-        >
-          {periodOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="form-field">
-        <div className="form-toggle-group">
-          <label className="form-label txt2">Напоминание в Telegram</label>
-          <label className="form-toggle">
+          <div className="input-with-icon">
             <input
-              type="checkbox"
-              checked={reminderEnabled}
-              onChange={(e) => setReminderEnabled(e.target.checked)}
+              ref={dateRef}
+              type="date"
+              id="treatment-eventDate"
+              className="form-input"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
               disabled={loading}
+              required
             />
-            <span className="form-toggle-slider"></span>
-          </label>
-        </div>
-      </div>
 
-      {reminderEnabled && (
-        <div className="form-field">
-          <label className="form-label txt2">Напоминать за</label>
-          <div className="form-button-group">
-            {reminderOptions.map((option) => (
-              <button
-                key={`${option.value}-${option.unit}`}
-                type="button"
-                className={`form-button-option ${
-                  reminderValue === option.value && reminderUnit === option.unit
-                    ? "form-button-option--active"
-                    : ""
-                }`}
-                onClick={() =>
-                  onReminderOptionClick(option.value, option.unit)
-                }
-                disabled={loading}
-              >
-                {option.label}
-              </button>
-            ))}
+            <button
+              type="button"
+              className="input-icon-btn"
+              aria-label="Выбрать дату"
+              disabled={loading}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                openPicker(dateRef);
+              }}
+            >
+              <img
+                src={CalendarIcon}
+                className="input-icon"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
           </div>
         </div>
-      )}
+
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="treatment-eventTime">
+            Время
+          </label>
+
+          <div className="input-with-icon">
+            <input
+              ref={timeRef}
+              type="time"
+              id="treatment-eventTime"
+              className="form-input"
+              value={eventTime}
+              onChange={(e) => setEventTime(e.target.value)}
+              disabled={loading}
+              required
+            />
+
+            <button
+              type="button"
+              className="input-icon-btn"
+              aria-label="Выбрать время"
+              disabled={loading}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                openPicker(timeRef);
+              }}
+            >
+              <img
+                src={TimeIcon}
+                className="input-icon"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="form-field">
+        <label className="form-label h3" htmlFor="treatment-periodUnit">
+          Периодичность
+        </label>
+
+        <div className="select-wrapper">
+          <select
+            id="treatment-periodUnit"
+            className="form-input form-select"
+            value={periodUnit}
+            onChange={(e) => setPeriodUnit(parseInt(e.target.value, 10))}
+            disabled={loading}
+          >
+            {periodOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <img className="select-arrow" src={ArrowIcon} alt="" aria-hidden="true" />
+        </div>
+      </div>
     </div>
   );
 };

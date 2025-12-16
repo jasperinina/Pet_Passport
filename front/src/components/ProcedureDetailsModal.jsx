@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import "../styles/modal.css";
+import CrossIcon from "../assets/icons/icon-cross.svg";
 
 const getTypeLabel = (type) => {
   switch (type) {
@@ -57,42 +58,53 @@ const ProcedureDetailsModal = ({ isOpen, onClose, event }) => {
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-content" onClick={handleContentClick}>
         <div className="modal-header">
-          <h2 className="h2 modal-title">Детали процедуры</h2>
+          {/* ✅ Заголовок должен быть h1 */}
+          <h1 className="h1 modal-title">Детали процедуры</h1>
+
           <button
             className="modal-close"
             type="button"
             onClick={handleClose}
             aria-label="Закрыть"
           >
-            ×
+            <img src={CrossIcon} alt="Закрыть" />
           </button>
+
+          {/* ✅ Линия после заголовка */}
+          <div className="modal-divider" />
         </div>
 
         <div className="modal-form">
-          {/* Заглушка — потом заменим реальными данными */}
-          <div className="form-field">
-            <span className="txt2">Тип</span>
-            <p className="h2">{typeLabel}</p>
+          {/* ✅ СКРОЛЛ ТОЛЬКО ЗДЕСЬ */}
+          <div className="modal-body">
+            {/* ✅ ВСЕ ПОЛЯ В ОБЕРТКЕ */}
+            <div className="modal-fields">
+              <div className="form-field">
+                <span className="h3">Тип</span>
+                <p className="h2">{typeLabel}</p>
+              </div>
+
+              <div className="form-field">
+                <span className="h3">Название</span>
+                <p className="h2">{title}</p>
+              </div>
+
+              <div className="form-field">
+                <span className="h3">Дата и время</span>
+                <p className="h2">{dateTime}</p>
+              </div>
+
+              <div className="form-field">
+                <span className="h3">Описание</span>
+                <p className="txt1">
+                  Здесь позже появится подробная информация о вакцинации или
+                  обработке. Пока это заглушка для верстки и логики.
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="form-field">
-            <span className="txt2">Название</span>
-            <p className="h2">{title}</p>
-          </div>
-
-          <div className="form-field">
-            <span className="txt2">Дата и время</span>
-            <p className="h2">{dateTime}</p>
-          </div>
-
-          <div className="form-field">
-            <span className="txt2">Описание</span>
-            <p className="txt1">
-              Здесь позже появится подробная информация о вакцинации или
-              обработке. Пока это заглушка для верстки и логики.
-            </p>
-          </div>
-
+          {/* ✅ КНОПКИ ОТДЕЛЬНО (STICKY В CSS) */}
           <div className="modal-actions">
             <button
               type="button"

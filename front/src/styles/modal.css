@@ -17,7 +17,8 @@
 /* БАЗОВАЯ модалка: 806 × 769, скролл внутри формы */
 .modal-content {
   width: 806px;
-  height: 500px;
+  height: 769px;
+  min-height: 769px;
 
   background: var(--white);
   border-radius: 20px;
@@ -25,7 +26,6 @@
   display: flex;
   flex-direction: column;
 
-  /* важный момент: скролл УБРАЛИ отсюда */
   overflow: hidden;
 
   box-shadow: none;
@@ -37,40 +37,43 @@
 /* Шапка модалки */
 .modal-header {
   position: relative;
-
-  padding: 40px 40px 24px;
+  padding: 40px 40px 0px; /* Отступ сверху 40px */
   text-align: center;
-
-  border-bottom: 1px solid var(--divider);
+  border-bottom: none; /* Убираем линию под заголовком */
 }
 
 .modal-title {
   margin: 0;
   color: var(--black);
+  font-size: 32px; /* Стиль для заголовка h1 */
+  font-weight: bold;
+}
+
+.modal-divider {
+  width: 726px;
+  height: 1px;
+  background-color: var(--divider);
+  border-radius: 726px;
+  margin: 40px auto 0; /* сверху 40px, по центру */
 }
 
 /* Крестик */
 .modal-close {
   position: absolute;
-  top: 32px;
-  right: 32px;
+  top: 28px; /* Отступ сверху 28px */
+  right: 28px; /* Отступ справа 28px */
 
   background: none;
   border: none;
 
-  font-size: 24px;
-  line-height: 1;
-  color: var(--txt);
-
-  cursor: pointer;
-  padding: 0;
-
-  width: 24px;
-  height: 24px;
+  width: 28px; /* Размер иконки */
+  height: 28px;
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  cursor: pointer;
 }
 
 .modal-close:disabled {
@@ -78,13 +81,23 @@
   cursor: default;
 }
 
-/* Тело модалки (форма) — здесь теперь скролл */
+.modal-close img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+}
+
 .modal-form {
   flex: 1;
-  padding: 28px 40px 40px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 
-  overflow-y: auto;
-  overflow-x: hidden;
+  padding-left: 40px;
+  margin-top: 40px;
+
+  overflow: hidden;
 }
 
 /* Ошибка */
@@ -101,9 +114,20 @@
   color: #d32f2f;
 }
 
-/* Поля формы */
-.form-field {
-  margin-bottom: 24px;
+.modal-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 726px;
+ 
+}
+
+/* ✅ СКРОЛЛЯЩИЙСЯ КОНТЕЙНЕР: инпуты + напоминания */
+.modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .form-field:last-of-type {
@@ -112,9 +136,7 @@
 
 .form-label {
   display: block;
-  margin-bottom: 8px;
-
-  /* визуально как txt2, но цвет заголовочный */
+  margin-bottom: 16px;
   font-size: var(--font-size-txt2);
   font-weight: var(--font-weight-txt2);
   color: var(--black);
@@ -123,7 +145,8 @@
 /* Инпуты / селекты */
 .form-input {
   width: 100%;
-  padding: 12px 16px;
+  height: 50px;
+  padding: 15px 20px;
 
   border: 1px solid var(--divider);
   border-radius: 12px;
@@ -154,32 +177,161 @@
   opacity: 0.6;
 }
 
-/* Нижний блок кнопок (Отмена / Сохранить и т.п.) */
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-
-  margin-top: 32px;
-  padding-top: 24px;
-
-  border-top: 1px solid var(--divider);
+.modal-reminder {
+  margin-top: 40px;
+  width: 726px;
 }
 
+/* Нижний блок кнопок (Отмена / Сохранить и т.п.) */
+.modal-actions {
+  flex: 0 0 auto;
+  margin-top: 40px;
+  padding-bottom: 40px;
+
+  width: 726px;
+
+  display: flex;
+  gap: 10px;
+
+  background: var(--white);
+  position: sticky;
+  bottom: 0;
+}
+
+/* Кнопки внутри модалки */
 .modal-actions .btn {
-  min-width: 120px;
+  width: 358px;
+  min-width: 358px;
+  height: 50px;
+}
+
+/* Если кнопка одна — занимает всю ширину контейнера */
+.modal-actions .btn:only-child {
+  width: 100%;
+}
+
+/* Input с иконкой (date / time) */
+.input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-icon .form-input {
+  width: 100%;
+  display: block;
+  padding-right: 56px; /* место под кнопку 40x40 */
+}
+
+.input-icon-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 40px;
+  height: 40px;
+
+  display: grid;
+  place-items: center;
+
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.input-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+}
+
+/* Убираем системные стрелки number */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Кастомные стрелки для number */
+.number-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.number-input-wrapper .form-input {
+  padding-right: 48px; /* место под стрелки */
+}
+
+.number-arrows {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.number-arrow {
+  width: 20px;
+  height: 20px;
+  margin-right:5px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.number-arrow img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* верхняя — перевёрнута */
+.number-arrow--up img {
+  transform: rotate(180deg);
+  margin-top: 15px;
+}
+
+/* нижняя — сдвинута левее на 0.5px */
+.number-arrow--down {
+  transform: translateX(-0.5px);
+  margin-bottom: 7px;
+}
+
+.number-arrow--down img {
+  transform: none;
+}
+
+
+.number-arrow:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* Скролл внутри модалки (на форме) */
-.modal-form::-webkit-scrollbar {
+.modal-body::-webkit-scrollbar {
   width: 4px;
 }
 
-.modal-form::-webkit-scrollbar-track {
+.modal-body::-webkit-scrollbar-track {
   background: var(--grey);
 }
 
-.modal-form::-webkit-scrollbar-thumb {
+.modal-body::-webkit-scrollbar-thumb {
   background: var(--divider);
   border-radius: 2px;
 }
@@ -189,22 +341,4 @@
 .modal-content *:focus {
   outline: none;
   box-shadow: none;
-}
-
-/* ЖЁСТКАЯ фиксация размеров модалок */
-.modal-overlay > .modal-content {
-  width: 806px !important;
-  height: 769px !important;
-  max-height: 769px !important;
-
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* Скролл именно внутри формы */
-.modal-overlay > .modal-content .modal-form {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
 }

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import CrossIcon from "../../assets/icons/icon-cross.svg";
+import ArrowIcon from "../../assets/icons/icon-arrow.svg";
 
 // общие стили модалок и процедур
 import "../../styles/modal.css";
@@ -18,7 +20,12 @@ import {
 import DoctorVisitFields from "./DoctorVisitFields";
 import VaccineFields from "./VaccineFields";
 import TreatmentFields from "./TreatmentFields";
-import { EVENT_TYPES, PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../../constants/eventConstants";
+import {
+  EVENT_TYPES,
+  PERIOD_UNITS,
+  PERIOD_OPTIONS,
+  REMINDER_OPTIONS,
+} from "../../constants/eventConstants";
 
 const PROCEDURE_TYPES = EVENT_TYPES;
 
@@ -63,7 +70,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
       setLoading(false);
 
       // Общие
-      setTitle("Приём#");
+      setTitle("");
       setEventDate(dateStr);
       setEventTime("13:00");
       setReminderEnabled(false);
@@ -100,9 +107,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
   }, [isOpen]);
 
   const handleClose = () => {
-    if (!loading) {
-      onClose();
-    }
+    if (!loading) onClose();
   };
 
   const calculateNextDate = (startDate, value, unit) => {
@@ -216,9 +221,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
           throw new Error("Неизвестный тип процедуры");
       }
 
-      if (onSuccess) {
-        onSuccess(result);
-      }
+      if (onSuccess) onSuccess(result);
       onClose();
     } catch (err) {
       console.error("Ошибка создания процедуры:", err);
@@ -237,7 +240,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h2 className="h2 modal-title">Добавить процедуру</h2>
+          <h1 className="h1 modal-title">Добавить процедуру</h1>
           <button
             className="modal-close"
             onClick={handleClose}
@@ -245,8 +248,10 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
             type="button"
             aria-label="Закрыть"
           >
-            ×
+            <img src={CrossIcon} alt="Закрыть" />
           </button>
+
+          <div className="modal-divider" />
         </div>
 
         <form className="modal-form" onSubmit={handleSubmit}>
@@ -256,111 +261,147 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
             </div>
           )}
 
-          {/* Тип процедуры */}
-          <div className="form-field">
-            <label className="form-label txt2" htmlFor="procedureType">
-              Выберите тип
-            </label>
-            <select
-              id="procedureType"
-              className="form-input form-select"
-              value={procedureType}
-              onChange={(e) => {
-                const newType = e.target.value;
-                setProcedureType(newType);
-                // Устанавливаем значение по умолчанию для названия
-                if (newType === PROCEDURE_TYPES.DOCTOR_VISIT) {
-                  setTitle("Приём#");
-                } else if (newType === PROCEDURE_TYPES.VACCINE) {
-                  setTitle("");
-                } else if (newType === PROCEDURE_TYPES.TREATMENT) {
-                  setTitle("");
-                }
-              }}
-              disabled={loading}
-            >
-              <option value={PROCEDURE_TYPES.DOCTOR_VISIT}>Прием</option>
-              <option value={PROCEDURE_TYPES.VACCINE}>Вакцинация</option>
-              <option value={PROCEDURE_TYPES.TREATMENT}>Обработка</option>
-            </select>
+          <div className="modal-body">
+            <div className="modal-fields">
+              {/* Тип процедуры */}
+              <div className="form-field">
+                <label className="form-label h3" htmlFor="procedureType">
+                  Выберите тип
+                </label>
+
+                {/* ВАЖНО: wrapper для позиционирования иконки */}
+                <div className="select-wrapper">
+                  <select
+                    id="procedureType"
+                    className="form-input form-select"
+                    value={procedureType}
+                    onChange={(e) => {
+                      setProcedureType(e.target.value);
+                      setTitle("");
+                    }}
+                    disabled={loading}
+                  >
+                    <option value={PROCEDURE_TYPES.DOCTOR_VISIT}>Прием</option>
+                    <option value={PROCEDURE_TYPES.VACCINE}>Вакцинация</option>
+                    <option value={PROCEDURE_TYPES.TREATMENT}>Обработка</option>
+                  </select>
+
+                  <img
+                    className="select-arrow"
+                    src={ArrowIcon}
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </div>
+              </div>
+
+              {procedureType === PROCEDURE_TYPES.DOCTOR_VISIT && (
+                <DoctorVisitFields
+                  loading={loading}
+                  title={title}
+                  setTitle={setTitle}
+                  eventDate={eventDate}
+                  setEventDate={setEventDate}
+                  eventTime={eventTime}
+                  setEventTime={setEventTime}
+                  clinic={clinic}
+                  setClinic={setClinic}
+                  doctor={doctor}
+                  setDoctor={setDoctor}
+                  diagnosis={diagnosis}
+                  setDiagnosis={setDiagnosis}
+                  recommendations={recommendations}
+                  setRecommendations={setRecommendations}
+                  referrals={referrals}
+                  setReferrals={setReferrals}
+                />
+              )}
+
+              {procedureType === PROCEDURE_TYPES.VACCINE && (
+                <VaccineFields
+                  loading={loading}
+                  title={title}
+                  setTitle={setTitle}
+                  medicine={medicine}
+                  setMedicine={setMedicine}
+                  eventDate={eventDate}
+                  setEventDate={setEventDate}
+                  eventTime={eventTime}
+                  setEventTime={setEventTime}
+                  periodUnit={periodUnit}
+                  setPeriodUnit={setPeriodUnit}
+                  periodOptions={PERIOD_OPTIONS}
+                />
+              )}
+
+              {procedureType === PROCEDURE_TYPES.TREATMENT && (
+                <TreatmentFields
+                  loading={loading}
+                  title={title}
+                  setTitle={setTitle}
+                  remedy={remedy}
+                  setRemedy={setRemedy}
+                  parasite={parasite}
+                  setParasite={setParasite}
+                  eventDate={eventDate}
+                  setEventDate={setEventDate}
+                  eventTime={eventTime}
+                  setEventTime={setEventTime}
+                  periodUnit={periodUnit}
+                  setPeriodUnit={setPeriodUnit}
+                  periodOptions={PERIOD_OPTIONS}
+                />
+              )}
+            </div>
+
+            {/* Напоминания (внутри scroll) */}
+            <div className="modal-reminder">
+              <div className="form-field">
+                <div className="form-toggle-group">
+                  <label className="form-label h3">
+                    Напоминание в Telegram
+                  </label>
+                  <label className="form-toggle">
+                    <input
+                      type="checkbox"
+                      checked={reminderEnabled}
+                      onChange={(e) => setReminderEnabled(e.target.checked)}
+                      disabled={loading}
+                    />
+                    <span className="form-toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              {reminderEnabled && (
+                <div className="form-field">
+                  <label className="form-label h3">Напоминать за</label>
+                  <div className="form-button-group">
+                    {REMINDER_OPTIONS.map((option) => (
+                      <button
+                        key={`${option.value}-${option.unit}`}
+                        type="button"
+                        className={`form-button-option ${
+                          reminderValue === option.value &&
+                          reminderUnit === option.unit
+                            ? "form-button-option--active"
+                            : ""
+                        }`}
+                        onClick={() =>
+                          handleReminderOptionClick(option.value, option.unit)
+                        }
+                        disabled={loading}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {procedureType === PROCEDURE_TYPES.DOCTOR_VISIT && (
-            <DoctorVisitFields
-              loading={loading}
-              title={title}
-              setTitle={setTitle}
-              eventDate={eventDate}
-              setEventDate={setEventDate}
-              eventTime={eventTime}
-              setEventTime={setEventTime}
-              clinic={clinic}
-              setClinic={setClinic}
-              doctor={doctor}
-              setDoctor={setDoctor}
-              diagnosis={diagnosis}
-              setDiagnosis={setDiagnosis}
-              recommendations={recommendations}
-              setRecommendations={setRecommendations}
-              referrals={referrals}
-              setReferrals={setReferrals}
-              reminderEnabled={reminderEnabled}
-              setReminderEnabled={setReminderEnabled}
-              reminderValue={reminderValue}
-              reminderUnit={reminderUnit}
-              reminderOptions={REMINDER_OPTIONS}
-              onReminderOptionClick={handleReminderOptionClick}
-            />
-          )}
-
-          {procedureType === PROCEDURE_TYPES.VACCINE && (
-            <VaccineFields
-              loading={loading}
-              title={title}
-              setTitle={setTitle}
-              medicine={medicine}
-              setMedicine={setMedicine}
-              eventDate={eventDate}
-              setEventDate={setEventDate}
-              eventTime={eventTime}
-              setEventTime={setEventTime}
-              periodUnit={periodUnit}
-              setPeriodUnit={setPeriodUnit}
-              periodOptions={PERIOD_OPTIONS}
-              reminderEnabled={reminderEnabled}
-              setReminderEnabled={setReminderEnabled}
-              reminderValue={reminderValue}
-              reminderUnit={reminderUnit}
-              reminderOptions={REMINDER_OPTIONS}
-              onReminderOptionClick={handleReminderOptionClick}
-            />
-          )}
-
-          {procedureType === PROCEDURE_TYPES.TREATMENT && (
-            <TreatmentFields
-              loading={loading}
-              title={title}
-              setTitle={setTitle}
-              remedy={remedy}
-              setRemedy={setRemedy}
-              parasite={parasite}
-              setParasite={setParasite}
-              eventDate={eventDate}
-              setEventDate={setEventDate}
-              eventTime={eventTime}
-              setEventTime={setEventTime}
-              periodUnit={periodUnit}
-              setPeriodUnit={setPeriodUnit}
-              periodOptions={PERIOD_OPTIONS}
-              reminderEnabled={reminderEnabled}
-              setReminderEnabled={setReminderEnabled}
-              reminderValue={reminderValue}
-              reminderUnit={reminderUnit}
-              reminderOptions={REMINDER_OPTIONS}
-              onReminderOptionClick={handleReminderOptionClick}
-            />
-          )}
-
+          {/* Кнопки (sticky в CSS) */}
           <div className="modal-actions">
             <button
               type="button"
@@ -370,11 +411,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
             >
               Отмена
             </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loading}
-            >
+            <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? "Добавление..." : "Добавить"}
             </button>
           </div>

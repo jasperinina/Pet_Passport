@@ -1,7 +1,7 @@
-/* Широкая модалка для процедур: те же 806 × 769, скролл внутри формы */
+/* Широкая модалка для процедур: те же 806 × 769 */
 .modal-content--wide {
   width: 806px;
-  height: 769px;
+  height: 873px;
   max-height: 769px;
 
   background: var(--white);
@@ -9,28 +9,28 @@
 
   display: flex;
   flex-direction: column;
-
-  /* скролл убираем отсюда — он будет на .modal-form */
   overflow: hidden;
-
-  box-shadow: none;
-  padding: 0;
-
   position: relative;
 }
 
 /* Двухколоночная сетка для пар полей */
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+}
+
+.procedure-section {
+  display: flex;
+  flex-direction: column;
+  gap: 28px; /* расстояние между всеми полями по вертикали */
 }
 
 .form-field--half {
   margin-bottom: 0;
 }
 
-/* Текстовые поля (диагноз, рекомендации) */
+/* Текстовые поля */
 .form-textarea {
   resize: none;
   min-height: 140px;
@@ -53,27 +53,81 @@
   opacity: 0.6;
 }
 
-/* Select типа процедуры / периодичности */
+/* Select (без background-image, стрелка в JSX) */
 .form-select {
   appearance: none;
 
   background-color: var(--grey);
   border: 1px solid transparent;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b90a6' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 16px center;
-
-  padding-right: 40px;
   cursor: pointer;
 }
 
 .form-select:focus {
   border-color: var(--black);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2336187d' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
 }
 
-/* Тоггл "Напоминание в Telegram" */
+/* Select + стрелка (SVG в JSX) */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrapper .form-select {
+  width: 100%;
+  display: block;
+  padding-right: 44px; /* место под 16x16 иконку + отступ справа */
+}
+
+.select-arrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: block;
+}
+
+/* Input с иконкой (date / time) — иконка кликабельная кнопкой */
+.input-with-icon {
+  position: relative;
+  width: 100%;
+}
+
+.input-with-icon .form-input {
+  width: 100%;
+  display: block;
+  padding-right: 56px; /* место под кнопку 40x40 */
+}
+
+.input-icon-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 40px;
+  height: 40px;
+
+  display: grid;
+  place-items: center;
+
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.input-icon {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+}
+
+/* Toggle */
 .form-toggle-group {
   display: flex;
   align-items: center;
@@ -114,7 +168,6 @@
 
   background-color: var(--white);
   border-radius: 50%;
-
   transition: transform 0.3s ease;
 }
 
@@ -168,42 +221,4 @@
 .form-button-option:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-/* Скролл внутри широкой модалки — на форме */
-.modal-content--wide .modal-form {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.modal-content--wide .modal-form::-webkit-scrollbar {
-  width: 4px;
-}
-
-.modal-content--wide .modal-form::-webkit-scrollbar-track {
-  background: var(--grey);
-}
-
-.modal-content--wide .modal-form::-webkit-scrollbar-thumb {
-  background: var(--divider);
-  border-radius: 2px;
-}
-
-/* ЖЁСТКАЯ фиксация размеров широкой модалки (на всякий случай) */
-.modal-overlay > .modal-content--wide {
-  width: 806px !important;
-  height: 769px !important;
-  max-height: 769px !important;
-
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* Скролл внутри широкой модалки */
-.modal-overlay > .modal-content--wide .modal-form {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
 }

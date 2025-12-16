@@ -1,4 +1,5 @@
 import API_BASE_URL from './config.js';
+import { USE_MOCK_API, mockGetUpcomingEvents } from './mockApi.js';
 
 const handleResponse = async (response, errorPrefix) => {
   if (!response.ok) {
@@ -121,6 +122,9 @@ export async function deleteTreatment(id) {
 
 // ========== Events Lists ==========
 export async function getUpcomingEvents(petId) {
+  if (USE_MOCK_API) {
+    return await mockGetUpcomingEvents(petId);
+  }
   const response = await fetch(`${API_BASE_URL}/api/events/upcoming/${petId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
@@ -136,6 +140,10 @@ export async function getUpcomingEvents(petId) {
 }
 
 export async function getPastEvents(petId) {
+  if (USE_MOCK_API) {
+    // В моковом режиме истории нет — возвращаем пустой список
+    return [];
+  }
   const response = await fetch(`${API_BASE_URL}/api/events/past/${petId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },

@@ -3,6 +3,10 @@ import "../styles/modal.css";
 import { updatePet, uploadPetPhoto, deletePetPhoto } from "../api/pets";
 import API_BASE_URL from "../api/config";
 import { FILE_UPLOAD, ERROR_MESSAGES } from "../constants/config";
+import CrossIcon from "../assets/icons/icon-cross.svg";
+import CalendarIcon from "../assets/icons/icon-calendar.svg";
+import ArrowIcon from "../assets/icons/icon-arrow.svg";
+
 
 const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -17,6 +21,17 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [petPhotos, setPetPhotos] = useState([]);
   const fileInputRef = useRef(null);
+
+  // ✅ ref для date input
+  const birthDateRef = useRef(null);
+
+  const openPicker = (ref) => {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    el.showPicker?.(); // Chrome/Edge
+    el.click(); // fallback
+  };
 
   useEffect(() => {
     if (!isOpen || !pet) return;
@@ -62,12 +77,12 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
       setError(ERROR_MESSAGES.INVALID_FILE_TYPE);
       return;
     }
-    
+
     if (file.size > FILE_UPLOAD.MAX_SIZE) {
       setError(ERROR_MESSAGES.FILE_TOO_LARGE);
       return;
     }
-    
+
     setSelectedFile(file);
     setError(null);
   };
@@ -83,17 +98,17 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
       setError(null);
 
       const result = await uploadPetPhoto(pet.id, selectedFile);
-      
+
       const photoUrl = result.photoUrl || result.url;
       const photoId = result.id || result.photoId;
-      
+
       if (!photoUrl || !photoId) {
         throw new Error("Неверный формат ответа от сервера");
       }
 
       setPetPhotos((prev) => [...prev, { id: photoId, url: photoUrl }]);
       setSelectedFile(null);
-      
+
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -125,21 +140,23 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
       setLoading(true);
       setError(null);
 
-      const numericPhotoId = typeof photoId === 'string' ? parseInt(photoId, 10) : photoId;
-      
+      const numericPhotoId =
+        typeof photoId === "string" ? parseInt(photoId, 10) : photoId;
+
       if (isNaN(numericPhotoId)) {
         throw new Error(`Неверный ID фотографии: ${photoId}`);
       }
 
       await deletePetPhoto(pet.id, numericPhotoId);
-      
-      // Удаляем фото из списка
-      setPetPhotos((prev) => prev.filter((photo) => {
-        const photoIdNum = typeof photo.id === 'string' ? parseInt(photo.id, 10) : photo.id;
-        return photoIdNum !== numericPhotoId;
-      }));
 
-      // Обновляем данные питомца
+      setPetPhotos((prev) =>
+        prev.filter((photo) => {
+          const photoIdNum =
+            typeof photo.id === "string" ? parseInt(photo.id, 10) : photo.id;
+          return photoIdNum !== numericPhotoId;
+        })
+      );
+
       if (onSuccess) {
         onSuccess();
       }
@@ -153,28 +170,21 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
     }
   };
 
-
-  // Обработка отправки формы
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Сначала загружаем фото, если оно выбрано
       if (selectedFile) {
         try {
           setUploadingPhoto(true);
-          console.log("Загрузка фото перед сохранением формы...");
-          
+
           const result = await uploadPetPhoto(pet.id, selectedFile);
-          
-          console.log("Результат загрузки фото:", result);
-          
-          // Проверяем структуру ответа - бекенд возвращает { photoUrl, Id }
+
           const photoUrl = result.photoUrl || result.url;
           const photoId = result.Id || result.id || result.photoId;
-          
+
           if (!photoUrl || !photoId) {
             throw new Error("Неверный формат ответа от сервера");
           }
@@ -183,11 +193,10 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
             id: photoId,
             url: photoUrl,
           };
-          
+
           setPetPhotos((prev) => [...prev, newPhoto]);
           setSelectedFile(null);
-          
-          // Очищаем input
+
           if (fileInputRef.current) {
             fileInputRef.current.value = "";
           }
@@ -202,7 +211,6 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
         }
       }
 
-      // Затем обновляем данные питомца
       const updateData = {};
 
       if (formData.name.trim()) {
@@ -243,12 +251,10 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
 
   return (
     <div className="modal-overlay">
-      <div
-        className="modal-content"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 className="h2 modal-title">Изменить данные</h2>
+          <h1 className="h1 modal-title">Изменить данные</h1>
+
           <button
             className="modal-close"
             onClick={handleClose}
@@ -256,8 +262,10 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
             type="button"
             aria-label="Закрыть"
           >
-            ×
+            <img src={CrossIcon} alt="Закрыть" />
           </button>
+
+          <div className="modal-divider" />
         </div>
 
         <form className="modal-form" onSubmit={handleSubmit}>
@@ -267,224 +275,311 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
             </div>
           )}
 
-          <div className="form-field">
-            <label className="form-label txt2" htmlFor="name">
-              Имя
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              className="form-input"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Введите имя"
-              disabled={loading}
-            />
-          </div>
+          <div className="modal-body">
+            <div className="modal-fields">
+              <div className="form-field">
+                <label className="form-label h3" htmlFor="name">
+                  Имя
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  className="form-input"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Введите имя"
+                  disabled={loading}
+                />
+              </div>
 
-          <div className="form-field">
-            <label className="form-label txt2" htmlFor="breed">
-              Порода
-            </label>
-            <input
-              type="text"
-              id="breed"
-              name="breed"
-              className="form-input"
-              value={formData.breed}
-              onChange={handleChange}
-              placeholder="Введите породу"
-              disabled={loading}
-            />
-          </div>
+              <div className="form-field">
+                <label className="form-label h3" htmlFor="breed">
+                  Порода
+                </label>
+                <input
+                  type="text"
+                  id="breed"
+                  name="breed"
+                  className="form-input"
+                  value={formData.breed}
+                  onChange={handleChange}
+                  placeholder="Введите породу"
+                  disabled={loading}
+                />
+              </div>
 
-          <div className="form-field">
-            <label className="form-label txt2" htmlFor="weightKg">
-              Вес (кг)
-            </label>
-            <input
-              type="number"
-              id="weightKg"
-              name="weightKg"
-              className="form-input"
-              value={formData.weightKg}
-              onChange={handleChange}
-              placeholder="Введите вес"
-              step="0.1"
-              min="0"
-              disabled={loading}
-            />
-          </div>
+              <div className="form-field">
+                <label className="form-label h3" htmlFor="weightKg">
+                  Вес (кг)
+                </label>
 
-          <div className="form-field">
-            <label className="form-label txt2" htmlFor="birthDate">
-              Дата рождения
-            </label>
-            <input
-              type="date"
-              id="birthDate"
-              name="birthDate"
-              className="form-input"
-              value={formData.birthDate}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
+                <div className="number-input-wrapper">
+                  <input
+                    type="number"
+                    id="weightKg"
+                    name="weightKg"
+                    className="form-input"
+                    value={formData.weightKg}
+                    onChange={handleChange}
+                    placeholder="Введите вес"
+                    step="0.1"
+                    min="0"
+                    disabled={loading}
+                  />
 
-          {/* Загрузка фото */}
-          <div className="form-field">
-            <label className="form-label txt2">Фотографии</label>
-            
-            {/* Существующие фото */}
-            {petPhotos.length > 0 && (
-              <div style={{ 
-                display: "grid", 
-                gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", 
-                gap: "12px", 
-                marginBottom: "16px" 
-              }}>
-                {petPhotos.map((photo) => (
-                  <div key={photo.id} style={{ position: "relative" }}>
-                    <img
-                      src={getPhotoUrl(photo.url)}
-                      alt="Фото питомца"
-                      style={{
-                        width: "100%",
-                        height: "100px",
-                        objectFit: "cover",
-                        borderRadius: "8px",
-                        border: "1px solid var(--divider)",
-                        opacity: loading ? 0.6 : 1,
-                      }}
-                    />
+                  <div className="number-arrows">
+                    {/* Вверх */}
                     <button
                       type="button"
-                      onClick={() => handleDeletePhoto(photo.id)}
+                      className="number-arrow number-arrow--up"
                       disabled={loading}
-                      style={{
-                        position: "absolute",
-                        top: "4px",
-                        right: "4px",
-                        backgroundColor: "rgba(211, 47, 47, 0.9)",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "50%",
-                        width: "24px",
-                        height: "24px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: loading ? "not-allowed" : "pointer",
-                        opacity: loading ? 0.6 : 1,
-                        fontSize: "18px",
-                        lineHeight: "1",
-                        padding: 0,
-                        fontWeight: "bold",
+                      onClick={() => {
+                        const step = 0.1;
+                        const current = parseFloat(formData.weightKg) || 0;
+                        setFormData((prev) => ({
+                          ...prev,
+                          weightKg: (current + step).toFixed(1),
+                        }));
                       }}
-                      title="Удалить фото"
                     >
-                      ×
+                      <img src={ArrowIcon} alt="" aria-hidden="true" />
+                    </button>
+
+                    {/* Вниз */}
+                    <button
+                      type="button"
+                      className="number-arrow number-arrow--down"
+                      disabled={loading}
+                      onClick={() => {
+                        const step = 0.1;
+                        const current = parseFloat(formData.weightKg) || 0;
+                        const next = Math.max(0, current - step);
+                        setFormData((prev) => ({
+                          ...prev,
+                          weightKg: next.toFixed(1),
+                        }));
+                      }}
+                    >
+                      <img src={ArrowIcon} alt="" aria-hidden="true" />
                     </button>
                   </div>
-                ))}
+                </div>
               </div>
-            )}
 
-            {/* Загрузка нового фото */}
-            {petPhotos.length < 4 && (
-              <div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileSelect}
-                  disabled={loading || uploadingPhoto}
-                  style={{ display: "none" }}
-                  id="photo-upload"
-                />
-                <label
-                  htmlFor="photo-upload"
-                  style={{
-                    display: "inline-block",
-                    padding: "8px 16px",
-                    backgroundColor: "var(--grey)",
-                    borderRadius: "8px",
-                    cursor: loading || uploadingPhoto ? "not-allowed" : "pointer",
-                    opacity: loading || uploadingPhoto ? 0.6 : 1,
-                    fontSize: "14px",
-                    color: "var(--black)",
-                  }}
-                >
-                  {selectedFile ? selectedFile.name : "Выбрать фото"}
+
+              <div className="form-field">
+                <label className="form-label h3" htmlFor="birthDate">
+                  Дата рождения
                 </label>
-                
-                {selectedFile && (
-                  <div style={{ marginTop: "12px" }}>
-                    <div style={{ 
-                      display: "flex", 
-                      alignItems: "center", 
+
+                <div className="input-with-icon">
+                  <input
+                    ref={birthDateRef}
+                    type="date"
+                    id="birthDate"
+                    name="birthDate"
+                    className="form-input"
+                    value={formData.birthDate}
+                    onChange={handleChange}
+                    disabled={loading}
+                  />
+
+                  <button
+                    type="button"
+                    className="input-icon-btn"
+                    aria-label="Выбрать дату рождения"
+                    disabled={loading}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      openPicker(birthDateRef);
+                    }}
+                  >
+                    <img
+                      src={CalendarIcon}
+                      className="input-icon"
+                      alt=""
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
+              </div>
+
+              {/* Загрузка фото */}
+              <div className="form-field">
+                <label className="form-label h3">Фотографии</label>
+
+                {petPhotos.length > 0 && (
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns:
+                        "repeat(auto-fill, minmax(100px, 1fr))",
                       gap: "12px",
-                      marginBottom: "8px"
-                    }}>
-                      <img
-                        src={URL.createObjectURL(selectedFile)}
-                        alt="Предпросмотр"
-                        style={{
-                          width: "80px",
-                          height: "80px",
-                          objectFit: "cover",
-                          borderRadius: "8px",
-                          border: "1px solid var(--divider)",
-                        }}
-                      />
-                      <span style={{ fontSize: "14px", color: "var(--txt)" }}>
-                        {selectedFile.name}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedFile(null);
-                          if (fileInputRef.current) {
-                            fileInputRef.current.value = "";
-                          }
-                        }}
-                        disabled={loading || uploadingPhoto}
-                        style={{
-                          padding: "8px 16px",
-                          backgroundColor: "transparent",
-                          color: "var(--txt)",
-                          border: "1px solid var(--divider)",
-                          borderRadius: "8px",
-                          cursor: loading || uploadingPhoto ? "not-allowed" : "pointer",
-                        }}
-                      >
-                        Убрать
-                      </button>
-                    </div>
-                    <p style={{ fontSize: "12px", color: "var(--txt)", marginTop: "4px" }}>
-                      Фото будет загружено при нажатии кнопки "Сохранить"
-                    </p>
+                      marginBottom: "16px",
+                    }}
+                  >
+                    {petPhotos.map((photo) => (
+                      <div key={photo.id} style={{ position: "relative" }}>
+                        <img
+                          src={getPhotoUrl(photo.url)}
+                          alt="Фото питомца"
+                          style={{
+                            width: "100%",
+                            height: "100px",
+                            objectFit: "cover",
+                            borderRadius: "8px",
+                            border: "1px solid var(--divider)",
+                            opacity: loading ? 0.6 : 1,
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePhoto(photo.id)}
+                          disabled={loading}
+                          style={{
+                            position: "absolute",
+                            top: "4px",
+                            right: "4px",
+                            backgroundColor: "rgba(211, 47, 47, 0.9)",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "50%",
+                            width: "24px",
+                            height: "24px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: loading ? "not-allowed" : "pointer",
+                            opacity: loading ? 0.6 : 1,
+                            fontSize: "18px",
+                            lineHeight: "1",
+                            padding: 0,
+                            fontWeight: "bold",
+                          }}
+                          title="Удалить фото"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
-                
-                {petPhotos.length > 0 && (
-                  <p style={{ 
-                    fontSize: "12px", 
-                    color: "var(--txt)", 
-                    marginTop: "8px" 
-                  }}>
-                    Загружено: {petPhotos.length} / 4
+
+                {petPhotos.length < 4 && (
+                  <div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      disabled={loading || uploadingPhoto}
+                      style={{ display: "none" }}
+                      id="photo-upload"
+                    />
+                    <label
+                      htmlFor="photo-upload"
+                      style={{
+                        display: "inline-block",
+                        padding: "8px 16px",
+                        backgroundColor: "var(--grey)",
+                        borderRadius: "8px",
+                        cursor:
+                          loading || uploadingPhoto ? "not-allowed" : "pointer",
+                        opacity: loading || uploadingPhoto ? 0.6 : 1,
+                        fontSize: "14px",
+                        color: "var(--black)",
+                      }}
+                    >
+                      {selectedFile ? selectedFile.name : "Выбрать фото"}
+                    </label>
+
+                    {selectedFile && (
+                      <div style={{ marginTop: "12px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "12px",
+                            marginBottom: "8px",
+                          }}
+                        >
+                          <img
+                            src={URL.createObjectURL(selectedFile)}
+                            alt="Предпросмотр"
+                            style={{
+                              width: "80px",
+                              height: "80px",
+                              objectFit: "cover",
+                              borderRadius: "8px",
+                              border: "1px solid var(--divider)",
+                            }}
+                          />
+                          <span
+                            style={{
+                              fontSize: "14px",
+                              color: "var(--txt)",
+                            }}
+                          >
+                            {selectedFile.name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedFile(null);
+                              if (fileInputRef.current) {
+                                fileInputRef.current.value = "";
+                              }
+                            }}
+                            disabled={loading || uploadingPhoto}
+                            style={{
+                              padding: "8px 16px",
+                              backgroundColor: "transparent",
+                              color: "var(--txt)",
+                              border: "1px solid var(--divider)",
+                              borderRadius: "8px",
+                              cursor:
+                                loading || uploadingPhoto
+                                  ? "not-allowed"
+                                  : "pointer",
+                            }}
+                          >
+                            Убрать
+                          </button>
+                        </div>
+                        <p
+                          style={{
+                            fontSize: "12px",
+                            color: "var(--txt)",
+                            marginTop: "4px",
+                          }}
+                        >
+                          Фото будет загружено при нажатии кнопки "Сохранить"
+                        </p>
+                      </div>
+                    )}
+
+                    {petPhotos.length > 0 && (
+                      <p
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--txt)",
+                          marginTop: "8px",
+                        }}
+                      >
+                        Загружено: {petPhotos.length} / 4
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {petPhotos.length >= 4 && (
+                  <p style={{ fontSize: "14px", color: "var(--txt)" }}>
+                    Достигнут лимит фотографий (максимум 4)
                   </p>
                 )}
               </div>
-            )}
-
-            {petPhotos.length >= 4 && (
-              <p style={{ fontSize: "14px", color: "var(--txt)" }}>
-                Достигнут лимит фотографий (максимум 4)
-              </p>
-            )}
+            </div>
           </div>
 
           <div className="modal-actions">
@@ -496,11 +591,7 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
             >
               Отмена
             </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={loading}
-            >
+            <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? "Сохранение..." : "Сохранить"}
             </button>
           </div>

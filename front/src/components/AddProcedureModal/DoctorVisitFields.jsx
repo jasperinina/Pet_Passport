@@ -1,3 +1,7 @@
+import { useRef } from "react";
+import CalendarIcon from "../../assets/icons/icon-calendar.svg";
+import TimeIcon from "../../assets/icons/icon-time.svg";
+
 const DoctorVisitFields = ({
   loading,
   title,
@@ -16,99 +20,150 @@ const DoctorVisitFields = ({
   setRecommendations,
   referrals,
   setReferrals,
-  reminderEnabled,
-  setReminderEnabled,
-  reminderValue,
-  reminderUnit,
-  reminderOptions,
-  onReminderOptionClick,
 }) => {
+  const dateRef = useRef(null);
+  const timeRef = useRef(null);
+
+  const openPicker = (ref) => {
+    const el = ref.current;
+    if (!el) return;
+    el.focus();
+    el.showPicker?.(); // Chrome/Edge
+    el.click();        // fallback
+  };
+
   return (
     <div className="procedure-section procedure-section--doctor">
       <div className="form-field">
-        <label className="form-label txt2" htmlFor="title">
+        <label className="form-label h3" htmlFor="doctorVisit-title">
           Название
         </label>
         <input
           type="text"
-          id="title"
+          id="doctorVisit-title"
           className="form-input"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Приём#"
+          placeholder="Введите название"
           disabled={loading}
         />
       </div>
 
       <div className="form-row">
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="clinic">
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="doctorVisit-clinic">
             Клиника
           </label>
           <input
             type="text"
-            id="clinic"
+            id="doctorVisit-clinic"
             className="form-input"
             value={clinic}
             onChange={(e) => setClinic(e.target.value)}
-            placeholder="Введите название"
+            placeholder="Введите клинику"
             disabled={loading}
           />
         </div>
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="doctor">
+
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="doctorVisit-doctor">
             Врач
           </label>
           <input
             type="text"
-            id="doctor"
+            id="doctorVisit-doctor"
             className="form-input"
             value={doctor}
             onChange={(e) => setDoctor(e.target.value)}
-            placeholder="Введите имя"
+            placeholder="Введите врача"
             disabled={loading}
           />
         </div>
       </div>
 
       <div className="form-row">
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="eventDate">
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="doctorVisit-eventDate">
             Дата
           </label>
-          <input
-            type="date"
-            id="eventDate"
-            className="form-input"
-            value={eventDate}
-            onChange={(e) => setEventDate(e.target.value)}
-            disabled={loading}
-            required
-          />
+
+          <div className="input-with-icon">
+            <input
+              ref={dateRef}
+              type="date"
+              id="doctorVisit-eventDate"
+              className="form-input"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
+              disabled={loading}
+              required
+            />
+
+            <button
+              type="button"
+              className="input-icon-btn"
+              aria-label="Выбрать дату"
+              disabled={loading}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                openPicker(dateRef);
+              }}
+            >
+              <img
+                src={CalendarIcon}
+                className="input-icon"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          </div>
         </div>
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="eventTime">
+
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="doctorVisit-eventTime">
             Время
           </label>
-          <input
-            type="time"
-            id="eventTime"
-            className="form-input"
-            value={eventTime}
-            onChange={(e) => setEventTime(e.target.value)}
-            disabled={loading}
-            required
-          />
+
+          <div className="input-with-icon">
+            <input
+              ref={timeRef}
+              type="time"
+              id="doctorVisit-eventTime"
+              className="form-input"
+              value={eventTime}
+              onChange={(e) => setEventTime(e.target.value)}
+              disabled={loading}
+              required
+            />
+
+            <button
+              type="button"
+              className="input-icon-btn"
+              aria-label="Выбрать время"
+              disabled={loading}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                openPicker(timeRef);
+              }}
+            >
+              <img
+                src={TimeIcon}
+                className="input-icon"
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          </div>
         </div>
       </div>
 
       <div className="form-row">
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="diagnosis">
+        <div className="form-field">
+          <label className="form-label h3" htmlFor="doctorVisit-diagnosis">
             Диагноз
           </label>
           <textarea
-            id="diagnosis"
+            id="doctorVisit-diagnosis"
             className="form-input form-textarea"
             value={diagnosis}
             onChange={(e) => setDiagnosis(e.target.value)}
@@ -117,12 +172,16 @@ const DoctorVisitFields = ({
             rows="4"
           />
         </div>
-        <div className="form-field form-field--half">
-          <label className="form-label txt2" htmlFor="recommendations">
+
+        <div className="form-field">
+          <label
+            className="form-label h3"
+            htmlFor="doctorVisit-recommendations"
+          >
             Рекомендации
           </label>
           <textarea
-            id="recommendations"
+            id="doctorVisit-recommendations"
             className="form-input form-textarea"
             value={recommendations}
             onChange={(e) => setRecommendations(e.target.value)}
@@ -134,11 +193,11 @@ const DoctorVisitFields = ({
       </div>
 
       <div className="form-field">
-        <label className="form-label txt2" htmlFor="referrals">
+        <label className="form-label h3" htmlFor="doctorVisit-referrals">
           Направления
         </label>
         <textarea
-          id="referrals"
+          id="doctorVisit-referrals"
           className="form-input form-textarea"
           value={referrals}
           onChange={(e) => setReferrals(e.target.value)}
@@ -147,46 +206,6 @@ const DoctorVisitFields = ({
           rows="3"
         />
       </div>
-
-      <div className="form-field">
-        <div className="form-toggle-group">
-          <label className="form-label txt2">Напоминание в Telegram</label>
-          <label className="form-toggle">
-            <input
-              type="checkbox"
-              checked={reminderEnabled}
-              onChange={(e) => setReminderEnabled(e.target.checked)}
-              disabled={loading}
-            />
-            <span className="form-toggle-slider"></span>
-          </label>
-        </div>
-      </div>
-
-      {reminderEnabled && (
-        <div className="form-field">
-          <label className="form-label txt2">Напоминать за</label>
-          <div className="form-button-group">
-            {reminderOptions.map((option) => (
-              <button
-                key={`${option.value}-${option.unit}`}
-                type="button"
-                className={`form-button-option ${
-                  reminderValue === option.value && reminderUnit === option.unit
-                    ? "form-button-option--active"
-                    : ""
-                }`}
-                onClick={() =>
-                  onReminderOptionClick(option.value, option.unit)
-                }
-                disabled={loading}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

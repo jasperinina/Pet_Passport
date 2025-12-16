@@ -92,7 +92,8 @@
 
 /* Кнопки */
 .pet-block__actions {
-  margin-top: 28px;
+  margin-top: auto;
+  margin-bottom: 40px;
   display: flex;
   column-gap: 20px;
 }
