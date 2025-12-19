@@ -117,6 +117,36 @@ body {
   width: 1214px;
   margin-left: auto;
   margin-right: auto;
+  padding: 0 20px;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .container {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  #root {
+    margin: 10px auto 80px;
+  }
+
+  /* Уменьшаем размеры шрифтов на мобильных */
+  :root {
+    --font-size-h1: 24px;
+    --font-size-h2: 20px;
+    --font-size-h3: 18px;
+    --font-size-h4: 14px;
+    --font-size-txt1: 16px;
+    --font-size-txt2: 14px;
+  }
+
+  /* Адаптируем кнопки */
+  .btn {
+    padding: 12px 20px;
+    height: 44px;
+    font-size: 14px;
+  }
 }
 
 /* Шрифты */

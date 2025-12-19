@@ -173,3 +173,103 @@
   flex-direction: column;
   gap: 20px;
 }
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .main-page {
+    margin-top: 20px;
+  }
+
+  .pet-block {
+    flex-direction: column;
+    height: auto;
+    gap: 16px;
+  }
+
+  .pet-block__photo-wrapper {
+    width: 100%;
+    height: 250px;
+    border-radius: 16px;
+  }
+
+  .pet-block__info {
+    width: 100%;
+    height: auto;
+    margin-left: 0;
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+
+  .pet-block__top-row {
+    padding-top: 0;
+  }
+
+  .pet-block__divider {
+    margin-top: 16px;
+  }
+
+  .pet-block__section {
+    margin-top: 20px;
+  }
+
+  .pet-block__section--grid {
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .pet-block__actions {
+    margin-top: 24px;
+    margin-bottom: 0;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .pet-block__actions .btn {
+    width: 100%;
+  }
+
+  .procedures {
+    margin-top: 40px;
+  }
+
+  .procedures__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .procedures__card {
+    margin-top: 24px;
+    height: 200px;
+    border-radius: 16px;
+  }
+
+  .procedures__empty-text {
+    font-size: 16px;
+    padding: 0 16px;
+  }
+
+  .procedures__list {
+    margin-top: 24px;
+    gap: 16px;
+  }
+
+  /* Адаптация фотографий питомца */
+  .pet-block__photo-wrapper {
+    border-radius: 16px;
+  }
+
+  .pet-photos-grid {
+    gap: 8px !important;
+  }
+
+  .pet-photos-grid__photo {
+    border-radius: 16px !important;
+  }
+
+  .pet-block__photo-wrapper img {
+    border-radius: 16px !important;
+  }
+}

@@ -15,6 +15,9 @@ import {
   createDoctorVisit,
   createVaccine,
   createTreatment,
+  updateDoctorVisit,
+  updateVaccine,
+  updateTreatment,
 } from "../../api/events";
 
 import DoctorVisitFields from "./DoctorVisitFields";
@@ -26,10 +29,11 @@ import {
   PERIOD_OPTIONS,
   REMINDER_OPTIONS,
 } from "../../constants/eventConstants";
+import { formatDateForInput, formatTimeForInput } from "../../utils/dateUtils";
 
 const PROCEDURE_TYPES = EVENT_TYPES;
 
-const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
+const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess, editEvent = null }) => {
   const [procedureType, setProcedureType] = useState(
     PROCEDURE_TYPES.DOCTOR_VISIT
   );
@@ -59,40 +63,75 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
   const [remedy, setRemedy] = useState("");
   const [parasite, setParasite] = useState("");
 
-  // Сброс формы при открытии
+  // Сброс формы при открытии или предзаполнение при редактировании
   useEffect(() => {
     if (isOpen) {
-      const now = new Date();
-      const dateStr = now.toISOString().split("T")[0];
-
-      setProcedureType(PROCEDURE_TYPES.DOCTOR_VISIT);
       setError(null);
       setLoading(false);
 
-      // Общие
-      setTitle("");
-      setEventDate(dateStr);
-      setEventTime("13:00");
-      setReminderEnabled(false);
-      setReminderValue(5);
-      setReminderUnit(PERIOD_UNITS.MINUTE);
+      if (editEvent) {
+        // Режим редактирования - предзаполняем поля
+        const eventDateStr = formatDateForInput(editEvent.eventDate);
+        const eventTimeStr = formatTimeForInput(editEvent.eventDate);
 
-      // Доктор
-      setClinic("");
-      setDoctor("");
-      setDiagnosis("");
-      setRecommendations("");
-      setReferrals("");
+        // Определяем тип события
+        if (editEvent.eventType === "DoctorVisit" || editEvent.eventType === "doctor-visit") {
+          setProcedureType(PROCEDURE_TYPES.DOCTOR_VISIT);
+          setClinic(editEvent.clinic || "");
+          setDoctor(editEvent.doctor || "");
+          setDiagnosis(editEvent.diagnosis || "");
+          setRecommendations(editEvent.recommendations || "");
+          setReferrals(editEvent.referrals || "");
+        } else if (editEvent.eventType === "Vaccine" || editEvent.eventType === "vaccine") {
+          setProcedureType(PROCEDURE_TYPES.VACCINE);
+          setMedicine(editEvent.medicine || "");
+          setPeriodUnit(editEvent.periodUnit ?? PERIOD_UNITS.MONTH);
+        } else if (editEvent.eventType === "Treatment" || editEvent.eventType === "treatment") {
+          setProcedureType(PROCEDURE_TYPES.TREATMENT);
+          setRemedy(editEvent.remedy || "");
+          setParasite(editEvent.parasite || "");
+          setPeriodUnit(editEvent.periodUnit ?? PERIOD_UNITS.MONTH);
+        }
 
-      // Вакцина
-      setMedicine("");
-      setPeriodUnit(PERIOD_UNITS.MONTH);
+        // Общие поля
+        setTitle(editEvent.title || "");
+        setEventDate(eventDateStr);
+        setEventTime(eventTimeStr);
+        setReminderEnabled(editEvent.reminderEnabled || false);
+        setReminderValue(editEvent.reminderValue ?? 5);
+        setReminderUnit(editEvent.reminderUnit ?? PERIOD_UNITS.MINUTE);
+      } else {
+        // Режим создания - сбрасываем форму
+        const now = new Date();
+        const dateStr = now.toISOString().split("T")[0];
 
-      // Обработка
-      setRemedy("");
-      setParasite("");
+        setProcedureType(PROCEDURE_TYPES.DOCTOR_VISIT);
+
+        // Общие
+        setTitle("");
+        setEventDate(dateStr);
+        setEventTime("13:00");
+        setReminderEnabled(false);
+        setReminderValue(5);
+        setReminderUnit(PERIOD_UNITS.MINUTE);
+
+        // Доктор
+        setClinic("");
+        setDoctor("");
+        setDiagnosis("");
+        setRecommendations("");
+        setReferrals("");
+
+        // Вакцина
+        setMedicine("");
+        setPeriodUnit(PERIOD_UNITS.MONTH);
+
+        // Обработка
+        setRemedy("");
+        setParasite("");
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, editEvent]);
 
   // Блокируем скролл body, пока модалка открыта
   useEffect(() => {
@@ -159,7 +198,6 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
       const eventDateISO = eventDateTime.toISOString();
 
       const baseData = {
-        petId: parseInt(petId, 10),
         title: title || getDefaultTitle(),
         eventDate: eventDateISO,
         reminderEnabled,
@@ -169,63 +207,116 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
 
       let result;
 
-      switch (procedureType) {
-        case PROCEDURE_TYPES.DOCTOR_VISIT: {
-          result = await createDoctorVisit({
-            ...baseData,
-            clinic: clinic || null,
-            doctor: doctor || null,
-            diagnosis: diagnosis || null,
-            recommendations: recommendations || null,
-            referrals: referrals || null,
-          });
-          break;
+      if (editEvent) {
+        // Режим редактирования
+        const eventId = editEvent.id || editEvent.eventId;
+
+        switch (procedureType) {
+          case PROCEDURE_TYPES.DOCTOR_VISIT: {
+            result = await updateDoctorVisit(eventId, {
+              ...baseData,
+              clinic: clinic || null,
+              doctor: doctor || null,
+              diagnosis: diagnosis || null,
+              recommendations: recommendations || null,
+              referrals: referrals || null,
+            });
+            break;
+          }
+
+          case PROCEDURE_TYPES.VACCINE: {
+            const vaccinePeriodValue = periodUnit !== null ? 1 : null;
+            const nextVaccinationDate =
+              vaccinePeriodValue && periodUnit !== null
+                ? calculateNextDate(eventDateTime, vaccinePeriodValue, periodUnit)
+                : null;
+
+            result = await updateVaccine(eventId, {
+              ...baseData,
+              medicine: medicine || null,
+              periodUnit: periodUnit !== null ? periodUnit : null,
+            });
+            break;
+          }
+
+          case PROCEDURE_TYPES.TREATMENT: {
+            result = await updateTreatment(eventId, {
+              ...baseData,
+              remedy: remedy || null,
+              parasite: parasite || null,
+              periodUnit: periodUnit !== null ? periodUnit : null,
+            });
+            break;
+          }
+
+          default:
+            throw new Error("Неизвестный тип процедуры");
         }
+      } else {
+        // Режим создания
+        const createData = {
+          ...baseData,
+          petId: parseInt(petId, 10),
+        };
 
-        case PROCEDURE_TYPES.VACCINE: {
-          const vaccinePeriodValue = periodUnit !== null ? 1 : null;
-          const nextVaccinationDate =
-            vaccinePeriodValue && periodUnit !== null
-              ? calculateNextDate(eventDateTime, vaccinePeriodValue, periodUnit)
-              : null;
+        switch (procedureType) {
+          case PROCEDURE_TYPES.DOCTOR_VISIT: {
+            result = await createDoctorVisit({
+              ...createData,
+              clinic: clinic || null,
+              doctor: doctor || null,
+              diagnosis: diagnosis || null,
+              recommendations: recommendations || null,
+              referrals: referrals || null,
+            });
+            break;
+          }
 
-          result = await createVaccine({
-            ...baseData,
-            medicine: medicine || null,
-            periodValue: vaccinePeriodValue,
-            periodUnit: periodUnit !== null ? periodUnit : null,
-            nextVaccinationDate: nextVaccinationDate?.toISOString() || null,
-          });
-          break;
+          case PROCEDURE_TYPES.VACCINE: {
+            const vaccinePeriodValue = periodUnit !== null ? 1 : null;
+            const nextVaccinationDate =
+              vaccinePeriodValue && periodUnit !== null
+                ? calculateNextDate(eventDateTime, vaccinePeriodValue, periodUnit)
+                : null;
+
+            result = await createVaccine({
+              ...createData,
+              medicine: medicine || null,
+              periodValue: vaccinePeriodValue,
+              periodUnit: periodUnit !== null ? periodUnit : null,
+              nextVaccinationDate: nextVaccinationDate?.toISOString() || null,
+            });
+            break;
+          }
+
+          case PROCEDURE_TYPES.TREATMENT: {
+            const treatmentPeriodValue = periodUnit !== null ? 1 : null;
+            const nextTreatmentDate =
+              treatmentPeriodValue && periodUnit !== null
+                ? calculateNextDate(eventDateTime, treatmentPeriodValue, periodUnit)
+                : null;
+
+            result = await createTreatment({
+              ...createData,
+              remedy: remedy || null,
+              parasite: parasite || null,
+              periodValue: treatmentPeriodValue,
+              periodUnit: periodUnit !== null ? periodUnit : null,
+              nextTreatmentDate: nextTreatmentDate?.toISOString() || null,
+            });
+            break;
+          }
+
+          default:
+            throw new Error("Неизвестный тип процедуры");
         }
-
-        case PROCEDURE_TYPES.TREATMENT: {
-          const treatmentPeriodValue = periodUnit !== null ? 1 : null;
-          const nextTreatmentDate =
-            treatmentPeriodValue && periodUnit !== null
-              ? calculateNextDate(eventDateTime, treatmentPeriodValue, periodUnit)
-              : null;
-
-          result = await createTreatment({
-            ...baseData,
-            remedy: remedy || null,
-            parasite: parasite || null,
-            periodValue: treatmentPeriodValue,
-            periodUnit: periodUnit !== null ? periodUnit : null,
-            nextTreatmentDate: nextTreatmentDate?.toISOString() || null,
-          });
-          break;
-        }
-
-        default:
-          throw new Error("Неизвестный тип процедуры");
       }
 
       if (onSuccess) onSuccess(result);
       onClose();
     } catch (err) {
-      console.error("Ошибка создания процедуры:", err);
-      setError(err.message || "Ошибка при создании процедуры");
+      console.error("Ошибка сохранения процедуры:", err);
+      setError(err.message || `Ошибка при ${editEvent ? "сохранении" : "создании"} процедуры`);
     } finally {
       setLoading(false);
     }
@@ -240,7 +331,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h1 className="h1 modal-title">Добавить процедуру</h1>
+          <h1 className="h1 modal-title">{editEvent ? "Редактировать процедуру" : "Добавить процедуру"}</h1>
           <button
             className="modal-close"
             onClick={handleClose}
@@ -279,7 +370,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
                       setProcedureType(e.target.value);
                       setTitle("");
                     }}
-                    disabled={loading}
+                    disabled={loading || !!editEvent}
                   >
                     <option value={PROCEDURE_TYPES.DOCTOR_VISIT}>Прием</option>
                     <option value={PROCEDURE_TYPES.VACCINE}>Вакцинация</option>
@@ -412,7 +503,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
               Отмена
             </button>
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? "Добавление..." : "Добавить"}
+              {loading ? (editEvent ? "Сохранение..." : "Добавление...") : (editEvent ? "Сохранить" : "Добавить")}
             </button>
           </div>
         </form>

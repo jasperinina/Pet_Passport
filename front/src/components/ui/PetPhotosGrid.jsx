@@ -18,10 +18,10 @@ const PetPhotosGrid = memo(({ photos, petName }) => {
   }
 
   const gridColumns = validPhotos.length === 1 ? "1fr" : "repeat(2, 1fr)";
-  const photoHeight = validPhotos.length === 1 ? "367px" : "178px";
 
   return (
     <div
+      className="pet-photos-grid"
       style={{
         display: "grid",
         gridTemplateColumns: gridColumns,
@@ -39,11 +39,11 @@ const PetPhotosGrid = memo(({ photos, petName }) => {
             key={photo.id || index}
             src={photoUrl}
             alt={`${petName} - фото ${index + 1}`}
+            className="pet-photos-grid__photo"
             style={{
               width: "100%",
-              height: photoHeight,
+              height: "100%",
               objectFit: "cover",
-              borderRadius: "20px",
             }}
             onError={(e) => {
               e.target.src = PetPhoto;

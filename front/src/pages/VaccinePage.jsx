@@ -2,14 +2,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "../styles/doctor-visit.css";
 import "../styles/procedure-modal.css";
-import { getVaccine, updateVaccine, deleteVaccine } from "../api/events";
-import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../constants/eventConstants";
-import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
+import { getVaccine, deleteVaccine } from "../api/events";
+import { formatEventDateTime, formatDateForInput, formatTimeForInput } from "../utils/dateUtils";
+import { PERIOD_UNITS, PERIOD_OPTIONS } from "../constants/eventConstants";
 import EventPageHeader from "../components/events/EventPageHeader";
 import EventCard from "../components/events/EventCard";
 import ReminderSection from "../components/events/ReminderSection";
 import LoadingState from "../components/events/LoadingState";
 import ErrorState from "../components/events/ErrorState";
+import AddProcedureModal from "../components/AddProcedureModal/AddProcedureModal";
 
 const VaccinePage = () => {
   const { eventId } = useParams();
@@ -32,7 +33,8 @@ const VaccinePage = () => {
   const [reminderValue, setReminderValue] = useState(5);
   const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [eventData, setEventData] = useState(null);
 
   useEffect(() => {
     const loadVaccine = async () => {
@@ -63,6 +65,13 @@ const VaccinePage = () => {
         setReminderEnabled(vaccine.reminderEnabled || false);
         setReminderValue(vaccine.reminderValue ?? 5);
         setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.MINUTE);
+
+        // Сохраняем данные события для редактирования с добавлением типа события
+        setEventData({
+          ...vaccine,
+          eventType: "Vaccine",
+          id: vaccine.id || parseInt(eventId, 10),
+        });
       } catch (err) {
         console.error("Ошибка загрузки вакцинации:", err);
         setError(
@@ -78,61 +87,44 @@ const VaccinePage = () => {
   }, [eventId]);
 
   const handleEditClick = () => {
-    setIsEditing(true);
+    setIsEditModalOpen(true);
   };
 
-  const handleSaveClick = async () => {
-    if (!eventId) return;
-
+  const handleEditSuccess = async (updatedEvent) => {
+    // Перезагружаем данные после успешного редактирования
     try {
       setLoading(true);
+      const vaccine = await getVaccine(parseInt(eventId, 10));
 
-      await updateVaccine(parseInt(eventId, 10), {
-        title: vaccineTitle || "Вакцинация",
-        eventDate: eventDateRaw,
-        medicine: cardsData.medicine,
-        periodUnit: cardsData.periodUnit,
-        reminderEnabled,
-        reminderValue: reminderEnabled ? reminderValue : 0,
-        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
-      });
-      
-      // Обновляем отображаемые дату и время после сохранения
-      const { date, time } = formatEventDateTime(eventDateRaw);
-      setCardsData((prev) => ({
-        ...prev,
+      setVaccineTitle(vaccine.title || "Вакцинация");
+      setEventDateRaw(vaccine.eventDate);
+
+      const { date, time } = formatEventDateTime(vaccine.eventDate);
+      const dateInput = formatDateForInput(vaccine.eventDate);
+      const timeInput = formatTimeForInput(vaccine.eventDate);
+
+      setCardsData({
         date,
         time,
-      }));
-      
-      setIsEditing(false);
+        dateInput,
+        timeInput,
+        medicine: vaccine.medicine || "",
+        periodUnit: vaccine.periodUnit ?? PERIOD_UNITS.MONTH,
+      });
+
+      setReminderEnabled(vaccine.reminderEnabled || false);
+      setReminderValue(vaccine.reminderValue ?? 5);
+      setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.MINUTE);
+      setEventData({
+        ...vaccine,
+        eventType: "Vaccine",
+        id: vaccine.id || parseInt(eventId, 10),
+      });
     } catch (err) {
-      console.error("Ошибка сохранения вакцинации:", err);
-      alert(err.message || "Не удалось сохранить изменения.");
+      console.error("Ошибка обновления данных:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCardFieldChange = (field, value) => {
-    setCardsData((prev) => {
-      const updated = {
-        ...prev,
-        [field]: value,
-      };
-      
-      // Если изменяется дата или время, обновляем eventDateRaw
-      if (field === "dateInput" || field === "timeInput") {
-        const dateInput = field === "dateInput" ? value : prev.dateInput;
-        const timeInput = field === "timeInput" ? value : prev.timeInput;
-        const newEventDate = combineDateTimeToISO(dateInput, timeInput);
-        if (newEventDate) {
-          setEventDateRaw(newEventDate);
-        }
-      }
-      
-      return updated;
-    });
   };
 
   const handleDelete = async () => {
@@ -163,11 +155,8 @@ const VaccinePage = () => {
         <EventPageHeader
           title={vaccineTitle}
           eventId={eventId}
-          isEditing={isEditing}
           onEdit={handleEditClick}
-          onSave={handleSaveClick}
           onDelete={handleDelete}
-          onTitleChange={setVaccineTitle}
           loading={loading}
         />
 
@@ -178,17 +167,6 @@ const VaccinePage = () => {
             value={{
               displayDate: cardsData.date,
               displayTime: cardsData.time,
-              dateInput: cardsData.dateInput,
-              timeInput: cardsData.timeInput,
-            }}
-            isEditing={isEditing}
-            onChange={(value) => {
-              if (value.dateInput) {
-                handleCardFieldChange("dateInput", value.dateInput);
-              }
-              if (value.timeInput) {
-                handleCardFieldChange("timeInput", value.timeInput);
-              }
             }}
             type="datetime"
           />
@@ -196,17 +174,11 @@ const VaccinePage = () => {
           <EventCard
             label="Препарат"
             value={cardsData.medicine}
-            isEditing={isEditing}
-            onChange={(value) => handleCardFieldChange("medicine", value)}
           />
 
           <EventCard
             label="Периодичность"
-            value={cardsData.periodUnit}
-            isEditing={isEditing}
-            onChange={(value) => handleCardFieldChange("periodUnit", value)}
-            type="select"
-            options={PERIOD_OPTIONS}
+            value={PERIOD_OPTIONS.find((opt) => opt.value === cardsData.periodUnit)?.label || "Раз в месяц"}
           />
         </section>
 
@@ -215,14 +187,19 @@ const VaccinePage = () => {
           reminderEnabled={reminderEnabled}
           reminderValue={reminderValue}
           reminderUnit={reminderUnit}
-          isEditing={isEditing}
-          onToggle={setReminderEnabled}
-          onOptionClick={(value, unit) => {
-            setReminderValue(value);
-            setReminderUnit(unit);
-          }}
         />
       </div>
+
+      {/* Модальное окно редактирования */}
+      {eventData && (
+        <AddProcedureModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          petId={eventData.petId}
+          onSuccess={handleEditSuccess}
+          editEvent={eventData}
+        />
+      )}
     </main>
   );
 };

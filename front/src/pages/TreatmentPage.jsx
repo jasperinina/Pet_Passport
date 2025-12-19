@@ -2,15 +2,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "../styles/doctor-visit.css";
 import "../styles/procedure-modal.css";
-import { getTreatment, updateTreatment, deleteTreatment } from "../api/events";
-import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../constants/eventConstants";
-import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
+import { getTreatment, deleteTreatment } from "../api/events";
+import { PERIOD_UNITS, PERIOD_OPTIONS } from "../constants/eventConstants";
+import { formatEventDateTime, formatDateForInput, formatTimeForInput } from "../utils/dateUtils";
 import EventPageHeader from "../components/events/EventPageHeader";
 import EventCard from "../components/events/EventCard";
-import EventSection from "../components/events/EventSection";
 import ReminderSection from "../components/events/ReminderSection";
 import LoadingState from "../components/events/LoadingState";
 import ErrorState from "../components/events/ErrorState";
+import AddProcedureModal from "../components/AddProcedureModal/AddProcedureModal";
 
 const TreatmentPage = () => {
   const { eventId } = useParams();
@@ -34,7 +34,8 @@ const TreatmentPage = () => {
   const [reminderValue, setReminderValue] = useState(5);
   const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [eventData, setEventData] = useState(null);
 
   useEffect(() => {
     const loadTreatment = async () => {
@@ -66,6 +67,13 @@ const TreatmentPage = () => {
         setReminderEnabled(treatment.reminderEnabled || false);
         setReminderValue(treatment.reminderValue ?? 5);
         setReminderUnit(treatment.reminderUnit ?? PERIOD_UNITS.MINUTE);
+
+        // Сохраняем данные события для редактирования с добавлением типа события
+        setEventData({
+          ...treatment,
+          eventType: "Treatment",
+          id: treatment.id || parseInt(eventId, 10),
+        });
       } catch (err) {
         console.error("Ошибка загрузки обработки:", err);
         setError(
@@ -81,62 +89,45 @@ const TreatmentPage = () => {
   }, [eventId]);
 
   const handleEditClick = () => {
-    setIsEditing(true);
+    setIsEditModalOpen(true);
   };
 
-  const handleSaveClick = async () => {
-    if (!eventId) return;
-
+  const handleEditSuccess = async (updatedEvent) => {
+    // Перезагружаем данные после успешного редактирования
     try {
       setLoading(true);
+      const treatment = await getTreatment(parseInt(eventId, 10));
 
-      await updateTreatment(parseInt(eventId, 10), {
-        title: treatmentTitle || "Обработка",
-        eventDate: eventDateRaw,
-        remedy: cardsData.remedy,
-        parasite: cardsData.parasite,
-        periodUnit: cardsData.periodUnit,
-        reminderEnabled,
-        reminderValue: reminderEnabled ? reminderValue : 0,
-        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MONTH,
-      });
-      
-      // Обновляем отображаемые дату и время после сохранения
-      const { date, time } = formatEventDateTime(eventDateRaw);
-      setCardsData((prev) => ({
-        ...prev,
+      setTreatmentTitle(treatment.title || "Обработка");
+      setEventDateRaw(treatment.eventDate);
+
+      const { date, time } = formatEventDateTime(treatment.eventDate);
+      const dateInput = formatDateForInput(treatment.eventDate);
+      const timeInput = formatTimeForInput(treatment.eventDate);
+
+      setCardsData({
         date,
         time,
-      }));
-      
-      setIsEditing(false);
+        dateInput,
+        timeInput,
+        remedy: treatment.remedy || "",
+        parasite: treatment.parasite || "",
+        periodUnit: treatment.periodUnit ?? PERIOD_UNITS.MONTH,
+      });
+
+      setReminderEnabled(treatment.reminderEnabled || false);
+      setReminderValue(treatment.reminderValue ?? 5);
+      setReminderUnit(treatment.reminderUnit ?? PERIOD_UNITS.MINUTE);
+      setEventData({
+        ...treatment,
+        eventType: "Treatment",
+        id: treatment.id || parseInt(eventId, 10),
+      });
     } catch (err) {
-      console.error("Ошибка сохранения обработки:", err);
-      alert(err.message || "Не удалось сохранить изменения.");
+      console.error("Ошибка обновления данных:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCardFieldChange = (field, value) => {
-    setCardsData((prev) => {
-      const updated = {
-        ...prev,
-        [field]: value,
-      };
-      
-      // Если изменяется дата или время, обновляем eventDateRaw
-      if (field === "dateInput" || field === "timeInput") {
-        const dateInput = field === "dateInput" ? value : prev.dateInput;
-        const timeInput = field === "timeInput" ? value : prev.timeInput;
-        const newEventDate = combineDateTimeToISO(dateInput, timeInput);
-        if (newEventDate) {
-          setEventDateRaw(newEventDate);
-        }
-      }
-      
-      return updated;
-    });
   };
 
   const handleDelete = async () => {
@@ -167,11 +158,8 @@ const TreatmentPage = () => {
         <EventPageHeader
           title={treatmentTitle}
           eventId={eventId}
-          isEditing={isEditing}
           onEdit={handleEditClick}
-          onSave={handleSaveClick}
           onDelete={handleDelete}
-          onTitleChange={setTreatmentTitle}
           loading={loading}
         />
 
@@ -182,17 +170,6 @@ const TreatmentPage = () => {
             value={{
               displayDate: cardsData.date,
               displayTime: cardsData.time,
-              dateInput: cardsData.dateInput,
-              timeInput: cardsData.timeInput,
-            }}
-            isEditing={isEditing}
-            onChange={(value) => {
-              if (value.dateInput) {
-                handleCardFieldChange("dateInput", value.dateInput);
-              }
-              if (value.timeInput) {
-                handleCardFieldChange("timeInput", value.timeInput);
-              }
             }}
             type="datetime"
           />
@@ -200,15 +177,11 @@ const TreatmentPage = () => {
           <EventCard
             label="Препарат"
             value={cardsData.remedy}
-            isEditing={isEditing}
-            onChange={(value) => handleCardFieldChange("remedy", value)}
           />
 
           <EventCard
             label="Паразит"
             value={cardsData.parasite}
-            isEditing={isEditing}
-            onChange={(value) => handleCardFieldChange("parasite", value)}
           />
         </section>
 
@@ -216,33 +189,9 @@ const TreatmentPage = () => {
         <section className="doctor-visit-section">
           <h2 className="h1 doctor-visit-section__title">Периодичность</h2>
           <div className="doctor-visit-section__card">
-            {isEditing ? (
-              <select
-                className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={cardsData.periodUnit}
-                onChange={(e) =>
-                  handleCardFieldChange("periodUnit", parseInt(e.target.value, 10))
-                }
-                style={{
-                  border: "none",
-                  outline: "none",
-                  background: "transparent",
-                  font: "inherit",
-                  color: "var(--txt)",
-                  padding: 0,
-                }}
-              >
-                {PERIOD_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <p className="txt1 doctor-visit-section__text">
-                {PERIOD_OPTIONS.find((opt) => opt.value === cardsData.periodUnit)?.label || "Раз в месяц"}
-              </p>
-            )}
+            <p className="txt1 doctor-visit-section__text">
+              {PERIOD_OPTIONS.find((opt) => opt.value === cardsData.periodUnit)?.label || "Раз в месяц"}
+            </p>
           </div>
         </section>
 
@@ -251,14 +200,19 @@ const TreatmentPage = () => {
           reminderEnabled={reminderEnabled}
           reminderValue={reminderValue}
           reminderUnit={reminderUnit}
-          isEditing={isEditing}
-          onToggle={setReminderEnabled}
-          onOptionClick={(value, unit) => {
-            setReminderValue(value);
-            setReminderUnit(unit);
-          }}
         />
       </div>
+
+      {/* Модальное окно редактирования */}
+      {eventData && (
+        <AddProcedureModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          petId={eventData.petId}
+          onSuccess={handleEditSuccess}
+          editEvent={eventData}
+        />
+      )}
     </main>
   );
 };

@@ -84,6 +84,7 @@ const UpcomingProcedures = () => {
                   time={time}
                   fullDate={fullDate}
                   typeName={getEventTypeName(event.type)}
+                  eventType={event.type}
                   reminderEnabled={event.reminderEnabled}
                   onClick={() => {
                     const eventPath = getEventPath(event.type, event.id, search);
