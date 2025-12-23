@@ -1,6 +1,6 @@
 .procedure-card {
   width: 100%;
-  min-height: 160px;
+  height: 139px;
   background: var(--white);
   border-radius: 20px;
   box-sizing: border-box;
@@ -24,17 +24,6 @@
   flex-direction: column;
 }
 
-/* Визуальный маркер типа события */
-.procedure-card__type-marker {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
 
 .procedure-card__type-emoji {
   font-size: 24px;
