@@ -1,0 +1,15 @@
+@use './styles/normalize.scss';
+@use './styles/fonts.scss';
+@use './styles/variables.scss';
+@use './styles/utils.scss';
+@use './styles/globals.scss';
+
+@use './styles/blocks/button.scss';
+@use './styles/blocks/cross-button.scss';
+@use './styles/blocks/input.scss';
+@use './styles/blocks/textarea.scss';
+@use './styles/blocks/select.scss';
+@use './styles/blocks/toggle.scss';
+@use './styles/blocks/logo.scss';
+@use './styles/blocks/form.scss';
+@use './styles/blocks/section.scss';

@@ -1,0 +1,81 @@
+@use '../../../styles/helpers/' as *;
+
+.pet-card {
+  display: grid;
+  grid-template-columns: rem(500) auto;
+  column-gap: rem(10);
+
+  @include tablet {
+    display: flex;
+    align-items: center;
+  }
+
+  @include mobile {
+    display: flex;
+    flex-direction: column;
+    row-gap: rem(10);
+  }
+
+  &__content {
+    width: 100%;
+    padding-block: rem(28);
+    padding-inline: rem(36);
+    height: rem(367);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+
+    @include tablet {
+      height: auto;
+    }
+
+    @include mobile {
+      padding: rem(20);
+    }
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 1rem;
+    padding-bottom: rem(20);
+    border-bottom: var(--border);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    row-gap: rem(24);
+    padding-block: rem(20);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    column-gap: rem(40);
+  }
+
+  &__data {
+    &-label {
+      padding-bottom: rem(8);
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    column-gap: rem(10);
+
+    @include tablet {
+      flex-direction: column;
+      align-items: start;
+      row-gap: rem(10);
+
+      & button {
+        width: 100%;
+      }
+    }
+  }
+}

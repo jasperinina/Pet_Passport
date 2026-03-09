@@ -1,0 +1,21 @@
+@use '../helpers/' as *;
+
+.input {
+  @include fluid-text(16, 14);
+
+  padding-inline: rem(20);
+  height: var(--input-height);
+  border: var(--border);
+  border-radius: var(--border-radius-small);
+  outline: none;
+  color: var(--color-gray);
+
+  @include hover {
+    border-color: var(--color-dark);
+  }
+
+  &:focus {
+    color: var(--color-dark);
+    border-color: var(--color-dark);
+  }
+}

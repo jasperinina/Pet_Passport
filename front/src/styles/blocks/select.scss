@@ -1,0 +1,37 @@
+@use '../helpers/' as *;
+
+.select {
+  position: relative;
+
+  &::after {
+    @include square(12);
+
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: rem(20);
+    translate: 0 -50%;
+    background: url("../../assets/icons/select-arrow.svg") center / contain no-repeat;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &__field {
+    @include fluid-text(16, 14);
+
+    position: relative;
+    padding-left: rem(20);
+    padding-right: rem(50);
+    height: var(--input-height);
+    width: 100%;
+    background-color: var(--color-light-gray);
+    border: var(--border);
+    border-radius: var(--border-radius-small);
+    outline: none;
+    color: var(--color-dark);
+
+    @include hover {
+      border-color: var(--color-dark);
+    }
+  }
+}

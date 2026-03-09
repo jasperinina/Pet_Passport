@@ -1,15 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import "../styles/doctor-visit.css";
-import "../styles/procedure-modal.css";
+
 import { getVaccine, updateVaccine, deleteVaccine } from "../api/events";
 import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
 import EventPageHeader from "../components/events/EventPageHeader";
-import EventCard from "../components/events/EventCard";
+import EventCard from "../components/events/EventCard/EventCard";
 import ReminderSection from "../components/events/ReminderSection";
 import LoadingState from "../components/events/LoadingState";
 import ErrorState from "../components/events/ErrorState";
+import Menu from "../components/layout/Menu/Menu";
 
 const VaccinePage = () => {
   const { eventId } = useParams();
@@ -158,21 +158,23 @@ const VaccinePage = () => {
   }
 
   return (
-    <main className="main-page doctor-visit-page">
-      <div className="container">
-        <EventPageHeader
-          title={vaccineTitle}
-          eventId={eventId}
-          isEditing={isEditing}
-          onEdit={handleEditClick}
-          onSave={handleSaveClick}
-          onDelete={handleDelete}
-          onTitleChange={setVaccineTitle}
-          loading={loading}
-        />
+    <div>
+      <section className="container">
+        <Menu />
+      </section>
 
-        {/* Верхние карточки */}
-        <section className="doctor-visit-cards">
+      <section className="section container">
+        <div className="section__grid">
+          <EventPageHeader
+            title={vaccineTitle}
+            eventId={eventId}
+            isEditing={isEditing}
+            onEdit={handleEditClick}
+            onSave={handleSaveClick}
+            onDelete={handleDelete}
+            onTitleChange={setVaccineTitle}
+            loading={loading}
+          />
           <EventCard
             label="Дата и время"
             value={{
@@ -192,14 +194,12 @@ const VaccinePage = () => {
             }}
             type="datetime"
           />
-
           <EventCard
             label="Препарат"
             value={cardsData.medicine}
             isEditing={isEditing}
             onChange={(value) => handleCardFieldChange("medicine", value)}
           />
-
           <EventCard
             label="Периодичность"
             value={cardsData.periodUnit}
@@ -208,22 +208,22 @@ const VaccinePage = () => {
             type="select"
             options={PERIOD_OPTIONS}
           />
-        </section>
-
-        {/* Напоминания */}
-        <ReminderSection
-          reminderEnabled={reminderEnabled}
-          reminderValue={reminderValue}
-          reminderUnit={reminderUnit}
-          isEditing={isEditing}
-          onToggle={setReminderEnabled}
-          onOptionClick={(value, unit) => {
-            setReminderValue(value);
-            setReminderUnit(unit);
-          }}
-        />
-      </div>
-    </main>
+        </div>
+        <div className="section__body">
+          <ReminderSection
+            reminderEnabled={reminderEnabled}
+            reminderValue={reminderValue}
+            reminderUnit={reminderUnit}
+            isEditing={isEditing}
+            onToggle={setReminderEnabled}
+            onOptionClick={(value, unit) => {
+              setReminderValue(value);
+              setReminderUnit(unit);
+            }}
+          />
+        </div>
+      </section>
+    </div>
   );
 };
 

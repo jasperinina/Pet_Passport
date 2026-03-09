@@ -31,139 +31,82 @@ const TreatmentFields = ({
   };
 
   return (
-    <div className="procedure-section procedure-section--treatment">
-      <div className="form-field">
-        <label className="form-label h3" htmlFor="treatment-title">
-          Название
-        </label>
+    <ul className="form__list">
+      <li className="form__item">
+        <label className="form__item-label h3" htmlFor="treatment-title-field">Название</label>
         <input
-          type="text"
-          id="treatment-title"
-          className="form-input"
+          className="form__item-input input"
+          id="treatment-title-field"
+          name="treatment-title-field"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Введите название"
           disabled={loading}
         />
-      </div>
-
-      <div className="form-row">
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="treatment-remedy">
-            Препарат
-          </label>
+      </li>
+      <li className="form__two-columns">
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="treatment-remedy-field">Препарат</label>
           <input
-            type="text"
-            id="treatment-remedy"
-            className="form-input"
+            className="form__item-input input"
+            id="treatment-remedy-field"
+            name="treatment-remedy-field"
             value={remedy}
             onChange={(e) => setRemedy(e.target.value)}
             placeholder="Введите препарат"
             disabled={loading}
           />
         </div>
-
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="treatment-parasite">
-            Паразит
-          </label>
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="treatment-parasite-field">Паразит</label>
           <input
-            type="text"
-            id="treatment-parasite"
-            className="form-input"
+            className="form__item-input input"
+            id="treatment-parasite-field"
+            name="treatment-parasite-field"
             value={parasite}
             onChange={(e) => setParasite(e.target.value)}
-            placeholder="Введите название"
+            placeholder="Введите название паразита"
             disabled={loading}
           />
         </div>
-      </div>
-
-      <div className="form-row">
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="treatment-eventDate">
-            Дата
-          </label>
-
-          <div className="input-with-icon">
-            <input
-              ref={dateRef}
-              type="date"
-              id="treatment-eventDate"
-              className="form-input"
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
-              disabled={loading}
-              required
-            />
-
-            <button
-              type="button"
-              className="input-icon-btn"
-              aria-label="Выбрать дату"
-              disabled={loading}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                openPicker(dateRef);
-              }}
-            >
-              <img
-                src={CalendarIcon}
-                className="input-icon"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-          </div>
+      </li>
+      <li className="form__two-columns">
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="treatment-date-field">Дата</label>
+          <input
+            className="form__item-input input"
+            id="treatment-date-field"
+            name="treatment-date-field"
+            type="date"
+            ref={dateRef}
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
+            disabled={loading}
+            required
+          />
         </div>
-
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="treatment-eventTime">
-            Время
-          </label>
-
-          <div className="input-with-icon">
-            <input
-              ref={timeRef}
-              type="time"
-              id="treatment-eventTime"
-              className="form-input"
-              value={eventTime}
-              onChange={(e) => setEventTime(e.target.value)}
-              disabled={loading}
-              required
-            />
-
-            <button
-              type="button"
-              className="input-icon-btn"
-              aria-label="Выбрать время"
-              disabled={loading}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                openPicker(timeRef);
-              }}
-            >
-              <img
-                src={TimeIcon}
-                className="input-icon"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-          </div>
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="treatment-time-field">Время</label>
+          <input
+            className="form__item-input input"
+            id="treatment-time-field"
+            name="treatment-time-field"
+            type="time"
+            ref={timeRef}
+            value={eventTime}
+            onChange={(e) => setEventTime(e.target.value)}
+            disabled={loading}
+            required
+          />
         </div>
-      </div>
-
-      <div className="form-field">
-        <label className="form-label h3" htmlFor="treatment-periodUnit">
-          Периодичность
-        </label>
-
-        <div className="select-wrapper">
+      </li>
+      <li className="form__item">
+        <label className="form__item-label h3" htmlFor="treatment-period-unit-field">Периодичность</label>
+        <div className="form__item-input select">
           <select
-            id="treatment-periodUnit"
-            className="form-input form-select"
+            className="select__field"
+            id="treatment-period-unit-field"
+            name="treatment-period-unit-field"
             value={periodUnit}
             onChange={(e) => setPeriodUnit(parseInt(e.target.value, 10))}
             disabled={loading}
@@ -174,11 +117,9 @@ const TreatmentFields = ({
               </option>
             ))}
           </select>
-
-          <img className="select-arrow" src={ArrowIcon} alt="" aria-hidden="true" />
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   );
 };
 

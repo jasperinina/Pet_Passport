@@ -1,7 +1,4 @@
 import { useRef } from "react";
-import ArrowIcon from "../../assets/icons/icon-arrow.svg";
-import CalendarIcon from "../../assets/icons/icon-calendar.svg";
-import TimeIcon from "../../assets/icons/icon-time.svg";
 
 const VaccineFields = ({
   loading,
@@ -29,122 +26,68 @@ const VaccineFields = ({
   };
 
   return (
-    <div className="procedure-section procedure-section--vaccine">
-      <div className="form-field">
-        <label className="form-label h3" htmlFor="vaccine-title">
-          Название
-        </label>
+    <ul className="form__list">
+      <li className="form__item">
+        <label className="form__item-label h3" htmlFor="vaccine-title-field">Название</label>
         <input
-          type="text"
-          id="vaccine-title"
-          className="form-input"
+          className="form__item-input input"
+          id="vaccine-title-field"
+          name="vaccine-title-field"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Введите название"
           disabled={loading}
         />
-      </div>
-
-      <div className="form-field">
-        <label className="form-label h3" htmlFor="vaccine-medicine">
-          Препарат
-        </label>
+      </li>
+      <li className="form__item">
+        <label className="form__item-label h3" htmlFor="vaccine-medicine-field">Препарат</label>
         <input
-          type="text"
-          id="vaccine-medicine"
-          className="form-input"
+          className="form__item-input input"
+          id="vaccine-medicine-field"
+          name="vaccine-medicine-field"
           value={medicine}
           onChange={(e) => setMedicine(e.target.value)}
           placeholder="Введите препарат"
           disabled={loading}
         />
-      </div>
-
-      <div className="form-row">
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="vaccine-eventDate">
-            Дата
-          </label>
-
-          <div className="input-with-icon">
-            <input
-              ref={dateRef}
-              type="date"
-              id="vaccine-eventDate"
-              className="form-input"
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
-              disabled={loading}
-              required
-            />
-
-            <button
-              type="button"
-              className="input-icon-btn"
-              aria-label="Выбрать дату"
-              disabled={loading}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                openPicker(dateRef);
-              }}
-            >
-              <img
-                src={CalendarIcon}
-                className="input-icon"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-          </div>
+      </li>
+      <li className="form__two-columns">
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="vaccine-date-field">Дата</label>
+          <input
+            className="form__item-input input"
+            id="vaccine-date-field"
+            name="vaccine-date-field"
+            type="date"
+            ref={dateRef}
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
+            disabled={loading}
+            required
+          />
         </div>
-
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="vaccine-eventTime">
-            Время
-          </label>
-
-          <div className="input-with-icon">
-            <input
-              ref={timeRef}
-              type="time"
-              id="vaccine-eventTime"
-              className="form-input"
-              value={eventTime}
-              onChange={(e) => setEventTime(e.target.value)}
-              disabled={loading}
-              required
-            />
-
-            <button
-              type="button"
-              className="input-icon-btn"
-              aria-label="Выбрать время"
-              disabled={loading}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                openPicker(timeRef);
-              }}
-            >
-              <img
-                src={TimeIcon}
-                className="input-icon"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-          </div>
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="vaccine-time-field">Время</label>
+          <input
+            className="form__item-input input"
+            id="vaccine-time-field"
+            name="vaccine-time-field"
+            type="time"
+            ref={timeRef}
+            value={eventTime}
+            onChange={(e) => setEventTime(e.target.value)}
+            disabled={loading}
+            required
+          />
         </div>
-      </div>
-
-      <div className="form-field">
-        <label className="form-label h3" htmlFor="vaccine-periodUnit">
-          Периодичность
-        </label>
-
-        <div className="select-wrapper">
+      </li>
+      <li className="form__item">
+        <label className="form__item-label h3" htmlFor="vaccine-period-unit-field">Периодичность</label>
+        <div className="form__item-input select">
           <select
-            id="vaccine-periodUnit"
-            className="form-input form-select"
+            className="select__field"
+            id="vaccine-period-unit-field"
+            name="vaccine-period-unit-field"
             value={periodUnit}
             onChange={(e) => setPeriodUnit(parseInt(e.target.value, 10))}
             disabled={loading}
@@ -155,11 +98,9 @@ const VaccineFields = ({
               </option>
             ))}
           </select>
-
-          <img className="select-arrow" src={ArrowIcon} alt="" aria-hidden="true" />
         </div>
-      </div>
-    </div>
+      </li>
+    </ul>
   );
 };
 

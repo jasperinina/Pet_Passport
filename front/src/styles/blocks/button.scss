@@ -1,0 +1,35 @@
+@use '../helpers/' as *;
+
+.button {
+  @include fluid-text(16, 14);
+
+  padding-inline: rem(28);
+  height: var(--button-height);
+  font-weight: 600;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-small);
+
+  @include hover {
+    opacity: 0.7;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+
+  &--filled {
+    color: var(--color-light);
+    background-color: var(--color-dark);
+  }
+
+  &--outlined  {
+    color: var(--color-dark);
+    background-color: transparent;
+    border: var(--border);
+  }
+
+  &--transparent {
+    color: var(--color-gray);
+    background-color: transparent;
+  }
+}

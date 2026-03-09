@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import "../styles/doctor-visit.css";
-import "../styles/procedure-modal.css";
+// import "../styles/doctor-visit.css";
+// import "../styles/procedure-modal.css";
 import {
   getDoctorVisit,
   updateDoctorVisit,
@@ -10,11 +10,12 @@ import {
 import { PERIOD_UNITS, REMINDER_OPTIONS } from "../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
 import EventPageHeader from "../components/events/EventPageHeader";
-import EventCard from "../components/events/EventCard";
-import EventSection from "../components/events/EventSection";
+import EventCard from "../components/events/EventCard/EventCard";
+import EventSection from "../components/events/EventSection/EventSection";
 import ReminderSection from "../components/events/ReminderSection";
 import LoadingState from "../components/events/LoadingState";
 import ErrorState from "../components/events/ErrorState";
+import Menu from "../components/layout/Menu/Menu";
 
 const DoctorVisitPage = () => {
   const { eventId } = useParams();
@@ -185,21 +186,23 @@ const DoctorVisitPage = () => {
   }
 
   return (
-    <main className="main-page doctor-visit-page">
-      <div className="container">
-        <EventPageHeader
-          title={visitTitle}
-          eventId={eventId}
-          isEditing={isEditing}
-          onEdit={handleEditClick}
-          onSave={handleSaveClick}
-          onDelete={handleDelete}
-          onTitleChange={setVisitTitle}
-          loading={loading}
-        />
+    <div>
+      <section className="container">
+        <Menu />
+      </section>
 
-        {/* Верхние карточки */}
-        <section className="doctor-visit-cards">
+      <section className="section container">
+        <div className="section__grid">
+          <EventPageHeader
+            title={visitTitle}
+            eventId={eventId}
+            isEditing={isEditing}
+            onEdit={handleEditClick}
+            onSave={handleSaveClick}
+            onDelete={handleDelete}
+            onTitleChange={setVisitTitle}
+            loading={loading}
+          />
           <EventCard
             label="Дата и время"
             value={{
@@ -219,7 +222,6 @@ const DoctorVisitPage = () => {
             }}
             type="datetime"
           />
-
           <EventCard
             label="Клиника"
             value={cardsData.clinic}
@@ -227,51 +229,46 @@ const DoctorVisitPage = () => {
             onChange={(value) => handleCardFieldChange("clinic", value)}
             type="textarea"
           />
-
           <EventCard
             label="Врач"
             value={cardsData.doctor}
             isEditing={isEditing}
             onChange={(value) => handleCardFieldChange("doctor", value)}
           />
-        </section>
-
-        {/* Секции */}
-        <EventSection
-          title="Диагноз"
-          value={visitData.diagnosis}
-          isEditing={isEditing}
-          onChange={(value) => handleSectionChange("diagnosis", value)}
-        />
-
-        <EventSection
-          title="Рекомендации"
-          value={visitData.recommendations}
-          isEditing={isEditing}
-          onChange={(value) => handleSectionChange("recommendations", value)}
-        />
-
-        <EventSection
-          title="Направления"
-          value={visitData.directions}
-          isEditing={isEditing}
-          onChange={(value) => handleSectionChange("directions", value)}
-        />
-
-        {/* Напоминания */}
-        <ReminderSection
-          reminderEnabled={reminderEnabled}
-          reminderValue={reminderValue}
-          reminderUnit={reminderUnit}
-          isEditing={isEditing}
-          onToggle={setReminderEnabled}
-          onOptionClick={(value, unit) => {
-            setReminderValue(value);
-            setReminderUnit(unit);
-          }}
-        />
-      </div>
-    </main>
+        </div>
+        <div className="section__body">
+          <EventSection
+            title="Диагноз"
+            value={visitData.diagnosis}
+            isEditing={isEditing}
+            onChange={(value) => handleSectionChange("diagnosis", value)}
+          />
+          <EventSection
+            title="Рекомендации"
+            value={visitData.recommendations}
+            isEditing={isEditing}
+            onChange={(value) => handleSectionChange("recommendations", value)}
+          />
+          <EventSection
+            title="Направления"
+            value={visitData.directions}
+            isEditing={isEditing}
+            onChange={(value) => handleSectionChange("directions", value)}
+          />
+          <ReminderSection
+            reminderEnabled={reminderEnabled}
+            reminderValue={reminderValue}
+            reminderUnit={reminderUnit}
+            isEditing={isEditing}
+            onToggle={setReminderEnabled}
+            onOptionClick={(value, unit) => {
+              setReminderValue(value);
+              setReminderUnit(unit);
+            }}
+          />
+        </div>
+      </section>
+    </div>
   );
 };
 

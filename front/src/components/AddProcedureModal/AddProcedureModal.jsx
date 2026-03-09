@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
+
 import CrossIcon from "../../assets/icons/icon-cross.svg";
 import ArrowIcon from "../../assets/icons/icon-arrow.svg";
-
-// общие стили модалок и процедур
-import "../../styles/modal.css";
-import "../../styles/procedure-modal.css";
-
-// стили по типам процедур
-import "../../styles/procedure-doctor.css";
-import "../../styles/procedure-vaccine.css";
-import "../../styles/procedure-treatment.css";
 
 import {
   createDoctorVisit,
@@ -233,160 +225,151 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
 
   if (!isOpen) return null;
 
+  // TODO: Сделать вывод ошибки
+  // TODO: Переписать VaccineFields и TreatmentFields, как DoctorVisitFields
+  // TODO: Пофиксить баг: тг напоминания перекрывают основной список (напоминания должны так же скроллиться)
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div
-        className="modal-content modal-content--wide"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="modal-header">
-          <h1 className="h1 modal-title">Добавить процедуру</h1>
-          <button
-            className="modal-close"
-            onClick={handleClose}
-            disabled={loading}
-            type="button"
-            aria-label="Закрыть"
-          >
-            <img src={CrossIcon} alt="Закрыть" />
-          </button>
-
-          <div className="modal-divider" />
+    <form className="form" onSubmit={handleSubmit}>
+      {/* {error && (
+        <div className="form__error">
+          <p>{error}</p>
         </div>
+      )} */}
 
-        <form className="modal-form" onSubmit={handleSubmit}>
-          {error && (
-            <div className="modal-error">
-              <p className="txt2">{error}</p>
-            </div>
-          )}
-
-          <div className="modal-body">
-            <div className="modal-fields">
-              {/* Тип процедуры */}
-              <div className="form-field">
-                <label className="form-label h3" htmlFor="procedureType">
-                  Выберите тип
+      <div className="form__inner">
+        <header className="form__header">
+          <h2 className="form__title h1">Добавить процедуру</h2>
+          <div className="form__close-button-wrapper">
+            <button
+              className="form__close-button cross-button"
+              type="button"
+              disabled={loading}
+              onClick={handleClose}
+            >
+              <span className="visually-hidden">Закрыть форму</span>
+            </button>
+          </div>
+        </header>
+        <div className="form__body">
+          <ul className="form__list">
+            <li className="form__item">
+              <label
+                className="form__item-label h3"
+                htmlFor="add-procedure-type-select"
+              >
+                Выберите тип
+              </label>
+              <div className="form__item-input select">
+                <select
+                  className="select__field"
+                  id="add-procedure-type-select"
+                  name="add-procedure-type-select"
+                  value={procedureType}
+                  onChange={(e) => {
+                    setProcedureType(e.target.value);
+                    setTitle("");
+                  }}
+                  disabled={loading}
+                >
+                  <option value={PROCEDURE_TYPES.DOCTOR_VISIT}>Прием</option>
+                  <option value={PROCEDURE_TYPES.VACCINE}>Вакцинация</option>
+                  <option value={PROCEDURE_TYPES.TREATMENT}>Обработка</option>
+                </select>
+              </div>
+            </li>
+            {procedureType === PROCEDURE_TYPES.DOCTOR_VISIT && (
+              <DoctorVisitFields
+                loading={loading}
+                title={title}
+                setTitle={setTitle}
+                eventDate={eventDate}
+                setEventDate={setEventDate}
+                eventTime={eventTime}
+                setEventTime={setEventTime}
+                clinic={clinic}
+                setClinic={setClinic}
+                doctor={doctor}
+                setDoctor={setDoctor}
+                diagnosis={diagnosis}
+                setDiagnosis={setDiagnosis}
+                recommendations={recommendations}
+                setRecommendations={setRecommendations}
+                referrals={referrals}
+                setReferrals={setReferrals}
+              />
+            )}
+            {procedureType === PROCEDURE_TYPES.VACCINE && (
+              <VaccineFields
+                loading={loading}
+                title={title}
+                setTitle={setTitle}
+                medicine={medicine}
+                setMedicine={setMedicine}
+                eventDate={eventDate}
+                setEventDate={setEventDate}
+                eventTime={eventTime}
+                setEventTime={setEventTime}
+                periodUnit={periodUnit}
+                setPeriodUnit={setPeriodUnit}
+                periodOptions={PERIOD_OPTIONS}
+              />
+            )}
+            {procedureType === PROCEDURE_TYPES.TREATMENT && (
+              <TreatmentFields
+                loading={loading}
+                title={title}
+                setTitle={setTitle}
+                remedy={remedy}
+                setRemedy={setRemedy}
+                parasite={parasite}
+                setParasite={setParasite}
+                eventDate={eventDate}
+                setEventDate={setEventDate}
+                eventTime={eventTime}
+                setEventTime={setEventTime}
+                periodUnit={periodUnit}
+                setPeriodUnit={setPeriodUnit}
+                periodOptions={PERIOD_OPTIONS}
+              />
+            )}
+            <li className="form__item form__item--row">
+              <label
+                className="form__item-label h3 toggle__label"
+                htmlFor="add-procedure-telegram-notification-input"
+              >
+                Напоминание в Telegram
+              </label>
+              <div className="toggle">
+                <input
+                  className="toggle__input"
+                  id="add-procedure-telegram-notification-input"
+                  name="add-procedure-telegram-notification-input"
+                  type="checkbox"
+                  checked={reminderEnabled}
+                  onChange={(e) => setReminderEnabled(e.target.checked)}
+                  disabled={loading}
+                />
+              </div>
+            </li>
+            {reminderEnabled && (
+              <li className="form__item form__item--row">
+                <label
+                  className="form__item-label h3 toggle__label"
+                  htmlFor="add-procedure-telegram-notification-time-choice"
+                >
+                  Напоминать за
                 </label>
-
-                {/* ВАЖНО: wrapper для позиционирования иконки */}
-                <div className="select-wrapper">
-                  <select
-                    id="procedureType"
-                    className="form-input form-select"
-                    value={procedureType}
-                    onChange={(e) => {
-                      setProcedureType(e.target.value);
-                      setTitle("");
-                    }}
-                    disabled={loading}
-                  >
-                    <option value={PROCEDURE_TYPES.DOCTOR_VISIT}>Прием</option>
-                    <option value={PROCEDURE_TYPES.VACCINE}>Вакцинация</option>
-                    <option value={PROCEDURE_TYPES.TREATMENT}>Обработка</option>
-                  </select>
-
-                  <img
-                    className="select-arrow"
-                    src={ArrowIcon}
-                    alt=""
-                    aria-hidden="true"
-                  />
-                </div>
-              </div>
-
-              {procedureType === PROCEDURE_TYPES.DOCTOR_VISIT && (
-                <DoctorVisitFields
-                  loading={loading}
-                  title={title}
-                  setTitle={setTitle}
-                  eventDate={eventDate}
-                  setEventDate={setEventDate}
-                  eventTime={eventTime}
-                  setEventTime={setEventTime}
-                  clinic={clinic}
-                  setClinic={setClinic}
-                  doctor={doctor}
-                  setDoctor={setDoctor}
-                  diagnosis={diagnosis}
-                  setDiagnosis={setDiagnosis}
-                  recommendations={recommendations}
-                  setRecommendations={setRecommendations}
-                  referrals={referrals}
-                  setReferrals={setReferrals}
-                />
-              )}
-
-              {procedureType === PROCEDURE_TYPES.VACCINE && (
-                <VaccineFields
-                  loading={loading}
-                  title={title}
-                  setTitle={setTitle}
-                  medicine={medicine}
-                  setMedicine={setMedicine}
-                  eventDate={eventDate}
-                  setEventDate={setEventDate}
-                  eventTime={eventTime}
-                  setEventTime={setEventTime}
-                  periodUnit={periodUnit}
-                  setPeriodUnit={setPeriodUnit}
-                  periodOptions={PERIOD_OPTIONS}
-                />
-              )}
-
-              {procedureType === PROCEDURE_TYPES.TREATMENT && (
-                <TreatmentFields
-                  loading={loading}
-                  title={title}
-                  setTitle={setTitle}
-                  remedy={remedy}
-                  setRemedy={setRemedy}
-                  parasite={parasite}
-                  setParasite={setParasite}
-                  eventDate={eventDate}
-                  setEventDate={setEventDate}
-                  eventTime={eventTime}
-                  setEventTime={setEventTime}
-                  periodUnit={periodUnit}
-                  setPeriodUnit={setPeriodUnit}
-                  periodOptions={PERIOD_OPTIONS}
-                />
-              )}
-            </div>
-
-            {/* Напоминания (внутри scroll) */}
-            <div className="modal-reminder">
-              <div className="form-field">
-                <div className="form-toggle-group">
-                  <label className="form-label h3">
-                    Напоминание в Telegram
-                  </label>
-                  <label className="form-toggle">
-                    <input
-                      type="checkbox"
-                      checked={reminderEnabled}
-                      onChange={(e) => setReminderEnabled(e.target.checked)}
-                      disabled={loading}
-                    />
-                    <span className="form-toggle-slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              {reminderEnabled && (
-                <div className="form-field">
-                  <label className="form-label h3">Напоминать за</label>
-                  <div className="form-button-group">
-                    {REMINDER_OPTIONS.map((option) => (
+                <ul className="toggle toggle__list">
+                  {REMINDER_OPTIONS.map((option) => (
+                    <li className="toggle__item" key={`${option.value}-${option.unit}`}>
                       <button
-                        key={`${option.value}-${option.unit}`}
-                        type="button"
-                        className={`form-button-option ${
-                          reminderValue === option.value &&
-                          reminderUnit === option.unit
-                            ? "form-button-option--active"
+                        className={`toggle__button ${
+                          reminderValue === option.value && 
+                          reminderUnit === option.unit 
+                            ? "toggle__button--active" 
                             : ""
                         }`}
+                        type="button"
                         onClick={() =>
                           handleReminderOptionClick(option.value, option.unit)
                         }
@@ -394,30 +377,32 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
                       >
                         {option.label}
                       </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Кнопки (sticky в CSS) */}
-          <div className="modal-actions">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={handleClose}
-              disabled={loading}
-            >
-              Отмена
-            </button>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? "Добавление..." : "Добавить"}
-            </button>
-          </div>
-        </form>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            )}
+          </ul>
+        </div>
+        <footer className="form__footer">
+          <button
+            className="button button--outlined"
+            type="button"
+            onClick={handleClose}
+            disabled={loading}
+          >
+            Отменить
+          </button>
+          <button
+            className="button button--filled"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Добавление..." : "Добавить"}
+          </button>
+        </footer>
       </div>
-    </div>
+    </form>
   );
 };
 

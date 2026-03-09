@@ -1,0 +1,29 @@
+@use '../../../styles/helpers/' as *;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: rem(60);
+  background-color: rgba($color: #000000, $alpha: 0.6);
+  z-index: 1000;
+
+  @include mobile {
+    padding: rem(20);
+  }
+
+  @include mobile-s {
+    padding: 0;
+  }
+
+  &__background {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+}

@@ -27,7 +27,7 @@ const PetPhotosGrid = memo(({ photos, petName }) => {
         gridTemplateColumns: gridColumns,
         gap: "10px",
         width: "100%",
-        height: "100%",
+        height: "100%"
       }}
     >
       {validPhotos.map((photo, index) => {

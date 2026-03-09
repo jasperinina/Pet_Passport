@@ -1,0 +1,26 @@
+@use '../../../styles/helpers/' as *;
+
+.procedures {
+  &__empty {
+    @include fluid-text(20, 16);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: rem(300);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    row-gap: rem(10);
+  }
+
+  &__item {
+    width: 100%;
+  }
+}

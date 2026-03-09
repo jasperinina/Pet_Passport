@@ -1,0 +1,48 @@
+@use '../../../styles/helpers/' as *;
+
+.header {
+  &__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 2rem;
+    padding: rem(19) rem(28);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+
+    @include mobile {
+      padding: rem(12) rem(16);
+    }
+
+    button {
+      @include hover {
+        opacity: 0.7;
+      }
+    }
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+
+    @include mobile {
+      justify-content: space-between;
+      column-gap: rem(10);
+      width: 100%;
+    }
+  }
+
+  &__separator {
+    display: block;
+    margin-inline: rem(28);
+    height: 1.5rem;
+    width: rem(1);
+    background-color: var(--color-gray-alt);
+  }
+
+  &__pet {
+    display: flex;
+    align-items: center;
+    column-gap: rem(8);
+  }
+}

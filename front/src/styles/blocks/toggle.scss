@@ -1,0 +1,79 @@
+@use '../helpers/' as *;
+
+.toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__label {
+    color: var(--color-dark);
+    pointer-events: none;
+  }
+
+  &__input {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    min-width: rem(70);
+    height: rem(36);
+    background-color: var(--color-light-gray);
+    border: 1px solid transparent;
+    border-radius: var(--border-radius-large);
+    cursor: pointer;
+
+    @include hover {
+      opacity: 0.7;
+    }
+
+    &:checked {
+      background-color: var(--color-blue-alt);
+
+      @include hover {
+        opacity: 0.7;
+      }
+    }
+
+    &::after {
+      @include square(26);
+
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: rem(5);
+      translate: 0 -50%;
+      background-color: var(--color-dark);
+      border-radius: 50%;
+      transition-duration: var(--transition-duration);
+    }
+
+    &:checked {
+      &::after {
+        left: 55%;
+        background-color: var(--color-blue);
+      }
+    }
+  }
+
+  &__list {
+    display: flex;
+    align-items: center;
+    column-gap: rem(10);
+  }
+
+  &__button {
+    padding: rem(8) rem(16);
+    color: inherit;
+    border: var(--border);
+    border-radius: var(--border-radius-large);
+
+    @include hover {
+      opacity: 0.7;
+    }
+
+    &--active {
+      color: var(--color-light);
+      background-color: var(--color-blue);
+      border-color: var(--color-blue);
+    }
+  }
+}

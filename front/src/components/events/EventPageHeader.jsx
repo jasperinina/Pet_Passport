@@ -13,78 +13,73 @@ const EventPageHeader = ({
   const navigate = useNavigate();
 
   return (
-    <section className="doctor-visit-header">
+    <div className="section__grid--first-child">
       {isEditing ? (
-        <input
-          className="h1 doctor-visit__title"
-          value={title}
-          onChange={(e) => onTitleChange?.(e.target.value)}
-          style={{
-            border: "none",
-            outline: "none",
-            background: "transparent",
-            font: "inherit",
-            color: "var(--black)",
-            padding: 0,
-            width: "100%",
-            maxWidth: "600px",
-          }}
-        />
-      ) : (
-        <h1 className="h1 doctor-visit__title">
-          {title} {eventId ? `#${eventId}` : ""}
-        </h1>
-      )}
-
-      <div className="doctor-visit-header__actions">
-        {isEditing ? (
-          <>
+        <header className="section__header section__header--filled">
+          <label className="visually-hidden" htmlFor="procedure-page-title">
+            {title}
+          </label>
+          <input
+            className="input"
+            id="procedure-page-title"
+            name="procedure-page-title"
+            value={title}
+            onChange={(e) => onTitleChange?.(e.target.value)}
+          />
+          <div className="section__actions">
             <button
-              className="btn btn-primary"
-              onClick={onSave}
+              className="button button--filled"
+              type="button"
               disabled={loading}
+              onClick={onSave}
             >
               Сохранить
             </button>
             <button
-              className="doctor-visit__btn-delete"
+              className="button button--transparent"
               type="button"
-              onClick={onDelete}
               disabled={loading}
+              onClick={onDelete}
             >
               Удалить
             </button>
-          </>
-        ) : (
-          <>
+          </div>
+        </header>
+      ) : (
+        <header className="section__header section__header--filled">
+          <h1 className="section__title h1">
+            {title}
+          </h1>
+          <div className="section__actions">
             <button
-              className="btn btn-primary"
-              onClick={onEdit}
+              className="button button--filled"
+              type="button"
               disabled={loading}
+              onClick={onEdit}
             >
               Редактировать
             </button>
             <button
-              className="btn btn-secondary"
-              onClick={() => navigate(-1)}
+              className="button button--outlined"
+              type="button"
               disabled={loading}
+              onClick={() => navigate(-1)}
             >
               Назад
             </button>
             <button
-              className="doctor-visit__btn-delete"
+              className="button button--transparent"
               type="button"
-              onClick={onDelete}
               disabled={loading}
+              onClick={onDelete}
             >
               Удалить
             </button>
-          </>
-        )}
-      </div>
-    </section>
+          </div>
+        </header>
+      )}
+    </div>
   );
 };
 
 export default EventPageHeader;
-

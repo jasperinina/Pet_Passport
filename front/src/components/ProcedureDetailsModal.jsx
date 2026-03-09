@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import "../styles/modal.css";
+
 import CrossIcon from "../assets/icons/icon-cross.svg";
 
 const getTypeLabel = (type) => {
@@ -16,19 +16,9 @@ const getTypeLabel = (type) => {
 };
 
 const ProcedureDetailsModal = ({ isOpen, onClose, event }) => {
-  // блокируем скролл страницы, пока модалка открыта
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, [isOpen]);
-
   if (!isOpen) return null;
+
+  console.log("test");
 
   const handleClose = () => {
     if (onClose) onClose();

@@ -1,0 +1,53 @@
+@use '../../../styles/helpers/' as *;
+
+.menu {
+  @include mobile {
+    padding: rem(16);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+  }
+
+  &__list {
+    display: flex;
+    align-items: center;
+    column-gap: rem(28);
+
+    @include mobile {
+      display: grid;
+      grid-template-columns: auto rem(1) auto;
+    }
+
+    @include mobile-s {
+      column-gap: rem(16);
+    }
+  }
+
+  &__item {
+    justify-self: center;
+    transition-duration: var(--transition-duration);
+    
+    @include hover {
+      opacity: 0.7;
+    }
+  }
+
+  &__link {
+    @include fluid-text(16, 12);
+
+    display: flex;
+    column-gap: rem(8);
+    color: var(--color-dark);
+    text-align: left;
+  }
+
+  &__text {
+    width: auto;
+  }
+
+  &__separator {
+    display: block;
+    width: rem(1);
+    height: rem(24);
+    background-color: var(--color-gray-alt);
+  }
+}

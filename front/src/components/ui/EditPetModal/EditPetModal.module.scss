@@ -1,0 +1,126 @@
+@use '../../../styles/helpers/' as *;
+
+.edit-pet-modal {
+  &__photos {
+    &-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(rem(100), 1fr));
+      gap: rem(12);
+      margin-bottom: rem(16);
+    }
+
+    &-item {
+      position: relative;
+    }
+
+    &-image {
+      width: 100%;
+      height: rem(100);
+      object-fit: cover;
+      border: var(--border);
+      border-radius: var(--border-radius-small);
+
+      &--opacity {
+        opacity: 0.6;
+      }
+    }
+
+    &-remove-button {
+      @include fluid-text(18, 14);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      position: absolute;
+      top: rem(4);
+      right: rem(4);
+      width: rem(24);
+      height: rem(24);
+      font-weight: 700;
+      background-color: rgba(211, 47, 47, 0.9);
+      color: var(--color-light);
+      border: none;
+      border-radius: 50%;
+
+      @include hover {
+        opacity: 0.6;
+      }
+
+      &--not-allowed {
+        cursor: not-allowed;
+      }
+
+      &--opacity {
+        opacity: 0.6;
+      }
+    }
+  }
+
+  &__photo-file {
+    &-label {
+      @include fluid-text(14, 12);
+
+      display: inline-block;
+      padding: rem(8) rem(16);
+      color: var(--color-dark);
+      background-color: var(--color-gray-alt);
+      border-radius: var(--border-radius-small);
+
+      @include hover {
+        opacity: 0.6;
+      }
+
+      &--not-allowed {
+        cursor: not-allowed;
+      }
+
+      &--opacity {
+        opacity: 0.6;
+      }
+    }
+
+    &-input {
+      display: none;
+    }
+
+    &-preview {
+      margin-top: rem(12);
+
+      &-inner {
+        display: flex;
+        align-items: center;
+        column-gap: rem(12);
+        margin-bottom: rem(8);
+
+        @include mobile-s {
+          display: grid;
+          grid-template-columns: rem(100) auto;
+          row-gap: rem(12);
+        }
+      }
+
+      &-image {
+        object-fit: cover;
+        border-radius: var(--border-radius-small);
+        border: var(--border);
+      }
+
+      &-name {
+        @include fluid-text(14, 12);
+      }
+
+      &-button {
+        padding: rem(8) rem(16);
+
+        &--not-allowed {
+          cursor: not-allowed;
+        }
+
+        @include mobile {
+          width: auto;
+        }
+      }
+    }
+  }
+}

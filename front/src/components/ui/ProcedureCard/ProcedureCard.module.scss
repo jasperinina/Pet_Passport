@@ -1,0 +1,68 @@
+@use '../../../styles/helpers/' as *;
+
+.procedure-card {
+  @include light-background;
+
+  border: 1px solid transparent;
+  transition-property: border-color;
+  transition-duration: var(--transition-duration);
+  cursor: pointer;
+
+  @include hover {
+    border-color: var(--color-dark);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    column-gap: rem(16);
+    padding-bottom: rem(24);
+
+    @include mobile-s {
+      display: grid;
+      grid-template-columns: rem(20) auto;
+      column-gap: rem(16);
+      row-gap: rem(10);
+      padding-bottom: rem(20);
+    }
+  }
+
+  &__datetime {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: rem(5) rem(12);
+    color: var(--color-dark);
+    border: var(--border);
+    border-radius: var(--border-radius-large);
+  }
+
+  &__date {
+    display: flex;
+    align-items: center;
+    column-gap: rem(8);
+    padding-right: rem(8);
+  }
+
+  &__time {
+    padding-left: rem(8);
+    border-left: var(--border);
+  }
+
+  &__type {
+    @include mobile-s {
+      grid-column: 1 / -1;
+    }
+
+    &-inner {
+      @include fluid-text(16, 14);
+
+      padding: rem(5) rem(12);
+      width: 100%;
+      text-align: center;
+      color: var(--color-dark);
+      background-color: var(--color-light-gray);
+      border-radius: var(--border-radius-large);
+    }
+  }
+}

@@ -1,16 +1,16 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import "../styles/doctor-visit.css";
-import "../styles/procedure-modal.css";
+
 import { getTreatment, updateTreatment, deleteTreatment } from "../api/events";
 import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
 import EventPageHeader from "../components/events/EventPageHeader";
-import EventCard from "../components/events/EventCard";
-import EventSection from "../components/events/EventSection";
+import EventCard from "../components/events/EventCard/EventCard";
+import EventSection from "../components/events/EventSection/EventSection";
 import ReminderSection from "../components/events/ReminderSection";
 import LoadingState from "../components/events/LoadingState";
 import ErrorState from "../components/events/ErrorState";
+import Menu from "../components/layout/Menu/Menu";
 
 const TreatmentPage = () => {
   const { eventId } = useParams();
@@ -162,21 +162,23 @@ const TreatmentPage = () => {
   }
 
   return (
-    <main className="main-page doctor-visit-page">
-      <div className="container">
-        <EventPageHeader
-          title={treatmentTitle}
-          eventId={eventId}
-          isEditing={isEditing}
-          onEdit={handleEditClick}
-          onSave={handleSaveClick}
-          onDelete={handleDelete}
-          onTitleChange={setTreatmentTitle}
-          loading={loading}
-        />
+    <div>
+      <section className="container">
+        <Menu />
+      </section>
 
-        {/* Верхние карточки */}
-        <section className="doctor-visit-cards">
+      <section className="section container">
+        <div className="section__grid">
+          <EventPageHeader
+            title={treatmentTitle}
+            eventId={eventId}
+            isEditing={isEditing}
+            onEdit={handleEditClick}
+            onSave={handleSaveClick}
+            onDelete={handleDelete}
+            onTitleChange={setTreatmentTitle}
+            loading={loading}
+          />
           <EventCard
             label="Дата и время"
             value={{
@@ -196,70 +198,41 @@ const TreatmentPage = () => {
             }}
             type="datetime"
           />
-
           <EventCard
             label="Препарат"
             value={cardsData.remedy}
             isEditing={isEditing}
             onChange={(value) => handleCardFieldChange("remedy", value)}
           />
-
           <EventCard
             label="Паразит"
             value={cardsData.parasite}
             isEditing={isEditing}
             onChange={(value) => handleCardFieldChange("parasite", value)}
           />
-        </section>
-
-        {/* Периодичность */}
-        <section className="doctor-visit-section">
-          <h2 className="h1 doctor-visit-section__title">Периодичность</h2>
-          <div className="doctor-visit-section__card">
-            {isEditing ? (
-              <select
-                className="txt1 doctor-visit-section__text doctor-visit-section__textarea"
-                value={cardsData.periodUnit}
-                onChange={(e) =>
-                  handleCardFieldChange("periodUnit", parseInt(e.target.value, 10))
-                }
-                style={{
-                  border: "none",
-                  outline: "none",
-                  background: "transparent",
-                  font: "inherit",
-                  color: "var(--txt)",
-                  padding: 0,
-                }}
-              >
-                {PERIOD_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            ) : (
-              <p className="txt1 doctor-visit-section__text">
-                {PERIOD_OPTIONS.find((opt) => opt.value === cardsData.periodUnit)?.label || "Раз в месяц"}
-              </p>
-            )}
-          </div>
-        </section>
-
-        {/* Напоминания */}
-        <ReminderSection
-          reminderEnabled={reminderEnabled}
-          reminderValue={reminderValue}
-          reminderUnit={reminderUnit}
-          isEditing={isEditing}
-          onToggle={setReminderEnabled}
-          onOptionClick={(value, unit) => {
-            setReminderValue(value);
-            setReminderUnit(unit);
-          }}
-        />
-      </div>
-    </main>
+        </div>
+        <div className="section__body">
+          <EventSection
+            title="Периодичность"
+            value={cardsData.periodUnit}
+            isEditing={isEditing}
+            onChange={(e) => handleCardFieldChange("periodUnit", parseInt(e.target.value, 10))}
+            type="select"
+          />
+          <ReminderSection
+            reminderEnabled={reminderEnabled}
+            reminderValue={reminderValue}
+            reminderUnit={reminderUnit}
+            isEditing={isEditing}
+            onToggle={setReminderEnabled}
+            onOptionClick={(value, unit) => {
+              setReminderValue(value);
+              setReminderUnit(unit);
+            }}
+          />
+        </div>
+      </section>
+    </div>
   );
 };
 

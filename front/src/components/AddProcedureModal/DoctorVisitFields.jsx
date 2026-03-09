@@ -1,6 +1,4 @@
 import { useRef } from "react";
-import CalendarIcon from "../../assets/icons/icon-calendar.svg";
-import TimeIcon from "../../assets/icons/icon-time.svg";
 
 const DoctorVisitFields = ({
   loading,
@@ -33,180 +31,117 @@ const DoctorVisitFields = ({
   };
 
   return (
-    <div className="procedure-section procedure-section--doctor">
-      <div className="form-field">
-        <label className="form-label h3" htmlFor="doctorVisit-title">
-          Название
-        </label>
+    <ul className="form__list">
+      <li className="form__item">
+        <label className="form__item-label h3" htmlFor="doctor-visit-title-field">Название</label>
         <input
-          type="text"
-          id="doctorVisit-title"
-          className="form-input"
+          className="form__item-input input"
+          id="doctor-visit-title-field"
+          name="doctor-visit-title-field"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Введите название"
           disabled={loading}
         />
-      </div>
-
-      <div className="form-row">
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="doctorVisit-clinic">
-            Клиника
-          </label>
+      </li>
+      <li className="form__two-columns">
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="doctor-visit-clinic-field">Клиника</label>
           <input
-            type="text"
-            id="doctorVisit-clinic"
-            className="form-input"
+            className="form__item-input input"
+            id="doctor-visit-clinic-field"
+            name="doctor-visit-clinic-field"
             value={clinic}
             onChange={(e) => setClinic(e.target.value)}
             placeholder="Введите клинику"
             disabled={loading}
           />
         </div>
-
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="doctorVisit-doctor">
-            Врач
-          </label>
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="doctor-visit-doctor-field">Врач</label>
           <input
-            type="text"
-            id="doctorVisit-doctor"
-            className="form-input"
+            className="form__item-input input"
+            id="doctor-visit-doctor-field"
+            name="doctor-visit-doctor-field"
             value={doctor}
             onChange={(e) => setDoctor(e.target.value)}
             placeholder="Введите врача"
             disabled={loading}
           />
         </div>
-      </div>
-
-      <div className="form-row">
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="doctorVisit-eventDate">
-            Дата
-          </label>
-
-          <div className="input-with-icon">
-            <input
-              ref={dateRef}
-              type="date"
-              id="doctorVisit-eventDate"
-              className="form-input"
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
-              disabled={loading}
-              required
-            />
-
-            <button
-              type="button"
-              className="input-icon-btn"
-              aria-label="Выбрать дату"
-              disabled={loading}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                openPicker(dateRef);
-              }}
-            >
-              <img
-                src={CalendarIcon}
-                className="input-icon"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-          </div>
+      </li>
+      <li className="form__two-columns">
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="doctor-visit-date-field">Дата</label>
+          <input
+            className="form__item-input input"
+            id="doctor-visit-date-field"
+            name="doctor-visit-date-field"
+            type="date"
+            ref={dateRef}
+            value={eventDate}
+            onChange={(e) => setEventDate(e.target.value)}
+            disabled={loading}
+            required
+          />
         </div>
-
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="doctorVisit-eventTime">
-            Время
-          </label>
-
-          <div className="input-with-icon">
-            <input
-              ref={timeRef}
-              type="time"
-              id="doctorVisit-eventTime"
-              className="form-input"
-              value={eventTime}
-              onChange={(e) => setEventTime(e.target.value)}
-              disabled={loading}
-              required
-            />
-
-            <button
-              type="button"
-              className="input-icon-btn"
-              aria-label="Выбрать время"
-              disabled={loading}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                openPicker(timeRef);
-              }}
-            >
-              <img
-                src={TimeIcon}
-                className="input-icon"
-                alt=""
-                aria-hidden="true"
-              />
-            </button>
-          </div>
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="doctor-visit-time-field">Время</label>
+          <input
+            className="form__item-input input"
+            id="doctor-visit-time-field"
+            name="doctor-visit-time-field"
+            type="time"
+            ref={timeRef}
+            value={eventTime}
+            onChange={(e) => setEventTime(e.target.value)}
+            disabled={loading}
+            required
+          />
         </div>
-      </div>
-
-      <div className="form-row">
-        <div className="form-field">
-          <label className="form-label h3" htmlFor="doctorVisit-diagnosis">
-            Диагноз
-          </label>
+      </li>
+      <li className="form__two-columns">
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="doctor-visit-diagnosis-field">Диагноз</label>
           <textarea
-            id="doctorVisit-diagnosis"
-            className="form-input form-textarea"
+            className="form__item-input textarea"
+            id="doctor-visit-diagnosis-field"
+            name="doctor-visit-diagnosis-field"
             value={diagnosis}
             onChange={(e) => setDiagnosis(e.target.value)}
-            placeholder="Диагноз"
+            placeholder="Введите диагноз"
             disabled={loading}
             rows="4"
           />
         </div>
-
-        <div className="form-field">
-          <label
-            className="form-label h3"
-            htmlFor="doctorVisit-recommendations"
-          >
-            Рекомендации
-          </label>
+        <div className="form__item">
+          <label className="form__item-label h3" htmlFor="doctor-visit-recommendations-field">Рекомендации</label>
           <textarea
-            id="doctorVisit-recommendations"
-            className="form-input form-textarea"
+            className="form__item-input textarea"
+            id="doctor-visit-recommendations-field"
+            name="doctor-visit-recommendations-field"
             value={recommendations}
             onChange={(e) => setRecommendations(e.target.value)}
-            placeholder="Рекомендации"
+            placeholder="Введите рекомендации"
             disabled={loading}
             rows="4"
           />
         </div>
-      </div>
-
-      <div className="form-field">
-        <label className="form-label h3" htmlFor="doctorVisit-referrals">
-          Направления
-        </label>
+      </li>
+      <li className="form__item">
+        <label className="form__item-label h3" htmlFor="doctor-visit-referrals-field">Направления</label>
         <textarea
-          id="doctorVisit-referrals"
-          className="form-input form-textarea"
+          className="form__item-input textarea"
+          id="doctor-visit-referrals-field"
+          name="doctor-visit-referrals-field"
           value={referrals}
           onChange={(e) => setReferrals(e.target.value)}
-          placeholder="Направления"
+          placeholder="Введите направления"
           disabled={loading}
           rows="3"
         />
-      </div>
-    </div>
+      </li>
+    </ul>
   );
 };
 

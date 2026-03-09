@@ -1,0 +1,22 @@
+@use '../helpers/' as *;
+
+.textarea {
+  @include fluid-text(16, 14);
+
+  padding-inline: rem(20);
+  width: 100%;
+  border: var(--border);
+  border-radius: var(--border-radius-small);
+  outline: none;
+  resize: none;
+  color: var(--color-gray);
+
+  @include hover {
+    border-color: var(--color-dark);
+  }
+
+  &:focus {
+    color: var(--color-dark);
+    border-color: var(--color-dark);
+  }
+}
