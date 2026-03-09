@@ -1,13 +1,10 @@
 import { useState, useEffect } from "react";
 
-import CrossIcon from "../../assets/icons/icon-cross.svg";
-import ArrowIcon from "../../assets/icons/icon-arrow.svg";
-
 import {
   createDoctorVisit,
   createVaccine,
   createTreatment,
-} from "../../api/events";
+} from "../../../../api/events";
 
 import DoctorVisitFields from "./DoctorVisitFields";
 import VaccineFields from "./VaccineFields";
@@ -17,7 +14,7 @@ import {
   PERIOD_UNITS,
   PERIOD_OPTIONS,
   REMINDER_OPTIONS,
-} from "../../constants/eventConstants";
+} from "../../../../constants/eventConstants";
 
 const PROCEDURE_TYPES = EVENT_TYPES;
 
@@ -225,17 +222,8 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
 
   if (!isOpen) return null;
 
-  // TODO: Сделать вывод ошибки
-  // TODO: Переписать VaccineFields и TreatmentFields, как DoctorVisitFields
-  // TODO: Пофиксить баг: тг напоминания перекрывают основной список (напоминания должны так же скроллиться)
   return (
     <form className="form" onSubmit={handleSubmit}>
-      {/* {error && (
-        <div className="form__error">
-          <p>{error}</p>
-        </div>
-      )} */}
-
       <div className="form__inner">
         <header className="form__header">
           <h2 className="form__title h1">Добавить процедуру</h2>
@@ -251,6 +239,11 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
           </div>
         </header>
         <div className="form__body">
+          {error && (
+            <div className="form__error">
+              <p>{error}</p>
+            </div>
+          )}
           <ul className="form__list">
             <li className="form__item">
               <label

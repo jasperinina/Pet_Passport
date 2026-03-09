@@ -1,5 +1,7 @@
 import { memo } from "react";
+
 import PetPhoto from "../../assets/images/pet-photo.png";
+
 import API_BASE_URL from "../../api/config";
 
 const PetPhotosGrid = memo(({ photos, petName }) => {
@@ -58,4 +60,3 @@ const PetPhotosGrid = memo(({ photos, petName }) => {
 PetPhotosGrid.displayName = 'PetPhotosGrid';
 
 export default PetPhotosGrid;
-

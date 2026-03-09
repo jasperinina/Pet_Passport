@@ -1,9 +1,8 @@
 import styles from "./ProcedureCard.module.scss";
 
-import BellOnIcon from "../../../assets/icons/icon-notifications-on.svg";
-import BellOffIcon from "../../../assets/icons/icon-notifications-off.svg";
-
-import DateIcon from "../../../assets/icons/icons-date.svg";
+import BellOnIcon from "../../../assets/icons/notifications-on.svg";
+import BellOffIcon from "../../../assets/icons/notifications-off.svg";
+import DateIcon from "../../../assets/icons/date.svg";
 
 const ProcedureCard = ({
   title,

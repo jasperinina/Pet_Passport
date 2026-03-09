@@ -1,9 +1,10 @@
 import styles from "./EditPetModal.module.scss";
 
 import { useState, useEffect, useRef } from "react";
-import { updatePet, uploadPetPhoto, deletePetPhoto } from "../../../api/pets";
-import API_BASE_URL from "../../../api/config";
-import { FILE_UPLOAD, ERROR_MESSAGES } from "../../../constants/config";
+
+import { updatePet, uploadPetPhoto, deletePetPhoto } from "../../../../api/pets";
+import API_BASE_URL from "../../../../api/config";
+import { FILE_UPLOAD, ERROR_MESSAGES } from "../../../../constants/config";
 
 const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -246,15 +247,8 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
 
   if (!isOpen) return null;
 
-  // TODO: Сделать вывод ошибки
   return (
     <form className="form" onSubmit={handleSubmit}>
-      {/* {error && (
-        <div className="form__error">
-          <p>{error}</p>
-        </div>
-      )} */}
-
       <div className="form__inner">
         <header className="form__header">
           <h2 className="form__title h1">Изменить данные</h2>
@@ -270,6 +264,11 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
           </div>
         </header>
         <div className="form__body">
+          {error && (
+            <div className="form__error">
+              <p>{error}</p>
+            </div>
+          )}
           <ul className="form__list">
             <li className="form__item">
               <label className="form__item-label h3" htmlFor="edit-pet-name-input">Имя</label>

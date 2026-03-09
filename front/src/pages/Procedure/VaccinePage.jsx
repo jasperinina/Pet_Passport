@@ -1,43 +1,32 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-// import "../styles/doctor-visit.css";
-// import "../styles/procedure-modal.css";
-import {
-  getDoctorVisit,
-  updateDoctorVisit,
-  deleteDoctorVisit,
-} from "../api/events";
-import { PERIOD_UNITS, REMINDER_OPTIONS } from "../constants/eventConstants";
-import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
-import EventPageHeader from "../components/events/EventPageHeader";
-import EventCard from "../components/events/EventCard/EventCard";
-import EventSection from "../components/events/EventSection/EventSection";
-import ReminderSection from "../components/events/ReminderSection";
-import LoadingState from "../components/events/LoadingState";
-import ErrorState from "../components/events/ErrorState";
-import Menu from "../components/layout/Menu/Menu";
 
-const DoctorVisitPage = () => {
+import EventPageHeader from "../../components/events/EventPageHeader";
+import EventCard from "../../components/events/EventCard/EventCard";
+import ReminderSection from "../../components/events/ReminderSection";
+import LoadingState from "../../components/events/LoadingState";
+import ErrorState from "../../components/events/ErrorState";
+import Menu from "../../components/layout/Menu/Menu";
+
+import { getVaccine, updateVaccine, deleteVaccine } from "../../api/events";
+import { PERIOD_UNITS, PERIOD_OPTIONS } from "../../constants/eventConstants";
+import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
+
+const VaccinePage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const [visitTitle, setVisitTitle] = useState("");
+  const [vaccineTitle, setVaccineTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
 
   const [cardsData, setCardsData] = useState({
     date: "",
     time: "",
-    clinic: "",
-    doctor: "",
-  });
-
-  const [visitData, setVisitData] = useState({
-    diagnosis: "",
-    recommendations: "",
-    directions: "",
+    medicine: "",
+    periodUnit: PERIOD_UNITS.MONTH,
   });
 
   const [reminderEnabled, setReminderEnabled] = useState(false);
@@ -47,52 +36,46 @@ const DoctorVisitPage = () => {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const loadVisit = async () => {
+    const loadVaccine = async () => {
       if (!eventId) return;
 
       try {
         setLoading(true);
         setError(null);
 
-        const visit = await getDoctorVisit(parseInt(eventId, 10));
+        const vaccine = await getVaccine(parseInt(eventId, 10));
 
-        setVisitTitle(visit.title || "Прием");
-        setEventDateRaw(visit.eventDate);
+        setVaccineTitle(vaccine.title || "Вакцинация");
+        setEventDateRaw(vaccine.eventDate);
 
-        const { date, time } = formatEventDateTime(visit.eventDate);
-        const dateInput = formatDateForInput(visit.eventDate);
-        const timeInput = formatTimeForInput(visit.eventDate);
+        const { date, time } = formatEventDateTime(vaccine.eventDate);
+        const dateInput = formatDateForInput(vaccine.eventDate);
+        const timeInput = formatTimeForInput(vaccine.eventDate);
 
         setCardsData({
           date,
           time,
           dateInput,
           timeInput,
-          clinic: visit.clinic || "",
-          doctor: visit.doctor || "",
+          medicine: vaccine.medicine || "",
+          periodUnit: vaccine.periodUnit ?? PERIOD_UNITS.MONTH,
         });
 
-        setVisitData({
-          diagnosis: visit.diagnosis || "",
-          recommendations: visit.recommendations || "",
-          directions: visit.referrals || "",
-        });
-
-        setReminderEnabled(visit.reminderEnabled || false);
-        setReminderValue(visit.reminderValue ?? 5);
-        setReminderUnit(visit.reminderUnit ?? PERIOD_UNITS.MINUTE);
+        setReminderEnabled(vaccine.reminderEnabled || false);
+        setReminderValue(vaccine.reminderValue ?? 5);
+        setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.MINUTE);
       } catch (err) {
-        console.error("Ошибка загрузки приема:", err);
+        console.error("Ошибка загрузки вакцинации:", err);
         setError(
           err.message ||
-            "Не удалось загрузить данные о приеме. Попробуйте позже."
+            "Не удалось загрузить данные о вакцинации. Попробуйте позже."
         );
       } finally {
         setLoading(false);
       }
     };
 
-    loadVisit();
+    loadVaccine();
   }, [eventId]);
 
   const handleEditClick = () => {
@@ -105,14 +88,11 @@ const DoctorVisitPage = () => {
     try {
       setLoading(true);
 
-      await updateDoctorVisit(parseInt(eventId, 10), {
-        title: visitTitle || "Прием",
+      await updateVaccine(parseInt(eventId, 10), {
+        title: vaccineTitle || "Вакцинация",
         eventDate: eventDateRaw,
-        clinic: cardsData.clinic,
-        doctor: cardsData.doctor,
-        diagnosis: visitData.diagnosis,
-        recommendations: visitData.recommendations,
-        referrals: visitData.directions,
+        medicine: cardsData.medicine,
+        periodUnit: cardsData.periodUnit,
         reminderEnabled,
         reminderValue: reminderEnabled ? reminderValue : 0,
         reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
@@ -128,7 +108,7 @@ const DoctorVisitPage = () => {
       
       setIsEditing(false);
     } catch (err) {
-      console.error("Ошибка сохранения приема:", err);
+      console.error("Ошибка сохранения вакцинации:", err);
       alert(err.message || "Не удалось сохранить изменения.");
     } finally {
       setLoading(false);
@@ -156,29 +136,22 @@ const DoctorVisitPage = () => {
     });
   };
 
-  const handleSectionChange = (field, value) => {
-    setVisitData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
   const handleDelete = async () => {
     if (!eventId) return;
-    const confirmed = window.confirm("Точно удалить этот прием?");
+    const confirmed = window.confirm("Точно удалить эту вакцинацию?");
     if (!confirmed) return;
 
     try {
-      await deleteDoctorVisit(parseInt(eventId, 10));
+      await deleteVaccine(parseInt(eventId, 10));
       navigate(-1);
     } catch (err) {
-      console.error("Ошибка удаления приема:", err);
-      alert(err.message || "Не удалось удалить прием.");
+      console.error("Ошибка удаления вакцинации:", err);
+      alert(err.message || "Не удалось удалить вакцинацию.");
     }
   };
 
   if (loading && !cardsData.date) {
-    return <LoadingState message="Загрузка данных о приеме..." />;
+    return <LoadingState message="Загрузка данных о вакцинации..." />;
   }
 
   if (error) {
@@ -194,13 +167,13 @@ const DoctorVisitPage = () => {
       <section className="section container">
         <div className="section__grid">
           <EventPageHeader
-            title={visitTitle}
+            title={vaccineTitle}
             eventId={eventId}
             isEditing={isEditing}
             onEdit={handleEditClick}
             onSave={handleSaveClick}
             onDelete={handleDelete}
-            onTitleChange={setVisitTitle}
+            onTitleChange={setVaccineTitle}
             loading={loading}
           />
           <EventCard
@@ -223,38 +196,21 @@ const DoctorVisitPage = () => {
             type="datetime"
           />
           <EventCard
-            label="Клиника"
-            value={cardsData.clinic}
+            label="Препарат"
+            value={cardsData.medicine}
             isEditing={isEditing}
-            onChange={(value) => handleCardFieldChange("clinic", value)}
-            type="textarea"
+            onChange={(value) => handleCardFieldChange("medicine", value)}
           />
           <EventCard
-            label="Врач"
-            value={cardsData.doctor}
+            label="Периодичность"
+            value={cardsData.periodUnit}
             isEditing={isEditing}
-            onChange={(value) => handleCardFieldChange("doctor", value)}
+            onChange={(value) => handleCardFieldChange("periodUnit", value)}
+            type="select"
+            options={PERIOD_OPTIONS}
           />
         </div>
         <div className="section__body">
-          <EventSection
-            title="Диагноз"
-            value={visitData.diagnosis}
-            isEditing={isEditing}
-            onChange={(value) => handleSectionChange("diagnosis", value)}
-          />
-          <EventSection
-            title="Рекомендации"
-            value={visitData.recommendations}
-            isEditing={isEditing}
-            onChange={(value) => handleSectionChange("recommendations", value)}
-          />
-          <EventSection
-            title="Направления"
-            value={visitData.directions}
-            isEditing={isEditing}
-            onChange={(value) => handleSectionChange("directions", value)}
-          />
           <ReminderSection
             reminderEnabled={reminderEnabled}
             reminderValue={reminderValue}
@@ -272,4 +228,4 @@ const DoctorVisitPage = () => {
   );
 };
 
-export default DoctorVisitPage;
+export default VaccinePage;

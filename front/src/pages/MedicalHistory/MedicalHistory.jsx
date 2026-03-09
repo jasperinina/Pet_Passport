@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getPastEvents } from "../../api/events";
-import ProcedureCard from "../../components/ui/ProcedureCard/ProcedureCard";
-import AddProcedureModal from "../../components/AddProcedureModal/AddProcedureModal";
-import { formatEventDateTime } from "../../utils/dateUtils";
-import { getEventTypeName, getEventPath } from "../../utils/eventUtils";
+
+import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import Menu from "../../components/layout/Menu/Menu";
+
+import { getPastEvents } from "../../api/events";
+import ModalOverlay from "../../components/layout/ModalOverlay/ModalOverlay";
 
 const MedicalHistory = () => {
   const navigate = useNavigate();
@@ -73,7 +73,8 @@ const MedicalHistory = () => {
         />
       </section>
 
-      <AddProcedureModal
+      <ModalOverlay
+        modalName="AddProcedureModal"
         isOpen={isAddProcedureModalOpen}
         onClose={() => setIsAddProcedureModalOpen(false)}
         petId={petId ? parseInt(petId, 10) : null}

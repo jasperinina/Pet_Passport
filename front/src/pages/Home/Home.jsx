@@ -1,19 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import { getPet } from "../../api/pets";
-import { getUpcomingEvents } from "../../api/events";
 import Menu from "../../components/layout/Menu/Menu";
 import PetCard from "../../components/ui/PetCard/PetCard";
-import EditPetModal from "../../components/ui/EditPetModal/EditPetModal";
-import AddProcedureModal from "../../components/AddProcedureModal/AddProcedureModal";
-import ProcedureDetailsModal from "../../components/ProcedureDetailsModal";
 import Procedures from "../../components/ui/Procedures/Procedures";
-import ProcedureCard from "../../components/ui/ProcedureCard/ProcedureCard";
-import { formatEventDateTime } from "../../utils/dateUtils";
-import { getEventTypeName, getEventPath } from "../../utils/eventUtils";
-import PetPhotosGrid from "../../components/ui/PetPhotosGrid";
 import ModalOverlay from "../../components/layout/ModalOverlay/ModalOverlay";
+
+import { getPet } from "../../api/pets";
+import { getUpcomingEvents } from "../../api/events";
 
 const Home = () => {
   const navigate = useNavigate();

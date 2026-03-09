@@ -1,5 +1,6 @@
-import { PERIOD_OPTIONS } from '../../../constants/eventConstants';
 import styles from './EventSection.module.scss';
+
+import { PERIOD_OPTIONS } from '../../../constants/eventConstants';
 
 const EventSection = ({
   title,

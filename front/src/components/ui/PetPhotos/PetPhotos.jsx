@@ -3,6 +3,7 @@ import styles from "./PetPhotos.module.scss";
 import { memo } from "react";
 
 import PetPhoto from "../../../assets/images/pet-photo.png";
+
 import API_BASE_URL from "../../../api/config";
 
 const PetPhotos = ({ photos, petName }) => {

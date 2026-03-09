@@ -1,8 +1,9 @@
 import styles from "./Menu.module.scss"
 
+import { useLocation, useNavigate } from "react-router-dom";
+
 import ProcedureIcon from "../../../assets/icons/procedures.svg";
 import HistoryIcon from "../../../assets/icons/history.svg";
-import { useLocation, useNavigate } from "react-router-dom";
 
 const Menu = ({ isMobileHidden = false }) => {
   const navigate = useNavigate();

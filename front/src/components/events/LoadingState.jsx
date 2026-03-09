@@ -14,4 +14,3 @@ const LoadingState = ({ message = "Загрузка данных..." }) => {
 };
 
 export default LoadingState;
-

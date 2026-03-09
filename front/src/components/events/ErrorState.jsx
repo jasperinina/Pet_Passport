@@ -21,4 +21,3 @@ const ErrorState = ({ error }) => {
 };
 
 export default ErrorState;
-

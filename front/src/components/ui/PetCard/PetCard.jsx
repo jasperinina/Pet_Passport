@@ -1,5 +1,5 @@
 import styles from "./PetCard.module.scss";
-import PetPhotosGrid from "../PetPhotosGrid";
+
 import PetPhotos from "../PetPhotos/PetPhotos";
 
 const PetCard = ({setIsAddProcedureModalOpen, setIsEditModalOpen, pet}) => {

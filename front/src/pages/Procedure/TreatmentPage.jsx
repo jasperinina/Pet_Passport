@@ -1,16 +1,17 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 
-import { getTreatment, updateTreatment, deleteTreatment } from "../api/events";
-import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../constants/eventConstants";
-import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../utils/dateUtils";
-import EventPageHeader from "../components/events/EventPageHeader";
-import EventCard from "../components/events/EventCard/EventCard";
-import EventSection from "../components/events/EventSection/EventSection";
-import ReminderSection from "../components/events/ReminderSection";
-import LoadingState from "../components/events/LoadingState";
-import ErrorState from "../components/events/ErrorState";
-import Menu from "../components/layout/Menu/Menu";
+import EventPageHeader from "../../components/events/EventPageHeader";
+import EventCard from "../../components/events/EventCard/EventCard";
+import EventSection from "../../components/events/EventSection/EventSection";
+import ReminderSection from "../../components/events/ReminderSection";
+import LoadingState from "../../components/events/LoadingState";
+import ErrorState from "../../components/events/ErrorState";
+import Menu from "../../components/layout/Menu/Menu";
+
+import { getTreatment, updateTreatment, deleteTreatment } from "../../api/events";
+import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../../constants/eventConstants";
+import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
 
 const TreatmentPage = () => {
   const { eventId } = useParams();

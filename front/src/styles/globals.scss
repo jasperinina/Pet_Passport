@@ -87,17 +87,3 @@ button {
   background-color: transparent;
   border: none;
 }
-
-// a,
-// button {
-//   &[aria-label] {
-//     position: relative;
-
-//     &::before {
-//       @include abs-center;
-//       @include square(rem(44));
-
-//       content: '';
-//     }
-//   }
-// }

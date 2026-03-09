@@ -1,7 +1,4 @@
 import { useRef } from "react";
-import ArrowIcon from "../../assets/icons/icon-arrow.svg";
-import CalendarIcon from "../../assets/icons/icon-calendar.svg";
-import TimeIcon from "../../assets/icons/icon-time.svg";
 
 const TreatmentFields = ({
   loading,

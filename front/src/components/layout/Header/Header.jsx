@@ -1,5 +1,7 @@
-import { useNavigate, useLocation } from "react-router-dom";
 import styles from "./Header.module.scss";
+
+import { useNavigate, useLocation } from "react-router-dom";
+
 import Logo from "../../../assets/icons/logo.svg";
 import PetIcon from "../../../assets/icons/cat.svg";
 import Menu from "../Menu/Menu";

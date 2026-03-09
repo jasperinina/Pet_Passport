@@ -1,3 +1,5 @@
+import "./styles/globals.scss";
+
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
@@ -5,11 +7,10 @@ import Header from "./components/layout/Header/Header";
 import Home from "./pages/Home/Home";
 import UpcomingProcedures from "./pages/UpcomingProcedures/UpcomingProcedures";
 import MedicalHistory from "./pages/MedicalHistory/MedicalHistory";
-import DoctorVisitPage from "./pages/DoctorVisitPage";
-import VaccinePage from "./pages/VaccinePage";
-import TreatmentPage from "./pages/TreatmentPage";
+import DoctorVisitPage from "./pages/Procedure/DoctorVisitPage";
+import VaccinePage from "./pages/Procedure/VaccinePage";
+import TreatmentPage from "./pages/Procedure/TreatmentPage";
 
-import "./styles/globals.scss";
 import { getPet } from "./api/pets";
 
 function App() {

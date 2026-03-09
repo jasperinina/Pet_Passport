@@ -1,6 +1,7 @@
-import AddProcedureModal from "../../AddProcedureModal/AddProcedureModal";
-import EditPetModal from "../../ui/EditPetModal/EditPetModal";
 import styles from "./ModalOverlay.module.scss";
+
+import AddProcedureModal from "../../ui/modals/AddProcedureModal/AddProcedureModal";
+import EditPetModal from "../../ui/modals/EditPetModal/EditPetModal";
 
 const ModalOverlay = ({
   modalName,
@@ -15,7 +16,6 @@ const ModalOverlay = ({
 
   document.documentElement.classList.add("modal-open");
 
-  // TODO: Перенести form в EditPetModal (и в другие)
   return (
     <div className={styles["modal-overlay"]}>
       {modalName === "AddProcedureModal" ? (

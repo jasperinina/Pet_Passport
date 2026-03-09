@@ -1,6 +1,6 @@
-import { memo } from "react";
-
 import styles from './EventCard.module.scss';
+
+import { memo } from "react";
 
 const EventCard = memo(({ label, value, isEditing, onChange, type = "text", options = null }) => {
   if (type === "datetime") {
