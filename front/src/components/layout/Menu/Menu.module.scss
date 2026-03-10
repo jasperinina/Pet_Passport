@@ -2,9 +2,14 @@
 
 .menu {
   @include mobile {
+    position: fixed;
+    bottom: rem(20);
+    left: rem(20);
+    right: rem(20);
     padding: rem(16);
     background-color: var(--color-light);
     border-radius: var(--border-radius);
+    box-shadow: 0 rem(0) rem(10) 0 var(--color-gray);
   }
 
   &__list {
