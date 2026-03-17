@@ -1,98 +1,135 @@
-import API_BASE_URL from './config.js';
+import { ERROR_MESSAGES } from '../constants/config.js';
+import NotificationService from '../services/notificationService.js';
+import { apiClient } from './apiClient.js';
 import { USE_MOCK_API, mockGetPet } from './mockApi.js';
 
 export async function createPet(petData) {
-  const response = await fetch(`${API_BASE_URL}/api/pets`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(petData),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Ошибка создания питомца: ${response.status}`);
+  try {
+    const response = await apiClient.post('/api/Pets', petData);
+    
+    NotificationService.showSuccess?.('Питомец успешно создан', 'Success!');
+    
+    return response;
+  } catch (error) {
+    NotificationService.showError?.('Ошибка создания питомца', 'Error :(');
+    
+    return null;
   }
-
-  return await response.json();
 }
 
 export async function getPet(id) {
-  if (USE_MOCK_API) {
-    return await mockGetPet(id);
-  }
-
-  const response = await fetch(`${API_BASE_URL}/api/pets/${id}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Питомец не найден');
+  try {
+    if (USE_MOCK_API) {
+      return await mockGetPet(id);
     }
-    const errorText = await response.text();
-    throw new Error(errorText || `Ошибка получения питомца: ${response.status}`);
-  }
 
-  return await response.json();
+    const response = await apiClient.get(`/api/Pets/${id}`);
+    
+    return response;
+  } catch (error) {
+    if (error.status === 404) {
+      NotificationService.showError?.(
+        ERROR_MESSAGES.PET_NOT_FOUND,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    } else {
+      NotificationService.showError?.(
+        'При загрузке данных питомца произошла ошибка',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    }
+    
+    return null;
+  }
 }
 
 export async function updatePet(id, petData) {
-  const response = await fetch(`${API_BASE_URL}/api/pets/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(petData),
-  });
+  try {
+    const response = await apiClient.put(`/api/Pets/${id}`, petData);
 
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Питомец не найден');
+    NotificationService.showSuccess?.('Данные питомца обновлены', 'Success!');
+
+    return response;
+  } catch (error) {
+    if (error.status === 404) {
+      NotificationService.showError?.(
+        ERROR_MESSAGES.PET_NOT_FOUND,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    } else {
+      NotificationService.showError?.(
+        'При обновлении данных питомца произошла ошибка',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     }
-    const errorText = await response.text();
-    throw new Error(errorText || `Ошибка обновления питомца: ${response.status}`);
-  }
 
-  return await response.json();
+    return null;
+  }
 }
 
 export async function uploadPetPhoto(petId, file, telegramFileId = null) {
-  if (!file) throw new Error('Файл не указан');
-  if (!petId) throw new Error('ID питомца не указан');
+  if (!file) {
+    NotificationService.showError?.(
+      'Файл не указан',
+      ERROR_MESSAGES.ERROR_TITLE
+    );
+  }
 
-  const formData = new FormData();
-  formData.append('file', file);
+  if (!petId) {
+    NotificationService.showError?.(
+      'ID питомца не указан',
+      ERROR_MESSAGES.ERROR_TITLE
+    );
+  }
 
-  const url = `${API_BASE_URL}/api/pets/${petId}/upload${
-    telegramFileId ? `?telegramFileId=${encodeURIComponent(telegramFileId)}` : ''
-  }`;
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
 
-  const response = await fetch(url, {
-    method: 'POST',
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
+    const url =
+      `/api/pets/${petId}/upload${telegramFileId ? `?telegramFileId=${encodeURIComponent(telegramFileId)}` : ''}`;
     
-    if (response.status === 404) throw new Error('Питомец не найден');
-    if (response.status === 400) throw new Error(errorText || 'Превышен лимит фотографий (максимум 4)');
-    
-    throw new Error(errorText || `Ошибка загрузки фотографии: ${response.status}`);
-  }
+    const response = await apiClient.upload(url, formData);
 
-  const text = await response.text();
-  if (!text) throw new Error('Пустой ответ от сервера');
+    if (!response.photoUrl || !response.url) {
+      NotificationService.showError?.(
+        'Ответ сервера не содержит URL фотографии',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
 
-  const result = JSON.parse(text);
-  
-  if (!result.photoUrl && !result.url) {
-    throw new Error('Ответ сервера не содержит URL фотографии');
-  }
-  if (!result.Id && !result.id) {
-    throw new Error('Ответ сервера не содержит ID фотографии');
-  }
+      return null;
+    }
 
-  return result;
+    if (!response.Id && !response.id) {
+      NotificationService.showError?.(
+        'Ответ сервера не содержит ID фотографии',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+
+      return null;
+    }
+
+    return response;
+  } catch (error) {
+    if (error.status === 404) {
+      NotificationService.showError?.(
+        ERROR_MESSAGES.PET_NOT_FOUND,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    } else if (error.status === 400) {
+      NotificationService.showError?.(
+        'Превышен лимит фотографий (максимум 4)',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    } else {
+      NotificationService.showError?.(
+        'При загрузке фотографий произошла ошибка',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    }
+
+    return null;
+  }
 }
 
 export async function updatePetPhotos(petId, options = {}) {
@@ -102,41 +139,56 @@ export async function updatePetPhotos(petId, options = {}) {
   newFiles.forEach(file => formData.append('newFiles', file));
   deletePhotoIds.forEach(id => formData.append('deletePhotoIds', id.toString()));
 
-  const response = await fetch(`${API_BASE_URL}/api/pets/${petId}/photos`, {
-    method: 'PUT',
-    body: formData,
-  });
+  try {
+    const response = await apiClient.put(`/api/Pets/${petId}/photos`, formData);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    
-    if (response.status === 404) throw new Error('Питомец не найден');
-    if (response.status === 400) throw new Error(errorText || 'Ошибка обновления фотографий');
-    
-    throw new Error(errorText || `Ошибка обновления фотографий: ${response.status}`);
+    return response;
+  } catch (error) {
+    if (error.status === 404) {
+      NotificationService.showError?.(
+        ERROR_MESSAGES.PET_NOT_FOUND,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    } else if (error.status === 400) {
+      NotificationService.showError?.(
+        'При обновлении фотографии произошла ошибка',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    }
+
+    return null;
   }
-
-  return await response.json();
 }
 
 export async function deletePetPhoto(petId, photoId) {
-  const response = await fetch(`${API_BASE_URL}/api/pets/${petId}/photos/${photoId}`, {
-    method: 'DELETE',
-  });
+  try {
+    const response = await apiClient.delete(`/api/Pets/${petId}/photos/${photoId}`);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    if (response.status === 404) {
-      throw new Error(errorText || 'Питомец или фото не найдено');
+    const contentType = response.headers.get('content-type');
+    if (contentType?.includes('application/json')) {
+      const text = await response.text();
+      if (text) return JSON.parse(text);
     }
-    throw new Error(errorText || `Ошибка удаления фотографии: ${response.status}`);
-  }
 
-  const contentType = response.headers.get('content-type');
-  if (contentType?.includes('application/json')) {
-    const text = await response.text();
-    if (text) return JSON.parse(text);
+    NotificationService.showSuccess?.(
+      'Фотография успешно удалена',
+      'Success!'
+    );
+
+    return response;
+  } catch (error) {
+    if (error.status === 404) {
+      NotificationService.showError?.(
+        'Питомец или фото не найдено',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    } else {
+      NotificationService.showError?.(
+        'При удалении фотографии произошла ошибка',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+    }
+
+    return null;
   }
-  
-  return { message: 'Фотография успешно удалена' };
 }

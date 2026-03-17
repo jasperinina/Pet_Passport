@@ -1,0 +1,14 @@
+@use "../../styles/helpers/" as *;
+
+.menu-button {
+  @include fluid-text(16, 12);
+
+  display: flex;
+  column-gap: rem(8);
+  color: var(--color-dark);
+  text-align: left;
+
+  &__text {
+    width: auto;
+  }
+}

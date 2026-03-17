@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 import Procedures from "../../components/ui/Procedures/Procedures";
-import Menu from "../../components/layout/Menu/Menu";
+import Menu from "../../components/menu/Menu";
 
 import { getPastEvents } from "../../api/events";
-import ModalOverlay from "../../components/layout/ModalOverlay/ModalOverlay";
+import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 
 const MedicalHistory = () => {
   const navigate = useNavigate();

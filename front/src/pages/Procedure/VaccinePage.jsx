@@ -5,19 +5,19 @@ import EventPageHeader from "../../components/events/EventPageHeader";
 import EventCard from "../../components/events/EventCard/EventCard";
 import ReminderSection from "../../components/events/ReminderSection";
 import LoadingState from "../../components/events/LoadingState";
-import ErrorState from "../../components/events/ErrorState";
-import Menu from "../../components/layout/Menu/Menu";
+import Menu from "../../components/menu/Menu";
 
 import { getVaccine, updateVaccine, deleteVaccine } from "../../api/events";
 import { PERIOD_UNITS, PERIOD_OPTIONS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
+import NotificationService from "../../services/notificationService";
+import { ERROR_MESSAGES } from "../../constants/config";
 
 const VaccinePage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const [vaccineTitle, setVaccineTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
@@ -41,7 +41,6 @@ const VaccinePage = () => {
 
       try {
         setLoading(true);
-        setError(null);
 
         const vaccine = await getVaccine(parseInt(eventId, 10));
 
@@ -66,9 +65,10 @@ const VaccinePage = () => {
         setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.MINUTE);
       } catch (err) {
         console.error("Ошибка загрузки вакцинации:", err);
-        setError(
-          err.message ||
-            "Не удалось загрузить данные о вакцинации. Попробуйте позже."
+
+        NotificationService.showError?.(
+          err.message || "Не удалось загрузить данные о вакцинации. Попробуйте позже.",
+          ERROR_MESSAGES.ERROR_TITLE
         );
       } finally {
         setLoading(false);
@@ -109,7 +109,11 @@ const VaccinePage = () => {
       setIsEditing(false);
     } catch (err) {
       console.error("Ошибка сохранения вакцинации:", err);
-      alert(err.message || "Не удалось сохранить изменения.");
+
+      NotificationService.showError?.(
+        err.message || "Не удалось сохранить изменения.",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     } finally {
       setLoading(false);
     }
@@ -146,16 +150,16 @@ const VaccinePage = () => {
       navigate(-1);
     } catch (err) {
       console.error("Ошибка удаления вакцинации:", err);
-      alert(err.message || "Не удалось удалить вакцинацию.");
+
+      NotificationService.showError?.(
+        err.message || "Не удалось удалить вакцинацию.",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     }
   };
 
   if (loading && !cardsData.date) {
     return <LoadingState message="Загрузка данных о вакцинации..." />;
-  }
-
-  if (error) {
-    return <ErrorState error={error} />;
   }
 
   return (

@@ -1,0 +1,51 @@
+@use '../../styles/helpers/' as *;
+
+.notification-banner {
+  position: fixed;
+  top: var(--section-padding-y);
+  left: var(--container-padding-x);
+  right: var(--container-padding-x);
+  margin-inline: auto;
+  width: auto;
+  max-width: rem(400);
+  color: var(--color-dark);
+  background-color: var(--color-light);
+  border-radius: var(--border-radius);
+  box-shadow: 0 rem(0) rem(10) 0 var(--color-gray);
+  z-index: 10000;
+
+  &__inner {
+    padding: rem(20);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &__title {
+    color: inherit;
+  }
+
+  &__message {
+    @include fluid-text(16, 14);
+  }
+
+  &--error {
+    color: var(--color-red);
+  }
+
+  &--success {
+    color: var(--color-green);
+  }
+
+  &--warning {
+
+  }
+
+  &--info {
+    
+  }
+}

@@ -1,11 +1,19 @@
+import { ERROR_MESSAGES } from '../constants/config';
+import NotificationService from '../services/notificationService';
 import API_BASE_URL from './config';
 
 class ApiClient {
-  constructor(baseURL) {
+  constructor(baseURL, options = {}) {
     this.baseURL = baseURL;
+    this.config = {
+      useNotifications: false,
+      showSuccessNotifications: false,
+      defaultErrorMessage: ERROR_MESSAGES.GENERIC_ERROR || 'Произошла ошибка',
+      ...options
+    };
   }
 
-  async request(endpoint, options = {}) {
+  async request(endpoint, options = {}, requestOptions = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
       headers: {
@@ -15,21 +23,34 @@ class ApiClient {
       ...options,
     };
 
+    const settings = { ...this.config, ...requestOptions };
+
     try {
       const response = await fetch(url, config);
-      return await this.handleResponse(response);
+
+      return await this.handleResponse(response, settings);
     } catch (error) {
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error('Ошибка сети. Проверьте подключение к серверу.');
+        throw new Error(ERROR_MESSAGES.NETWORK_ERROR);
       }
       throw error;
     }
   }
 
-  async handleResponse(response) {
+  async handleResponse(response, settings) {
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || `HTTP Error: ${response.status}`);
+      let errorText;
+      try {
+        errorText = await response.text();
+      } catch {
+        errorText = '';
+      }
+
+      const errorMessage = errorText || `HTTP Error: ${response.status}`;
+      const error = new Error(errorMessage);
+      error.status = response.status;
+
+      throw error;
     }
 
     const contentType = response.headers.get('content-type');
@@ -38,39 +59,81 @@ class ApiClient {
       return text ? JSON.parse(text) : {};
     }
     
-    return {};
+    return response.body;
   }
 
-  async get(endpoint) {
-    return this.request(endpoint, { method: 'GET' });
+  async handleError(error, settings) {
+    let finalError;
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      finalError = new Error(ERROR_MESSAGES.NETWORK_ERROR || 'Ошибка сети');
+    } else {
+      finalError = error;
+    }
+
+    if (settings.useNotifications && NotificationService.showError) {
+      NotificationService.showError(
+        finalError.message,
+        'Ошибка запроса'
+      );
+    }
+
+    throw finalError;
   }
 
-  async post(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+  async get(endpoint, requestOptions = {}) {
+    return await this.request(
+      endpoint,
+      {
+        method: 'GET'
+      },
+      requestOptions);
   }
 
-  async put(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
+  async post(endpoint, data, requestOptions = {}) {
+    return await this.request(
+      endpoint,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      },
+      requestOptions
+    );
   }
 
-  async delete(endpoint) {
-    return this.request(endpoint, { method: 'DELETE' });
+  async put(endpoint, data, requestOptions = {}) {
+    return await this.request(
+      endpoint,
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+      },
+      requestOptions
+    );
   }
 
-  async upload(endpoint, formData) {
-    return this.request(endpoint, {
-      method: 'POST',
-      body: formData,
-      headers: {},
-    });
+  async delete(endpoint, requestOptions = {}) {
+    return await this.request(
+      endpoint,
+      {
+        method: 'DELETE'
+      },
+      requestOptions
+    );
+  }
+
+  async upload(endpoint, formData, requestOptions = {}) {
+    return await this.request(
+      endpoint,
+      {
+        method: 'POST',
+        body: formData,
+        headers: {},
+      },
+      requestOptions
+    );
   }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);
 
+export default ApiClient;

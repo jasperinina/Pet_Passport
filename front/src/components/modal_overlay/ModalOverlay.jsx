@@ -1,7 +1,7 @@
 import styles from "./ModalOverlay.module.scss";
 
-import AddProcedureModal from "../../ui/modals/AddProcedureModal/AddProcedureModal";
-import EditPetModal from "../../ui/modals/EditPetModal/EditPetModal";
+import AddProcedureModal from "../ui/modals/AddProcedureModal/AddProcedureModal";
+import EditPetModal from "../ui/modals/EditPetModal/EditPetModal";
 
 const ModalOverlay = ({
   modalName,

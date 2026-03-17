@@ -1,13 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import Menu from "../../components/layout/Menu/Menu";
+import Menu from "../../components/menu/Menu";
 import PetCard from "../../components/ui/PetCard/PetCard";
 import Procedures from "../../components/ui/Procedures/Procedures";
-import ModalOverlay from "../../components/layout/ModalOverlay/ModalOverlay";
+import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 
 import { getPet } from "../../api/pets";
 import { getUpcomingEvents } from "../../api/events";
+import NotificationService from "../../services/notificationService";
+import { ERROR_MESSAGES } from "../../constants/config";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -32,7 +34,11 @@ const Home = () => {
     const petId = getPetIdFromUrl();
 
     if (!petId) {
-      setError("ID питомца не указан в URL");
+      NotificationService.showError?.(
+        "ID питомца не указан в URL",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+      // setError("ID питомца не указан в URL");
       setLoading(false);
       return;
     }

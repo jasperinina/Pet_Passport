@@ -3,7 +3,8 @@ import "./styles/globals.scss";
 import { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
-import Header from "./components/layout/Header/Header";
+import NotificationBanner from "./components/notification_banner/NotificationBanner";
+import Header from "./components/header/Header";
 import Home from "./pages/Home/Home";
 import UpcomingProcedures from "./pages/UpcomingProcedures/UpcomingProcedures";
 import MedicalHistory from "./pages/MedicalHistory/MedicalHistory";
@@ -12,8 +13,21 @@ import VaccinePage from "./pages/Procedure/VaccinePage";
 import TreatmentPage from "./pages/Procedure/TreatmentPage";
 
 import { getPet } from "./api/pets";
+import { useNotification } from "./context/NotificationContext";
+import NotificationService from "./services/notificationService";
 
 function App() {
+  const { showError, showSuccess, showWarning, showInfo } = useNotification();
+
+  useEffect(() => {
+    NotificationService.init(
+      (message, title) => showError(message, title),
+      (message, title) => showSuccess(message, title),
+      (message, title) => showWarning(message, title),
+      (message, title) => showInfo(message, title)
+    );
+  }, [showError, showSuccess, showWarning, showInfo]);
+
   const [pet, setPet] = useState(null);
 
   const loadPet = async () => {
@@ -45,6 +59,9 @@ function App() {
 
   return (
     <div className="app-wrapper">
+      {/* NotificationBanner доступен во всем приложении */}
+      <NotificationBanner />
+
       {/* Header теперь сам навигирует через useNavigate */}
       <Header petName={pet?.name} />
 

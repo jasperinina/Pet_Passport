@@ -6,19 +6,19 @@ import EventCard from "../../components/events/EventCard/EventCard";
 import EventSection from "../../components/events/EventSection/EventSection";
 import ReminderSection from "../../components/events/ReminderSection";
 import LoadingState from "../../components/events/LoadingState";
-import ErrorState from "../../components/events/ErrorState";
-import Menu from "../../components/layout/Menu/Menu";
+import Menu from "../../components/menu/Menu";
 
 import { getTreatment, updateTreatment, deleteTreatment } from "../../api/events";
 import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
+import NotificationService from "../../services/notificationService";
+import { ERROR_MESSAGES } from "../../constants/config";
 
 const TreatmentPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const [treatmentTitle, setTreatmentTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
@@ -43,7 +43,6 @@ const TreatmentPage = () => {
 
       try {
         setLoading(true);
-        setError(null);
 
         const treatment = await getTreatment(parseInt(eventId, 10));
 
@@ -69,9 +68,10 @@ const TreatmentPage = () => {
         setReminderUnit(treatment.reminderUnit ?? PERIOD_UNITS.MINUTE);
       } catch (err) {
         console.error("Ошибка загрузки обработки:", err);
-        setError(
-          err.message ||
-            "Не удалось загрузить данные об обработке. Попробуйте позже."
+
+        NotificationService.showError?.(
+          err.message || "Не удалось загрузить данные об обработке. Попробуйте позже.",
+          ERROR_MESSAGES.ERROR_TITLE
         );
       } finally {
         setLoading(false);
@@ -113,7 +113,11 @@ const TreatmentPage = () => {
       setIsEditing(false);
     } catch (err) {
       console.error("Ошибка сохранения обработки:", err);
-      alert(err.message || "Не удалось сохранить изменения.");
+
+      NotificationService.showError?.(
+        err.message || "Не удалось сохранить изменения.",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     } finally {
       setLoading(false);
     }
@@ -150,16 +154,16 @@ const TreatmentPage = () => {
       navigate(-1);
     } catch (err) {
       console.error("Ошибка удаления обработки:", err);
-      alert(err.message || "Не удалось удалить обработку.");
+
+      NotificationService.showError?.(
+        err.message || "Не удалось удалить обработку.",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     }
   };
 
   if (loading && !cardsData.date) {
     return <LoadingState message="Загрузка данных об обработке..." />;
-  }
-
-  if (error) {
-    return <ErrorState error={error} />;
   }
 
   return (

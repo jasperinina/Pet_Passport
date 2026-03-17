@@ -1,159 +1,157 @@
+import { ERROR_MESSAGES } from '../constants/config.js';
+import NotificationService from '../services/notificationService.js';
+import { apiClient } from './apiClient.js';
 import API_BASE_URL from './config.js';
 import { USE_MOCK_API, mockGetUpcomingEvents } from './mockApi.js';
 
-const handleResponse = async (response, errorPrefix) => {
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `${errorPrefix}: ${response.status}`);
-  }
-  
-  const contentType = response.headers.get('content-type');
-  if (contentType?.includes('application/json')) {
-    const text = await response.text();
-    return text ? JSON.parse(text) : {};
-  }
-  return {};
-};
-
 // ========== Doctor Visit ==========
 export async function createDoctorVisit(data) {
-  const response = await fetch(`${API_BASE_URL}/api/doctor-visit`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return await handleResponse(response, 'Ошибка создания посещения');
+  try {
+    const response = await apiClient.post('/api/doctor-visit', data);
+
+    NotificationService.showSuccess?.(
+      'Посещение успешно добавлено',
+      'Success!'
+    );
+
+    return response;
+  } catch {
+
+  }
 }
 
 export async function getDoctorVisit(id) {
-  const response = await fetch(`${API_BASE_URL}/api/doctor-visit/${id}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  return await handleResponse(response, 'Ошибка получения посещения');
+  try {
+    return await apiClient.get(`/api/doctor-visit/${id}`);
+  } catch {
+
+  }
 }
 
 export async function updateDoctorVisit(id, data) {
-  const response = await fetch(`${API_BASE_URL}/api/doctor-visit/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return await handleResponse(response, 'Ошибка обновления посещения');
+  try {
+    return await apiClient.put(`/api/doctor-visit/${id}`, data);
+  } catch {
+
+  }
 }
 
 export async function deleteDoctorVisit(id) {
-  const response = await fetch(`${API_BASE_URL}/api/doctor-visit/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  return await handleResponse(response, 'Ошибка удаления посещения');
+  try {
+    return await apiClient.delete(`/api/doctor-visit/${id}`);
+  } catch {
+
+  }
 }
 
 // ========== Vaccine ==========
 export async function createVaccine(data) {
-  const response = await fetch(`${API_BASE_URL}/api/vaccine`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return await handleResponse(response, 'Ошибка создания вакцинации');
+  try {
+    return await apiClient.post(`/api/vaccine`, data);
+  } catch {
+
+  }
 }
 
 export async function getVaccine(id) {
-  const response = await fetch(`${API_BASE_URL}/api/vaccine/${id}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  return await handleResponse(response, 'Ошибка получения вакцинации');
+  try {
+    return await apiClient.get(`/api/vaccine/${id}`);
+  } catch {
+
+  }
 }
 
 export async function updateVaccine(id, data) {
-  const response = await fetch(`${API_BASE_URL}/api/vaccine/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return await handleResponse(response, 'Ошибка обновления вакцинации');
+  try {
+    return await apiClient.put(`/api/vaccine/${id}`, data);
+  } catch {
+
+  }
 }
 
 export async function deleteVaccine(id) {
-  const response = await fetch(`${API_BASE_URL}/api/vaccine/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  return await handleResponse(response, 'Ошибка удаления вакцинации');
+  try {
+    return await apiClient.delete(`/api/vaccine/${id}`);
+  } catch {
+
+  }
 }
 
 // ========== Treatment ==========
 export async function createTreatment(data) {
-  const response = await fetch(`${API_BASE_URL}/api/treatment`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return await handleResponse(response, 'Ошибка создания обработки');
+  try {
+    return await apiClient.post(`/api/treatment`, data);
+  } catch {
+
+  }
 }
 
 export async function getTreatment(id) {
-  const response = await fetch(`${API_BASE_URL}/api/treatment/${id}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  return await handleResponse(response, 'Ошибка получения обработки');
+  try {
+    return await apiClient.get(`/api/treatment/${id}`);
+  } catch {
+
+  }
 }
 
 export async function updateTreatment(id, data) {
-  const response = await fetch(`${API_BASE_URL}/api/treatment/${id}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return await handleResponse(response, 'Ошибка обновления обработки');
+  try {
+    return await apiClient.put(`/api/treatment/${id}`, data);
+  } catch {
+
+  }
 }
 
 export async function deleteTreatment(id) {
-  const response = await fetch(`${API_BASE_URL}/api/treatment/${id}`, {
-    method: 'DELETE',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  return await handleResponse(response, 'Ошибка удаления обработки');
+  try {
+    return await apiClient.delete(`/api/treatment/${id}`);
+  } catch {
+
+  }
 }
 
 // ========== Events Lists ==========
-export async function getUpcomingEvents(petId) {
-  if (USE_MOCK_API) {
-    return await mockGetUpcomingEvents(petId);
-  }
-  const response = await fetch(`${API_BASE_URL}/api/events/upcoming/${petId}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
+export async function getUpcomingEvents(petId) {  
+  try {
+    if (USE_MOCK_API) {
+      return await mockGetUpcomingEvents(petId);
+    }
 
-  // Возвращаем пустой массив, если эндпоинт не найден
-  if (response.status === 404) {
-    console.warn('Эндпоинт для получения процедур не найден.');
-    return [];
-  }
+    const response = await apiClient.get(`/api/events/${petId}`);
 
-  return await handleResponse(response, 'Ошибка получения процедур');
+    if (response.status === 404) {
+      NotificationService.showWarning?.(
+        'Процедуры не найдены',
+        'Warning'
+      );
+
+      return [];
+    }
+
+    return response;
+  } catch {
+
+  }
 }
 
 export async function getPastEvents(petId) {
-  if (USE_MOCK_API) {
-    // В моковом режиме истории нет — возвращаем пустой список
-    return [];
-  }
-  const response = await fetch(`${API_BASE_URL}/api/events/past/${petId}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
+  try {
+    if (USE_MOCK_API) {
+      // В моковом режиме истории нет — возвращаем пустой список
+      return [];
+    }
 
-  // Возвращаем пустой массив, если эндпоинт не найден
-  if (response.status === 404) {
-    console.warn('Эндпоинт для получения истории не найден.');
-    return [];
-  }
+    const response = await apiClient.get(`/api/events/${petId}`);
 
-  return await handleResponse(response, 'Ошибка получения истории');
+    if (response.status === 404) {
+      NotificationService.showWarning?.(
+        'Прошедшие процедуры не найдены',
+        'Warning'
+      );
+    }
+
+    return response;
+  } catch {
+
+  }
 }

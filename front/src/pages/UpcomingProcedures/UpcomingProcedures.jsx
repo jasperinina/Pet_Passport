@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import ModalOverlay from "../../components/layout/ModalOverlay/ModalOverlay";
-import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
+import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import Procedures from "../../components/ui/Procedures/Procedures";
-import Menu from "../../components/layout/Menu/Menu";
+import Menu from "../../components/menu/Menu";
 
 import { getUpcomingEvents } from "../../api/events";
+import NotificationService from "../../services/notificationService";
+import { ERROR_MESSAGES } from "../../constants/config";
 
 const UpcomingProcedures = () => {
   const navigate = useNavigate();
@@ -32,6 +33,11 @@ const UpcomingProcedures = () => {
         .finally(() => {
           setLoading(false);
         });
+    } else {
+      NotificationService.showError?.(
+        'ID питомца не указан',
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     }
   }, [petId]);
 

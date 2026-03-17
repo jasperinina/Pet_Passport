@@ -15,6 +15,8 @@ import {
   PERIOD_OPTIONS,
   REMINDER_OPTIONS,
 } from "../../../../constants/eventConstants";
+import NotificationService from "../../../../services/notificationService";
+import { ERROR_MESSAGES } from "../../../../constants/config";
 
 const PROCEDURE_TYPES = EVENT_TYPES;
 
@@ -23,7 +25,6 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
     PROCEDURE_TYPES.DOCTOR_VISIT
   );
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   // Общие поля
   const [title, setTitle] = useState("");
@@ -55,7 +56,6 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
       const dateStr = now.toISOString().split("T")[0];
 
       setProcedureType(PROCEDURE_TYPES.DOCTOR_VISIT);
-      setError(null);
       setLoading(false);
 
       // Общие
@@ -141,7 +141,6 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     try {
       const eventDateTime = new Date(`${eventDate}T${eventTime}`);
@@ -207,14 +206,19 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
         }
 
         default:
-          throw new Error("Неизвестный тип процедуры");
+          NotificationService.showWarning?.(
+            "Неизвестный тип процедуры",
+            "Warning"
+          );
       }
 
       if (onSuccess) onSuccess(result);
       onClose();
     } catch (err) {
-      console.error("Ошибка создания процедуры:", err);
-      setError(err.message || "Ошибка при создании процедуры");
+      NotificationService.showError?.(
+        `При создании процедуры произошла ошибка`,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     } finally {
       setLoading(false);
     }
@@ -239,11 +243,6 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
           </div>
         </header>
         <div className="form__body">
-          {error && (
-            <div className="form__error">
-              <p>{error}</p>
-            </div>
-          )}
           <ul className="form__list">
             <li className="form__item">
               <label

@@ -6,8 +6,7 @@ import EventCard from "../../components/events/EventCard/EventCard";
 import EventSection from "../../components/events/EventSection/EventSection";
 import ReminderSection from "../../components/events/ReminderSection";
 import LoadingState from "../../components/events/LoadingState";
-import ErrorState from "../../components/events/ErrorState";
-import Menu from "../../components/layout/Menu/Menu";
+import Menu from "../../components/menu/Menu";
 
 import {
   getDoctorVisit,
@@ -16,13 +15,14 @@ import {
 } from "../../api/events";
 import { PERIOD_UNITS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
+import NotificationService from "../../services/notificationService";
+import { ERROR_MESSAGES } from "../../constants/config";
 
 const DoctorVisitPage = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const [visitTitle, setVisitTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
@@ -52,7 +52,6 @@ const DoctorVisitPage = () => {
 
       try {
         setLoading(true);
-        setError(null);
 
         const visit = await getDoctorVisit(parseInt(eventId, 10));
 
@@ -83,9 +82,10 @@ const DoctorVisitPage = () => {
         setReminderUnit(visit.reminderUnit ?? PERIOD_UNITS.MINUTE);
       } catch (err) {
         console.error("Ошибка загрузки приема:", err);
-        setError(
-          err.message ||
-            "Не удалось загрузить данные о приеме. Попробуйте позже."
+
+        NotificationService.showError?.(
+          err.message || "Не удалось загрузить данные о приеме. Попробуйте позже.",
+          ERROR_MESSAGES.ERROR_TITLE
         );
       } finally {
         setLoading(false);
@@ -129,7 +129,11 @@ const DoctorVisitPage = () => {
       setIsEditing(false);
     } catch (err) {
       console.error("Ошибка сохранения приема:", err);
-      alert(err.message || "Не удалось сохранить изменения.");
+
+      NotificationService.showError?.(
+        err.message || "Не удалось сохранить изменения.",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     } finally {
       setLoading(false);
     }
@@ -173,16 +177,16 @@ const DoctorVisitPage = () => {
       navigate(-1);
     } catch (err) {
       console.error("Ошибка удаления приема:", err);
-      alert(err.message || "Не удалось удалить прием.");
+
+      NotificationService.showError?.(
+        err.message || "Не удалось удалить прием.",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     }
   };
 
   if (loading && !cardsData.date) {
     return <LoadingState message="Загрузка данных о приеме..." />;
-  }
-
-  if (error) {
-    return <ErrorState error={error} />;
   }
 
   return (
@@ -237,24 +241,30 @@ const DoctorVisitPage = () => {
           />
         </div>
         <div className="section__body">
-          <EventSection
-            title="Диагноз"
-            value={visitData.diagnosis}
-            isEditing={isEditing}
-            onChange={(value) => handleSectionChange("diagnosis", value)}
-          />
-          <EventSection
-            title="Рекомендации"
-            value={visitData.recommendations}
-            isEditing={isEditing}
-            onChange={(value) => handleSectionChange("recommendations", value)}
-          />
-          <EventSection
-            title="Направления"
-            value={visitData.directions}
-            isEditing={isEditing}
-            onChange={(value) => handleSectionChange("directions", value)}
-          />
+          {visitData.diagnosis && (
+            <EventSection
+              title="Диагноз"
+              value={visitData.diagnosis}
+              isEditing={isEditing}
+              onChange={(value) => handleSectionChange("diagnosis", value)}
+            />
+          )}
+          {visitData.recommendations && (
+            <EventSection
+              title="Рекомендации"
+              value={visitData.recommendations}
+              isEditing={isEditing}
+              onChange={(value) => handleSectionChange("recommendations", value)}
+            />
+          )}
+          {visitData.directions && (
+            <EventSection
+              title="Направления"
+              value={visitData.directions}
+              isEditing={isEditing}
+              onChange={(value) => handleSectionChange("directions", value)}
+            />
+          )}
           <ReminderSection
             reminderEnabled={reminderEnabled}
             reminderValue={reminderValue}

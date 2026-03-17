@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { updatePet, uploadPetPhoto, deletePetPhoto } from "../../../../api/pets";
 import API_BASE_URL from "../../../../api/config";
 import { FILE_UPLOAD, ERROR_MESSAGES } from "../../../../constants/config";
+import NotificationService from "../../../../services/notificationService";
 
 const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -14,7 +15,6 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
     birthDate: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [petPhotos, setPetPhotos] = useState([]);
@@ -42,7 +42,6 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
     });
     setPetPhotos(pet.photos || []);
     setSelectedFile(null);
-    setError(null);
   }, [isOpen, pet]);
 
   useEffect(() => {
@@ -72,28 +71,38 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      setError(ERROR_MESSAGES.INVALID_FILE_TYPE);
+      NotificationService.showError?.(
+        ERROR_MESSAGES.INVALID_FILE_TYPE,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+
       return;
     }
 
     if (file.size > FILE_UPLOAD.MAX_SIZE) {
-      setError(ERROR_MESSAGES.FILE_TOO_LARGE);
+      NotificationService.showError?.(
+        ERROR_MESSAGES.FILE_TOO_LARGE,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+
       return;
     }
 
     setSelectedFile(file);
-    setError(null);
   };
 
   const handlePhotoUpload = async () => {
     if (!selectedFile || !pet?.id) {
-      setError("Файл не выбран или питомец не найден");
+      NotificationService.showError?.(
+        "Файл не выбран или питомец не найден",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+
       return;
     }
 
     try {
       setUploadingPhoto(true);
-      setError(null);
 
       const result = await uploadPetPhoto(pet.id, selectedFile);
 
@@ -116,8 +125,11 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
       }
     } catch (err) {
       const errorMessage = err.message || "Ошибка загрузки фотографии";
-      setError(errorMessage);
-      alert(errorMessage);
+
+      NotificationService.showError?.(
+        errorMessage,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     } finally {
       setUploadingPhoto(false);
     }
@@ -136,7 +148,6 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
 
     try {
       setLoading(true);
-      setError(null);
 
       const numericPhotoId =
         typeof photoId === "string" ? parseInt(photoId, 10) : photoId;
@@ -160,9 +171,13 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
       }
     } catch (err) {
       const errorMessage = err.message || "Ошибка удаления фотографии";
-      setError(errorMessage);
+
+      NotificationService.showError?.(
+        errorMessage,
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+
       console.error("Ошибка удаления фото:", err);
-      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -171,7 +186,6 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
     try {
       if (selectedFile) {
@@ -199,8 +213,13 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
             fileInputRef.current.value = "";
           }
         } catch (photoError) {
+          NotificationService.showError?.(
+            photoError.message || "Ошибка загрузки фотографии",
+            ERROR_MESSAGES.ERROR_TITLE
+          );
+
           console.error("Ошибка загрузки фото:", photoError);
-          setError(photoError.message || "Ошибка загрузки фотографии");
+
           setLoading(false);
           setUploadingPhoto(false);
           return;
@@ -238,7 +257,11 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
 
       onClose();
     } catch (err) {
-      setError(err.message || "Ошибка при обновлении данных питомца");
+      NotificationService.showError?.(
+        err.message || "Ошибка при обновлении данных питомца",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
+
       console.error("Ошибка обновления питомца:", err);
     } finally {
       setLoading(false);
@@ -264,11 +287,6 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
           </div>
         </header>
         <div className="form__body">
-          {error && (
-            <div className="form__error">
-              <p>{error}</p>
-            </div>
-          )}
           <ul className="form__list">
             <li className="form__item">
               <label className="form__item-label h3" htmlFor="edit-pet-name-input">Имя</label>
@@ -339,6 +357,7 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
                         className={`${styles["edit-pet-modal__photos-remove-button"]} ${loading ? `${styles["edit-pet-modal__photos-remove-button--not-allowed"]} ${styles["edit-pet-modal__photos-remove-button--opacity"]}` : ""}`}
                         type="button"
                         title="Удалить фото"
+                        onClick={() => handleDeletePhoto(photo.id)}
                       >
                         &#65794;
                       </button>

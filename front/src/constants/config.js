@@ -19,6 +19,7 @@ export const ROUTES = {
 };
 
 export const ERROR_MESSAGES = {
+  ERROR_TITLE: 'Error :(',
   PET_NOT_FOUND: 'Питомец не найден',
   NO_PET_ID: 'ID питомца не указан в URL',
   FILE_TOO_LARGE: `Размер файла не должен превышать ${FILE_UPLOAD.MAX_SIZE / 1024 / 1024} МБ`,
@@ -27,3 +28,9 @@ export const ERROR_MESSAGES = {
   GENERIC_ERROR: 'Произошла ошибка. Попробуйте позже.',
 };
 
+export const NOTIFICATION_TYPES = {
+  ERROR: 'error',
+  SUCCESS: 'success',
+  WARNING: 'warning',
+  INFO: 'info'
+};
