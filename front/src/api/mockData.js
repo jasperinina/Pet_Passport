@@ -16,15 +16,16 @@ export const mockPet = {
   ]
 };
 
-export const mockUpcomingEvents = [
+export const mockEvents = [
   {
     id: 1,
     type: "vaccine",
     title: "Вакцинация от туберкулеза",
-    eventDate: "2025-09-21T13:00:00Z",
+    eventDate: "2026-09-21T13:00:00Z",
     reminderEnabled: true,
     medicine: "Вакцина БЦЖ",
-    nextVaccinationDate: "2026-09-21T13:00:00Z"
+    nextVaccinationDate: "2026-09-21T13:00:00Z",
+    status: 2
   },
   {
     id: 2,
@@ -33,17 +34,17 @@ export const mockUpcomingEvents = [
     eventDate: "2025-09-25T10:00:00Z",
     reminderEnabled: false,
     clinic: "Ветеринарная клиника",
-    doctor: "Иванов И.И."
+    doctor: "Иванов И.И.",
+    status: 1
   },
   {
     id: 3,
     type: "treatment",
     title: "Обработка от паразитов",
-    eventDate: "2025-10-01T14:00:00Z",
+    eventDate: "2026-10-01T14:00:00Z",
     reminderEnabled: true,
     remedy: "Капли на холку",
-    parasite: "Блохи и клещи"
+    parasite: "Блохи и клещи",
+    status: 2
   }
 ];
-
-

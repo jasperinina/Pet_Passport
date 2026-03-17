@@ -28,3 +28,9 @@ export const EVENT_TYPES = {
   TREATMENT: "treatment",
 };
 
+export const EVENT_STATUSES = {
+  INDEFINITE: 0,
+  UPCOMING: 1,
+  COMPLETED: 2,
+  CANCELLED: 3
+};

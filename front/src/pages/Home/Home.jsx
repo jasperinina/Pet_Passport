@@ -7,9 +7,10 @@ import Procedures from "../../components/ui/Procedures/Procedures";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 
 import { getPet } from "../../api/pets";
-import { getUpcomingEvents } from "../../api/events";
+import { getEvents } from "../../api/events";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
+import { EVENT_STATUSES } from "../../constants/eventConstants";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ const Home = () => {
     if (!petId) return;
 
     try {
-      const events = await getUpcomingEvents(parseInt(petId, 10));
+      const events = await getEvents(parseInt(petId, 10), EVENT_STATUSES.UPCOMING);
       setUpcomingEvents(events.slice(0, 3));
     } catch (err) {
       setUpcomingEvents([]);

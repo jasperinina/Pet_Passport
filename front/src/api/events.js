@@ -1,8 +1,6 @@
-import { ERROR_MESSAGES } from '../constants/config.js';
 import NotificationService from '../services/notificationService.js';
 import { apiClient } from './apiClient.js';
-import API_BASE_URL from './config.js';
-import { USE_MOCK_API, mockGetUpcomingEvents } from './mockApi.js';
+import { USE_MOCK_API, mockGetEvents } from './mockApi.js';
 
 // TODO: Заполнить пустые блоки catch выводом ошибок
 
@@ -113,41 +111,17 @@ export async function deleteTreatment(id) {
 }
 
 // ========== Events Lists ==========
-export async function getUpcomingEvents(petId) {  
+export async function getEvents(petId, status) {
   try {
     if (USE_MOCK_API) {
-      return await mockGetUpcomingEvents(petId);
+      return await mockGetEvents(petId, status);
     }
 
-    const response = await apiClient.get(`/api/events/${petId}`);
+    const response = await apiClient.get(`/api/events/${petId}?status=${status}`);
 
     if (response.status === 404) {
       NotificationService.showWarning?.(
         'Процедуры не найдены',
-        'Warning'
-      );
-
-      return [];
-    }
-
-    return response;
-  } catch {
-
-  }
-}
-
-export async function getPastEvents(petId) {
-  try {
-    if (USE_MOCK_API) {
-      // В моковом режиме истории нет — возвращаем пустой список
-      return [];
-    }
-
-    const response = await apiClient.get(`/api/events/${petId}`);
-
-    if (response.status === 404) {
-      NotificationService.showWarning?.(
-        'Прошедшие процедуры не найдены',
         'Warning'
       );
     }

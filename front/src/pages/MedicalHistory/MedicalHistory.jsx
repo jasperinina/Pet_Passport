@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import Menu from "../../components/menu/Menu";
 
-import { getPastEvents } from "../../api/events";
+import { getEvents } from "../../api/events";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
+import { EVENT_STATUSES } from "../../constants/eventConstants";
 
 const MedicalHistory = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const MedicalHistory = () => {
   useEffect(() => {
     if (petId) {
       setLoading(true);
-      getPastEvents(parseInt(petId, 10))
+      getEvents(parseInt(petId, 10), EVENT_STATUSES.COMPLETED)
         .then((events) => {
           setProcedures(events);
         })
@@ -37,7 +37,7 @@ const MedicalHistory = () => {
 
   const handleProcedureAdded = () => {
     if (petId) {
-      getPastEvents(parseInt(petId, 10))
+      getEvents(parseInt(petId, 10), EVENT_STATUSES.COMPLETED)
         .then((events) => {
           setProcedures(events);
         })

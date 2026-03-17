@@ -1,5 +1,5 @@
 // Моковые функции API для разработки без бекенда
-import { mockPet, mockUpcomingEvents } from './mockData.js';
+import { mockEvents, mockPet } from './mockData.js';
 
 // Включить/выключить моковый режим через переменную окружения
 const USE_MOCK_API = import.meta.env.VITE_USE_MOCK_API === 'true';
@@ -10,12 +10,10 @@ export const mockGetPet = async (id) => {
   return { ...mockPet, id };
 };
 
-export const mockGetUpcomingEvents = async (petId) => {
+export const mockGetEvents = async (petId, status) => {
   // Имитация задержки сети
   await new Promise(resolve => setTimeout(resolve, 300));
-  return mockUpcomingEvents;
+  return mockEvents.filter(e => e.status === status);
 };
 
 export { USE_MOCK_API };
-
-

@@ -5,9 +5,10 @@ import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import Menu from "../../components/menu/Menu";
 
-import { getUpcomingEvents } from "../../api/events";
+import { getEvents } from "../../api/events";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
+import { EVENT_STATUSES } from "../../constants/eventConstants";
 
 const UpcomingProcedures = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const UpcomingProcedures = () => {
   useEffect(() => {
     if (petId) {
       setLoading(true);
-      getUpcomingEvents(parseInt(petId, 10))
+      getEvents(parseInt(petId, 10), EVENT_STATUSES.UPCOMING)
         .then((events) => {
           setProcedures(events);
         })
@@ -43,7 +44,7 @@ const UpcomingProcedures = () => {
 
   const handleProcedureAdded = () => {
     if (petId) {
-      getUpcomingEvents(parseInt(petId, 10))
+      getEvents(parseInt(petId, 10), EVENT_STATUSES.UPCOMING)
         .then((events) => {
           setProcedures(events);
         })
