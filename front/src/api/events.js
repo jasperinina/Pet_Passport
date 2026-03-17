@@ -4,6 +4,8 @@ import { apiClient } from './apiClient.js';
 import API_BASE_URL from './config.js';
 import { USE_MOCK_API, mockGetUpcomingEvents } from './mockApi.js';
 
+// TODO: Заполнить пустые блоки catch выводом ошибок
+
 // ========== Doctor Visit ==========
 export async function createDoctorVisit(data) {
   try {
@@ -151,6 +153,14 @@ export async function getPastEvents(petId) {
     }
 
     return response;
+  } catch {
+
+  }
+}
+
+export async function updateEventStatus(eventId, newStatus) {
+  try {
+    return await apiClient.patch(`/api/events/${eventId}/status`, { status: newStatus });
   } catch {
 
   }

@@ -111,6 +111,17 @@ class ApiClient {
     );
   }
 
+  async patch(endpoint, data, requestOptions = {}) {
+    return await this.request(
+      endpoint,
+      {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+      },
+      requestOptions
+    );
+  }
+
   async delete(endpoint, requestOptions = {}) {
     return await this.request(
       endpoint,
