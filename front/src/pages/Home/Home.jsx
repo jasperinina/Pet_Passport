@@ -61,7 +61,7 @@ const Home = () => {
     if (!petId) return;
 
     try {
-      const events = await getEvents(parseInt(petId, 10), EVENT_STATUSES.UPCOMING);
+      const events = await getEvents(parseInt(petId, 10), [EVENT_STATUSES.UPCOMING]);
       setUpcomingEvents(events.slice(0, 3));
     } catch (err) {
       setUpcomingEvents([]);

@@ -22,7 +22,14 @@ const MedicalHistory = () => {
   useEffect(() => {
     if (petId) {
       setLoading(true);
-      getEvents(parseInt(petId, 10), EVENT_STATUSES.COMPLETED)
+      getEvents(
+        parseInt(petId, 10),
+        [
+          EVENT_STATUSES.INDEFINITE,
+          EVENT_STATUSES.COMPLETED,
+          EVENT_STATUSES.CANCELLED
+        ]
+      )
         .then((events) => {
           setProcedures(events);
         })
@@ -37,7 +44,14 @@ const MedicalHistory = () => {
 
   const handleProcedureAdded = () => {
     if (petId) {
-      getEvents(parseInt(petId, 10), EVENT_STATUSES.COMPLETED)
+      getEvents(
+        parseInt(petId, 10),
+        [
+          EVENT_STATUSES.INDEFINITE,
+          EVENT_STATUSES.COMPLETED,
+          EVENT_STATUSES.CANCELLED
+        ]
+      )
         .then((events) => {
           setProcedures(events);
         })

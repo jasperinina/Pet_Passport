@@ -10,10 +10,10 @@ export const mockGetPet = async (id) => {
   return { ...mockPet, id };
 };
 
-export const mockGetEvents = async (petId, status) => {
+export const mockGetEvents = async (petId, statuses) => {
   // Имитация задержки сети
   await new Promise(resolve => setTimeout(resolve, 300));
-  return mockEvents.filter(e => e.status === status);
+  return mockEvents.filter(e => statuses.includes(e.status));
 };
 
 export { USE_MOCK_API };

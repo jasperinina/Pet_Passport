@@ -24,7 +24,7 @@ const UpcomingProcedures = () => {
   useEffect(() => {
     if (petId) {
       setLoading(true);
-      getEvents(parseInt(petId, 10), EVENT_STATUSES.UPCOMING)
+      getEvents(parseInt(petId, 10), [EVENT_STATUSES.UPCOMING])
         .then((events) => {
           setProcedures(events);
         })
@@ -44,7 +44,7 @@ const UpcomingProcedures = () => {
 
   const handleProcedureAdded = () => {
     if (petId) {
-      getEvents(parseInt(petId, 10), EVENT_STATUSES.UPCOMING)
+      getEvents(parseInt(petId, 10), [EVENT_STATUSES.UPCOMING])
         .then((events) => {
           setProcedures(events);
         })

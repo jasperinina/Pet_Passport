@@ -25,7 +25,7 @@ export const mockEvents = [
     reminderEnabled: true,
     medicine: "Вакцина БЦЖ",
     nextVaccinationDate: "2026-09-21T13:00:00Z",
-    status: 2
+    status: 3
   },
   {
     id: 2,

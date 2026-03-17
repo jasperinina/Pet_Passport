@@ -111,13 +111,20 @@ export async function deleteTreatment(id) {
 }
 
 // ========== Events Lists ==========
-export async function getEvents(petId, status) {
+export async function getEvents(petId, statuses) {
   try {
     if (USE_MOCK_API) {
-      return await mockGetEvents(petId, status);
+      return await mockGetEvents(petId, statuses);
     }
 
-    const response = await apiClient.get(`/api/events/${petId}?status=${status}`);
+    let url = `/api/events/${petId}`;
+
+    if (statuses && statuses.length > 0) {
+      const queryParams = statuses.map(s => `status=${s}`).join('&');
+      url += `?${queryParams}`;
+    }
+
+    const response = await apiClient.get(url);
 
     if (response.status === 404) {
       NotificationService.showWarning?.(
