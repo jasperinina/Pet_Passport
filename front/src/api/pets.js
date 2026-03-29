@@ -1,5 +1,5 @@
-import { ERROR_MESSAGES } from '../constants/config.js';
-import NotificationService from '../services/notificationService.js';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants/config.js';
+import NotificationService, { notifyError, notifySuccess } from '../services/notificationService.js';
 import { apiClient } from './apiClient.js';
 import { USE_MOCK_API, mockGetPet } from './mockApi.js';
 
@@ -7,13 +7,18 @@ export async function createPet(petData) {
   try {
     const response = await apiClient.post('/api/Pets', petData);
     
-    NotificationService.showSuccess?.('Питомец успешно создан', 'Success!');
+    notifySuccess(SUCCESS_MESSAGES.PET.CREATED);
     
     return response;
   } catch (error) {
-    NotificationService.showError?.('Ошибка создания питомца', 'Error :(');
-    
-    return null;
+    switch (error.status) {
+      case 400:
+        notifyError(ERROR_MESSAGES.PET.BAD_REQUEST);
+        break;
+      default:
+        notifyError(ERROR_MESSAGES.GLOBAL.DEFAULT);
+        break;
+    }
   }
 }
 
@@ -27,19 +32,17 @@ export async function getPet(id) {
     
     return response;
   } catch (error) {
-    if (error.status === 404) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.PET_NOT_FOUND,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    } else {
-      NotificationService.showError?.(
-        'При загрузке данных питомца произошла ошибка',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+    switch (error.status) {
+      case 400:
+        notifyError(ERROR_MESSAGES.PET.BAD_REQUEST);
+        break;
+      case 404:
+        notifyError(ERROR_MESSAGES.PET.NOT_FOUND);
+        break;
+      default:
+        notifyError(ERROR_MESSAGES.PET.NO_GET);
+        break;
     }
-    
-    return null;
   }
 }
 
@@ -47,39 +50,31 @@ export async function updatePet(id, petData) {
   try {
     const response = await apiClient.put(`/api/Pets/${id}`, petData);
 
-    NotificationService.showSuccess?.('Данные питомца обновлены', 'Success!');
+    notifySuccess(SUCCESS_MESSAGES.PET.UPDATED);
 
     return response;
   } catch (error) {
-    if (error.status === 404) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.PET_NOT_FOUND,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    } else {
-      NotificationService.showError?.(
-        'При обновлении данных питомца произошла ошибка',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+    switch (error.status) {
+      case 400:
+        notifyError(ERROR_MESSAGES.PET.BAD_REQUEST);
+        break;
+      case 404:
+        notifyError(ERROR_MESSAGES.PET.NOT_FOUND);
+        break;
+      default:
+        notifyError(ERROR_MESSAGES.PET.NO_UPDATED);
+        break;
     }
-
-    return null;
   }
 }
 
 export async function uploadPetPhoto(petId, file, telegramFileId = null) {
   if (!file) {
-    NotificationService.showError?.(
-      'Файл не указан',
-      ERROR_MESSAGES.ERROR_TITLE
-    );
+    notifyError(ERROR_MESSAGES.FILE.NO_SPECIFIED);
   }
 
   if (!petId) {
-    NotificationService.showError?.(
-      'ID питомца не указан',
-      ERROR_MESSAGES.ERROR_TITLE
-    );
+    notifyError(ERROR_MESSAGES.PET.NO_ID);
   }
 
   try {
@@ -90,45 +85,30 @@ export async function uploadPetPhoto(petId, file, telegramFileId = null) {
       `/api/pets/${petId}/upload${telegramFileId ? `?telegramFileId=${encodeURIComponent(telegramFileId)}` : ''}`;
     
     const response = await apiClient.upload(url, formData);
-
+    
     if (!response.photoUrl || !response.url) {
-      NotificationService.showError?.(
-        'Ответ сервера не содержит URL фотографии',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-
+      notifyError(ERROR_MESSAGES.FILE.RESPONSE_NO_CONTAINS_URL);
       return null;
     }
 
     if (!response.Id && !response.id) {
-      NotificationService.showError?.(
-        'Ответ сервера не содержит ID фотографии',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-
+      notifyError(ERROR_MESSAGES.FILE.RESPONSE_NO_CONTAINS_ID);
       return null;
     }
 
     return response;
   } catch (error) {
-    if (error.status === 404) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.PET_NOT_FOUND,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    } else if (error.status === 400) {
-      NotificationService.showError?.(
-        'Превышен лимит фотографий (максимум 4)',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    } else {
-      NotificationService.showError?.(
-        'При загрузке фотографий произошла ошибка',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+    switch (error.status) {
+      case 400:
+        notifyError(ERROR_MESSAGES.FILE.LIMIT_EXCEEDED);
+        break;
+      case 404:
+        notifyError(ERROR_MESSAGES.PET.NOT_FOUND);
+        break;
+      default:
+        notifyError(ERROR_MESSAGES.FILE.DEFAULT);
+        break;
     }
-
-    return null;
   }
 }
 
@@ -142,21 +122,21 @@ export async function updatePetPhotos(petId, options = {}) {
   try {
     const response = await apiClient.put(`/api/Pets/${petId}/photos`, formData);
 
+    notifySuccess(SUCCESS_MESSAGES.FILE.UPDATED);
+
     return response;
   } catch (error) {
-    if (error.status === 404) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.PET_NOT_FOUND,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    } else if (error.status === 400) {
-      NotificationService.showError?.(
-        'При обновлении фотографии произошла ошибка',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+    switch (error.status) {
+      case 400:
+        notifyError(ERROR_MESSAGES.FILE.NO_UPDATED);
+        break;
+      case 404:
+        notifyError(ERROR_MESSAGES.PET.NOT_FOUND);
+        break;
+      default:
+        notifyError(ERROR_MESSAGES.FILE.DEFAULT);
+        break;
     }
-
-    return null;
   }
 }
 
@@ -170,25 +150,17 @@ export async function deletePetPhoto(petId, photoId) {
       if (text) return JSON.parse(text);
     }
 
-    NotificationService.showSuccess?.(
-      'Фотография успешно удалена',
-      'Success!'
-    );
+    notifySuccess(SUCCESS_MESSAGES.FILE.DELETED);
 
     return response;
   } catch (error) {
-    if (error.status === 404) {
-      NotificationService.showError?.(
-        'Питомец или фото не найдено',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    } else {
-      NotificationService.showError?.(
-        'При удалении фотографии произошла ошибка',
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+    switch (error.status) {
+      case 404:
+        notifyError(ERROR_MESSAGES.FILE.NOT_FOUND);
+        break;
+      default:
+        notifyError(ERROR_MESSAGES.FILE.NO_DELETED);
+        break;
     }
-
-    return null;
   }
 }

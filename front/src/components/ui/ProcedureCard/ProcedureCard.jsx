@@ -25,7 +25,7 @@ const ProcedureCard = ({
 
   return (
     <article className={styles["procedure-card"]} onClick={onClick}>
-      <header className={styles["procedure-card__header"]}>
+      <header className={`${styles["procedure-card__header"]} ${reminderEnabled ? styles["procedure-card__header--rows"] : ''}`}>
         <img
           className=
             {`${styles["procedure-card__notification-image"]} 

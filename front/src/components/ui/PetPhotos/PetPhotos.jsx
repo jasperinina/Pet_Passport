@@ -1,7 +1,5 @@
 import styles from "./PetPhotos.module.scss";
 
-import { memo } from "react";
-
 import PetPhoto from "../../../assets/images/pet-photo.png";
 
 import API_BASE_URL from "../../../api/config";
@@ -31,26 +29,24 @@ const PetPhotos = ({ photos, petName }) => {
   }
 
   return (
-    <div className={styles["pet-photos"]}>
-      <div className={`${styles[`pet-photos__grid--${validPhotos.length === 1 ? "1" : "2"}`]}`}>
-        {validPhotos.map((photo, index) => {
-          const photoUrl = getPhotoUrl(photo.url);
-          if (!photoUrl) return null;
+    <div className={`${styles["pet-photos"]} ${styles[`pet-photos--${validPhotos.length}`]}`}>
+      {validPhotos.map((photo, index) => {
+        const photoUrl = getPhotoUrl(photo.url);
+        if (!photoUrl) return null;
 
-          return (
-            <img
-              className={`${styles["pet-photos__item"]} ${validPhotos.length === 1 ? "" : styles["pet-photos__item--small"]}`}
-              key={photo.id || index}
-              src={photoUrl}
-              alt={`${petName} - фото ${index + 1}`}
-              onError={(e) => {
-                e.target.src = PetPhoto;
-              }}
-              width="500" height="367" loading="lazy"
-            />
-          );
-        })}
-      </div>
+        return (
+          <img
+            className={`${styles["pet-photos__item"]} ${validPhotos.length === 1 ? "" : styles["pet-photos__item--small"]}`}
+            key={photo.id || index}
+            src={photoUrl}
+            alt={`${petName} - фото ${index + 1}`}
+            onError={(e) => {
+              e.target.src = PetPhoto;
+            }}
+            width="500" height="367" loading="lazy"
+          />
+        );
+      })}
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import styles from "./CrossButton.module.scss";
 
-const CrossButton = ({ handleClose, loading = false }) => {
+const CrossButton = ({ handleClose, loading = false, color = "dark" }) => {
   return (
-    <div className={styles["cross-button"]}>
+    <div className={styles["cross-button"]} data-color={color}>
       <button
         className={styles["cross-button__button"]}
         type="button"

@@ -8,7 +8,7 @@ class ApiClient {
     this.config = {
       useNotifications: false,
       showSuccessNotifications: false,
-      defaultErrorMessage: ERROR_MESSAGES.GENERIC_ERROR || 'Произошла ошибка',
+      defaultErrorMessage: ERROR_MESSAGES.GLOBAL.DEFAULT,
       ...options
     };
   }
@@ -27,11 +27,11 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config);
-
+      
       return await this.handleResponse(response, settings);
     } catch (error) {
       if (error instanceof TypeError && error.message.includes('fetch')) {
-        throw new Error(ERROR_MESSAGES.NETWORK_ERROR);
+        throw new Error(ERROR_MESSAGES.GLOBAL.NETWORK);
       }
       throw error;
     }
@@ -50,6 +50,9 @@ class ApiClient {
       const error = new Error(errorMessage);
       error.status = response.status;
 
+      // TODO: Временно, чтобы узнать статусы ошибок
+      console.error(error);
+
       throw error;
     }
 
@@ -60,24 +63,6 @@ class ApiClient {
     }
     
     return response.body;
-  }
-
-  async handleError(error, settings) {
-    let finalError;
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      finalError = new Error(ERROR_MESSAGES.NETWORK_ERROR || 'Ошибка сети');
-    } else {
-      finalError = error;
-    }
-
-    if (settings.useNotifications && NotificationService.showError) {
-      NotificationService.showError(
-        finalError.message,
-        'Ошибка запроса'
-      );
-    }
-
-    throw finalError;
   }
 
   async get(endpoint, requestOptions = {}) {

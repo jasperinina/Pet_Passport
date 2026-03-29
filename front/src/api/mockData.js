@@ -12,6 +12,21 @@ export const mockPet = {
       id: 1,
       url: "/uploads/pets/1/photo.jpg",
       telegramFileId: null
+    },
+    {
+      id: 2,
+      url: "/uploads/pets/2/photo.jpg",
+      telegramFileId: null
+    },
+    {
+      id: 3,
+      url: "/uploads/pets/3/photo.jpg",
+      telegramFileId: null
+    },
+    {
+      id: 4,
+      url: "/uploads/pets/4/photo.jpg",
+      telegramFileId: null
     }
   ]
 };

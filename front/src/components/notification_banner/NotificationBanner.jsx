@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import CrossButton from "../cross_button/CrossButton";
 import { useNotification } from "../../context/NotificationContext";
+import { NOTIFICATION_TYPES } from "../../constants/config";
 
 const NotificationBanner = () => {
   const { notification, isVisible, hideNotification } = useNotification();
@@ -32,6 +33,7 @@ const NotificationBanner = () => {
           <CrossButton
             className={styles["notification-banner__cross-button"]}
             handleClose={handleClose}
+            color="light"
           />
         </header>
         <p className={styles["notification-banner__message"]}>{notification.message}</p>

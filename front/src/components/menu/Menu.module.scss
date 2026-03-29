@@ -10,6 +10,7 @@
     background-color: var(--color-light);
     border-radius: var(--border-radius);
     box-shadow: 0 rem(0) rem(10) 0 var(--color-gray);
+    z-index: 100;
   }
 
   &__list {

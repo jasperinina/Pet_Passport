@@ -29,16 +29,22 @@
     color: inherit;
   }
 
+  &__cross-button {
+    --cross-color: currentColor;
+  }
+
   &__message {
     @include fluid-text(16, 14);
   }
 
   &--error {
-    color: var(--color-red);
+    color: var(--color-light);
+    background-color: var(--color-red);
   }
 
   &--success {
-    color: var(--color-green);
+    color: var(--color-light);
+    background-color: var(--color-green);
   }
 
   &--warning {

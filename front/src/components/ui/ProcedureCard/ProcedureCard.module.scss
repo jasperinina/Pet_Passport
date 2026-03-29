@@ -25,6 +25,12 @@
       row-gap: rem(10);
       padding-bottom: rem(20);
     }
+
+    &--rows {
+      @include mobile-s {
+        grid-template-columns: none;
+      }
+    }
   }
 
   &__datetime {

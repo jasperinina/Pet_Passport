@@ -4,8 +4,8 @@
   &__photos {
     &-list {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(rem(100), 1fr));
-      gap: rem(12);
+      grid-template-columns: repeat(4, minmax(rem(100), 1fr));
+      column-gap: rem(12);
       margin-bottom: rem(16);
     }
 

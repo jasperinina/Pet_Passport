@@ -19,12 +19,9 @@ const Home = () => {
 
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const getPetIdFromUrl = () => {
     const params = new URLSearchParams(window.location.search);
@@ -39,18 +36,20 @@ const Home = () => {
         "ID питомца не указан в URL",
         ERROR_MESSAGES.ERROR_TITLE
       );
-      // setError("ID питомца не указан в URL");
+
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      setError(null);
       const petData = await getPet(parseInt(petId, 10));
       setPet(petData);
     } catch (err) {
-      setError(err.message || "Ошибка загрузки данных о питомце");
+      NotificationService.showError?.(
+        err.message || "Ошибка загрузки данных о питомце",
+        ERROR_MESSAGES.ERROR_TITLE
+      );
     } finally {
       setLoading(false);
     }
@@ -84,7 +83,6 @@ const Home = () => {
     document.documentElement.classList.remove("modal-open");
   }
 
-  // состояния загрузки / ошибки
   if (loading) {
     return (
       <section className="main-page">
@@ -97,25 +95,11 @@ const Home = () => {
     );
   }
 
-  if (error) {
-    return (
-      <section className="main-page">
-        <div className="container">
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <p className="txt1" style={{ color: "var(--error, #d32f2f)" }}>
-              {error}
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   if (!pet) {
     return null;
   }
 
-  //? Как открывается ProcedureDetailsModal?
+  // TODO: Как открывается ProcedureDetailsModal?
   return (
     <div>
       <section className="section container">

@@ -4,6 +4,16 @@
   display: flex;
   justify-content: end;
 
+  &[data-color="dark"] &__button::before,
+  &[data-color="dark"] &__button::after {
+    background-color: var(--color-dark);
+  }
+
+  &[data-color="light"] &__button::before,
+  &[data-color="light"] &__button::after {
+    background-color: var(--color-light);
+  }
+
   &__button {
     @include square(32);
 
@@ -22,7 +32,6 @@
       left: 7px;
       width: 70%;
       height: 2px;
-      background-color: var(--color-dark);
       border-radius: 5px;
 
       @include hover {
