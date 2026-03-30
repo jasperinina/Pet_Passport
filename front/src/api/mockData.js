@@ -18,16 +18,16 @@ export const mockPet = {
       url: "/uploads/pets/2/photo.jpg",
       telegramFileId: null
     },
-    {
-      id: 3,
-      url: "/uploads/pets/3/photo.jpg",
-      telegramFileId: null
-    },
-    {
-      id: 4,
-      url: "/uploads/pets/4/photo.jpg",
-      telegramFileId: null
-    }
+    // {
+    //   id: 3,
+    //   url: "/uploads/pets/3/photo.jpg",
+    //   telegramFileId: null
+    // },
+    // {
+    //   id: 4,
+    //   url: "/uploads/pets/4/photo.jpg",
+    //   telegramFileId: null
+    // }
   ]
 };
 
@@ -61,5 +61,23 @@ export const mockEvents = [
     remedy: "Капли на холку",
     parasite: "Блохи и клещи",
     status: 2
+  }
+];
+
+export const mockEventTemplates = [
+  {
+    id: 1,
+    type: "vaccine",
+    title: "Вакцинация от туберкулеза",
+    eventDate: "2026-01-01T05:00:00Z",
+    medicine: "Вакцина БЦЖ"
+  },
+  {
+    id: 2,
+    type: "treatment",
+    title: "Обработка от паразитов",
+    eventDate: "2026-01-01T05:00:00Z",
+    remedy: "Капли на холку",
+    parasite: "Блохи и клещи",
   }
 ];

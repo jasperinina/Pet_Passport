@@ -45,6 +45,27 @@
         grid-column: 1 / -1;
       }
     }
+
+    &--rows {
+      @include mobile {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: rem(10);
+        width: 100%;
+
+        & .button:last-child {
+          grid-column: 2;
+        }
+      }
+
+      @include mobile-s {
+        grid-template-columns: 100%;
+        
+        & .button:last-child {
+          grid-column: 1;
+        }
+      }
+    }
   }
 
   &__action {

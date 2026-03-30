@@ -15,6 +15,7 @@ import TreatmentPage from "./pages/Procedure/TreatmentPage";
 import { getPet } from "./api/pets";
 import { useNotification } from "./context/NotificationContext";
 import NotificationService from "./services/notificationService";
+import RecommendedProcedures from "./pages/RecommendedProcedures/RecommendedProcedures";
 
 function App() {
   const { showError, showSuccess, showWarning, showInfo } = useNotification();
@@ -69,6 +70,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/upcoming" element={<UpcomingProcedures />} />
+          <Route path="/recommendations" element={<RecommendedProcedures />} />
           <Route path="/history" element={<MedicalHistory />} />
           <Route path="/doctor-visit/:eventId" element={<DoctorVisitPage />} />
           <Route path="/vaccine/:eventId" element={<VaccinePage />} />

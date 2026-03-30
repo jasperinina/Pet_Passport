@@ -126,9 +126,10 @@ const Home = () => {
           </button>
         </header>
         <Procedures
-          upcomingEvents={upcomingEvents}
+          events={upcomingEvents}
           navigate={navigate}
           search={search}
+          message="Нет предстоящих процедур"
         />
         <button
           className="section__action visible-mobile"

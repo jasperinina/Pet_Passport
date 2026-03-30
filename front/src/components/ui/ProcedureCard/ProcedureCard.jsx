@@ -13,6 +13,7 @@ const ProcedureCard = ({
   typeName,
   reminderEnabled,
   isNotificationImageHidden,
+  isRecommendation = false,
   onClick
 }) => {
   const dateText = fullDate || date || "";
@@ -22,10 +23,10 @@ const ProcedureCard = ({
   const bellAlt = reminderEnabled
     ? "Напоминание включено"
     : "Напоминание выключено";
-
+  
   return (
     <article className={styles["procedure-card"]} onClick={onClick}>
-      <header className={`${styles["procedure-card__header"]} ${reminderEnabled ? styles["procedure-card__header--rows"] : ''}`}>
+      <header className={`${styles["procedure-card__header"]} ${isNotificationImageHidden ? styles["procedure-card__header--rows"] : ""}`}>
         <img
           className=
             {`${styles["procedure-card__notification-image"]} 
@@ -34,25 +35,27 @@ const ProcedureCard = ({
           alt={bellAlt}
           width="20" height="20"
         />
-        <div className={styles["procedure-card__datetime"]}>
-          <div className={styles["procedure-card__date"]}>
-            <img
-              className={styles["procedure-card__date-image"]}
-              src={DateIcon}
-              alt=""
-            />
-            <div className={styles["procedure-card__date-text"]}>
-              {dateText && (
-                <time dateTime={unformattedDateTime.split('T')[0]}>{dateText}</time>
+        {!isRecommendation && (
+          <div className={styles["procedure-card__datetime"]}>
+            <div className={styles["procedure-card__date"]}>
+              <img
+                className={styles["procedure-card__date-image"]}
+                src={DateIcon}
+                alt=""
+              />
+              <div className={styles["procedure-card__date-text"]}>
+                {dateText && (
+                  <time dateTime={unformattedDateTime.split('T')[0]}>{dateText}</time>
+                )}
+              </div>
+            </div>
+            <div className={styles["procedure-card__time"]}>
+              {timeText && (
+                <time dateTime={timeText}>{timeText}</time>
               )}
             </div>
           </div>
-          <div className={styles["procedure-card__time"]}>
-            {timeText && (
-              <time dateTime={timeText}>{timeText}</time>
-            )}
-          </div>
-        </div>
+        )}
         <div className={styles["procedure-card__type"]}>
           <div className={styles["procedure-card__type-inner"]}>
             {typeName}

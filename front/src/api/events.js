@@ -1,12 +1,16 @@
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants/config.js';
-import NotificationService from '../services/notificationService.js';
 import { apiClient } from './apiClient.js';
-import { USE_MOCK_API, mockGetEvents } from './mockApi.js';
+import { USE_MOCK_API, mockGetEventTemplates, mockGetEvents } from './mockApi.js';
 import { notifyError, notifySuccess } from '../services/notificationService.js';
 
 // ========== Doctor Visit ==========
 export async function createDoctorVisit(data) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
+      return null;
+    }
+
     const response = await apiClient.post('/api/doctor-visit', data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
@@ -92,7 +96,12 @@ export async function deleteDoctorVisit(id) {
 // ========== Vaccine ==========
 export async function createVaccine(data) {
   try {
-    const response = await apiClient.post(`/api/vaccine`, data);
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
+      return null;
+    }
+
+    const response = await apiClient.post('/api/vaccine', data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
 
@@ -177,7 +186,12 @@ export async function deleteVaccine(id) {
 // ========== Treatment ==========
 export async function createTreatment(data) {
   try {
-    const response = await apiClient.post(`/api/treatment`, data);
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
+      return null;
+    }
+
+    const response = await apiClient.post('/api/treatment', data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
 
@@ -256,6 +270,19 @@ export async function deleteTreatment(id) {
         notifyError(ERROR_MESSAGES.GLOBAL.DEFAULT);
         break;
     }
+  }
+}
+
+// ========== Event Templates ==========
+export async function getEventTemplates() {
+  try {
+    if (USE_MOCK_API) {
+      return await mockGetEventTemplates();
+    }
+
+    return await apiClient.get('/api/event-templates');
+  } catch (error) {
+    console.error(error);
   }
 }
 

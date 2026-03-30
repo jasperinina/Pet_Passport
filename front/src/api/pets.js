@@ -48,6 +48,11 @@ export async function getPet(id) {
 
 export async function updatePet(id, petData) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.PET.UPDATED);
+      return null;
+    }
+
     const response = await apiClient.put(`/api/Pets/${id}`, petData);
 
     notifySuccess(SUCCESS_MESSAGES.PET.UPDATED);
@@ -78,6 +83,11 @@ export async function uploadPetPhoto(petId, file, telegramFileId = null) {
   }
 
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.PET.UPDATED);
+      return null;
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
@@ -86,6 +96,8 @@ export async function uploadPetPhoto(petId, file, telegramFileId = null) {
     
     const response = await apiClient.upload(url, formData);
     
+    if (!response) return null;
+
     if (!response.photoUrl || !response.url) {
       notifyError(ERROR_MESSAGES.FILE.RESPONSE_NO_CONTAINS_URL);
       return null;
@@ -142,6 +154,11 @@ export async function updatePetPhotos(petId, options = {}) {
 
 export async function deletePetPhoto(petId, photoId) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.FILE.DELETED);
+      return null;
+    }
+
     const response = await apiClient.delete(`/api/Pets/${petId}/photos/${photoId}`);
 
     const contentType = response.headers.get('content-type');

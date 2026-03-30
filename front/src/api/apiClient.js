@@ -27,7 +27,7 @@ class ApiClient {
 
     try {
       const response = await fetch(url, config);
-      
+
       return await this.handleResponse(response, settings);
     } catch (error) {
       if (error instanceof TypeError && error.message.includes('fetch')) {

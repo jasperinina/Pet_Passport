@@ -15,12 +15,18 @@ import {
   PERIOD_OPTIONS,
   REMINDER_OPTIONS,
 } from "../../../../constants/eventConstants";
-import NotificationService from "../../../../services/notificationService";
-import { ERROR_MESSAGES } from "../../../../constants/config";
+import NotificationService, { notifyError } from "../../../../services/notificationService";
+import { NOTIFICATION_TITLES } from "../../../../constants/config";
 
 const PROCEDURE_TYPES = EVENT_TYPES;
 
-const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
+const AddProcedureModal = ({
+  isOpen,
+  onClose,
+  petId,
+  onSuccess,
+  event = null
+}) => {
   const [procedureType, setProcedureType] = useState(
     PROCEDURE_TYPES.DOCTOR_VISIT
   );
@@ -29,7 +35,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
   // Общие поля
   const [title, setTitle] = useState("");
   const [eventDate, setEventDate] = useState("");
-  const [eventTime, setEventTime] = useState("13:00");
+  const [eventTime, setEventTime] = useState("10:00");
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderValue, setReminderValue] = useState(5);
   const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
@@ -51,7 +57,43 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
 
   // Сброс формы при открытии
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+
+    if (event) {
+      setProcedureType(event.type);
+      setTitle(event.title || "");
+
+      const eventDateTime = new Date(event.eventDate);
+      const dateStr = eventDateTime.toISOString().split("T")[0];
+      const timeStr = eventDateTime.toTimeString().slice(0, 5);
+      setEventDate(dateStr);
+      setEventTime(timeStr);
+
+      setReminderEnabled(event.reminderEnabled || false);
+      setReminderValue(event.reminderValue ?? 5);
+      setReminderUnit(event.reminderUnit || PERIOD_UNITS.MINUTE);
+
+      switch (event.type) {
+        case PROCEDURE_TYPES.DOCTOR_VISIT:
+          setClinic(event.clinic || "");
+          setDoctor(event.doctor || "");
+          setDiagnosis(event.diagnosis || "");
+          setRecommendations(event.recommendations || "");
+          setReferrals(event.referrals || "");
+          break;
+        case PROCEDURE_TYPES.VACCINE:
+          setMedicine(event.medicine || "");
+          setPeriodUnit(event.periodUnit || PERIOD_UNITS.MONTH);
+          break;
+        case PROCEDURE_TYPES.TREATMENT:
+          setRemedy(event.remedy || "");
+          setParasite(event.parasite || "");
+          setPeriodUnit(event.periodUnit || PERIOD_UNITS.MONTH);
+          break;
+        default:
+          break;
+      }
+    } else {
       const now = new Date();
       const dateStr = now.toISOString().split("T")[0];
 
@@ -61,7 +103,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
       // Общие
       setTitle("");
       setEventDate(dateStr);
-      setEventTime("13:00");
+      setEventTime("10:00");
       setReminderEnabled(false);
       setReminderValue(5);
       setReminderUnit(PERIOD_UNITS.MINUTE);
@@ -81,7 +123,7 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
       setRemedy("");
       setParasite("");
     }
-  }, [isOpen]);
+  }, [isOpen, event]);
 
   // Блокируем скролл body, пока модалка открыта
   useEffect(() => {
@@ -208,17 +250,15 @@ const AddProcedureModal = ({ isOpen, onClose, petId, onSuccess }) => {
         default:
           NotificationService.showWarning?.(
             "Неизвестный тип процедуры",
-            "Warning"
+            NOTIFICATION_TITLES.WARNING
           );
       }
 
       if (onSuccess) onSuccess(result);
       onClose();
     } catch (err) {
-      NotificationService.showError?.(
-        `При создании процедуры произошла ошибка`,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+      console.log(err);
+      notifyError(`При создании процедуры произошла ошибка`);
     } finally {
       setLoading(false);
     }

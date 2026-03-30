@@ -24,6 +24,7 @@ const ModalOverlay = ({
           onClose={onClose}
           petId={petId}
           onSuccess={onSuccess}
+          event={event}
         />
       ) : modalName === "EditPetModal" ? (
         <EditPetModal

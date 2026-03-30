@@ -194,6 +194,13 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
 
           const result = await uploadPetPhoto(pet.id, selectedFile);
 
+          if (!result) {
+            onClose();
+            setLoading(false);
+            setUploadingPhoto(false);
+            return;
+          }
+
           const photoUrl = result.photoUrl || result.url;
           const photoId = result.Id || result.id || result.photoId;
 

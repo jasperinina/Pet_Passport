@@ -36,7 +36,7 @@ const UpcomingProcedures = () => {
         });
     } else {
       NotificationService.showError?.(
-        'ID питомца не указан',
+        ERROR_MESSAGES.PET.NO_ID,
         ERROR_MESSAGES.ERROR_TITLE
       );
     }
@@ -63,16 +63,25 @@ const UpcomingProcedures = () => {
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Предстоящие процедуры</h2>
-          <button
-            className="button button--filled"
-            type="button"
-            onClick={() => setIsAddProcedureModalOpen(true)}
-          >
-            Добавить
-          </button>
+          <div className="section__actions section__actions--rows">
+            <button
+              className="button button--filled"
+              type="button"
+              onClick={() => setIsAddProcedureModalOpen(true)}
+            >
+              Добавить
+            </button>
+            <button
+              className="button button--outlined"
+              type="button"
+              onClick={() => navigate(`/recommendations${search}`)}
+            >
+              Рекомендации
+            </button> 
+          </div>
         </header>
         <Procedures
-          upcomingEvents={procedures}
+          events={procedures}
           navigate={navigate}
           search={search}
           message="Нет предстоящих процедур"

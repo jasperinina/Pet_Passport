@@ -6,13 +6,15 @@ import { formatEventDateTime } from "../../../utils/dateUtils";
 import { getEventPath, getEventTypeName } from "../../../utils/eventUtils";
 
 const Procedures = ({
-  upcomingEvents,
+  events,
   navigate,
   search,
   message,
-  isNotificationImageHidden = false
+  isNotificationImageHidden = false,
+  isRecommendation = false,
+  onRecommendationClick = () => {}
 }) => {
-  const hasProcedures = upcomingEvents.length > 0;
+  const hasProcedures = events.length > 0;
 
   return (
     <div className={styles.procedures}>
@@ -22,7 +24,7 @@ const Procedures = ({
         </div>
       ) : (
         <ul className={styles["procedures__list"]}>
-          {upcomingEvents.map((event) => {
+          {events.map((event) => {
             const { date, time, fullDate } = formatEventDateTime(
               event.eventDate
             );
@@ -36,12 +38,17 @@ const Procedures = ({
                   time={time}
                   fullDate={fullDate}
                   typeName={getEventTypeName(event.type)}
-                  reminderEnabled={event.reminderEnabled}
+                  reminderEnabled={event.reminderEnabled === undefined ? false : event.reminderEnabled}
                   isNotificationImageHidden={isNotificationImageHidden}
+                  isRecommendation={isRecommendation}
                   onClick={() => {
-                    const eventPath = getEventPath(event.type, event.id, search);
-                    if (eventPath) {
-                      navigate(eventPath);
+                    if (isRecommendation) {
+                      onRecommendationClick?.(event);
+                    } else {
+                      const eventPath = getEventPath(event.type, event.id, search);
+                      if (eventPath) {
+                        navigate(eventPath);
+                      }
                     }
                   }}
                 />
