@@ -63,9 +63,20 @@ const AddProcedureModal = ({
       setProcedureType(event.type);
       setTitle(event.title || "");
 
-      const eventDateTime = new Date(event.eventDate);
-      const dateStr = eventDateTime.toISOString().split("T")[0];
-      const timeStr = eventDateTime.toTimeString().slice(0, 5);
+      let dateStr;
+      let timeStr;
+      if (event.eventDate) {
+        const eventDateTime = new Date(event.eventDate);
+        if (!isNaN(eventDateTime.getTime())) {
+          dateStr = eventDateTime.toISOString().split("T")[0];
+          timeStr = eventDateTime.toTimeString().slice(0, 5);
+        } else {
+          const now = new Date();
+          dateStr = now.toISOString().split("T")[0];
+          timeStr = "10:00";
+        }
+      }
+      
       setEventDate(dateStr);
       setEventTime(timeStr);
 

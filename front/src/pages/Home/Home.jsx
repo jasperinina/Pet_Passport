@@ -114,13 +114,22 @@ const Home = () => {
       <section className="section container">
         <header className="section__header">
           <h2 className="section__title h1">Предстоящие процедуры</h2>
-          <button
-            className="section__action hidden-mobile"
-            type="button"
-            onClick={() => navigate(`/upcoming${search}`)}
-          >
-            Посмотреть все
-          </button>
+          <div className="section__actions">
+            <button
+              className="section__action hidden-mobile"
+              type="button"
+              onClick={() => navigate(`/upcoming${search}`)}
+            >
+              Посмотреть все
+            </button>
+            <button
+              className="section__action hidden-mobile"
+              type="button"
+              onClick={() => navigate(`/recommendations${search}`)}
+            >
+              Рекомендации
+            </button>
+          </div>
         </header>
         <Procedures
           events={upcomingEvents}
@@ -128,13 +137,22 @@ const Home = () => {
           search={search}
           message="Нет предстоящих процедур"
         />
-        <button
-          className="section__action visible-mobile"
-          type="button"
-          onClick={() => navigate(`/upcoming${search}`)}
-        >
-          Посмотреть все
-        </button>
+        <div className="section__actions section__actions--rows section__actions--margin">
+          <button
+            className="section__action visible-mobile"
+            type="button"
+            onClick={() => navigate(`/upcoming${search}`)}
+          >
+            Посмотреть все
+          </button>
+          <button
+            className="button button--outlined visible-mobile"
+            type="button"
+            onClick={() => navigate(`/recommendations${search}`)}
+          >
+            Рекомендации
+          </button>
+        </div>
       </section>
 
       {/* <ProcedureDetailsModal

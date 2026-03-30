@@ -6,8 +6,7 @@ import Procedures from "../../components/ui/Procedures/Procedures";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
 
-import { getEventTemplates, getEvents } from "../../api/events";
-import { EVENT_STATUSES } from "../../constants/eventConstants";
+import { getEventTemplates } from "../../api/events";
 
 const RecommendedProcedures = () => {
   const navigate = useNavigate();

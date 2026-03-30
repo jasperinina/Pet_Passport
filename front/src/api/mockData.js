@@ -69,14 +69,12 @@ export const mockEventTemplates = [
     id: 1,
     type: "vaccine",
     title: "Вакцинация от туберкулеза",
-    eventDate: "2026-01-01T05:00:00Z",
     medicine: "Вакцина БЦЖ"
   },
   {
     id: 2,
     type: "treatment",
     title: "Обработка от паразитов",
-    eventDate: "2026-01-01T05:00:00Z",
     remedy: "Капли на холку",
     parasite: "Блохи и клещи",
   }

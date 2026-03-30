@@ -43,7 +43,7 @@ const Procedures = ({
                   isRecommendation={isRecommendation}
                   onClick={() => {
                     if (isRecommendation) {
-                      onRecommendationClick?.(event);
+                      onRecommendationClick(event);
                     } else {
                       const eventPath = getEventPath(event.type, event.id, search);
                       if (eventPath) {
