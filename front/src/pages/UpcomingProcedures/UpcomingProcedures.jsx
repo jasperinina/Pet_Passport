@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import Menu from "../../components/menu/Menu";
+import LoadingState from "../../components/events/LoadingState/LoadingState";
 
 import { getEvents } from "../../api/events";
 import NotificationService from "../../services/notificationService";
@@ -53,6 +54,14 @@ const UpcomingProcedures = () => {
         });
     }
   };
+
+  if (loading) {
+    return (
+      <section className="section container">
+        <LoadingState message="Загрузка процедур..." />
+      </section>
+    );
+  }
 
   return (
     <div>

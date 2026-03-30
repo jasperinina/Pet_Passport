@@ -11,6 +11,7 @@ import { getEvents } from "../../api/events";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
 import { EVENT_STATUSES } from "../../constants/eventConstants";
+import LoadingState from "../../components/events/LoadingState/LoadingState";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -85,12 +86,8 @@ const Home = () => {
 
   if (loading) {
     return (
-      <section className="main-page">
-        <div className="container">
-          <div style={{ textAlign: "center", padding: "50px" }}>
-            <p className="txt1">Загрузка данных о питомце.</p>
-          </div>
-        </div>
+      <section className="section container">
+        <LoadingState message="Загрузка данных питомца..." />
       </section>
     );
   }

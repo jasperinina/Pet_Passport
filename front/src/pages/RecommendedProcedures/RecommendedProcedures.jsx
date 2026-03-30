@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Menu from "../../components/menu/Menu";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
+import LoadingState from "../../components/events/LoadingState/LoadingState";
 
 import { getEventTemplates, getEvents } from "../../api/events";
 import { EVENT_STATUSES } from "../../constants/eventConstants";
@@ -58,6 +59,14 @@ const RecommendedProcedures = () => {
     setIsAddProcedureModalOpen(true);
   };
 
+  if (loading) {
+    return (
+      <section className="section container">
+        <LoadingState message="Загрузка процедур..." />
+      </section>
+    );
+  }
+
   return (
     <div>
       <div className="container">
@@ -67,6 +76,16 @@ const RecommendedProcedures = () => {
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Рекомендуемые процедуры</h2>
+          <div className="section__actions">
+            <button
+              className="button button--outlined"
+              type="button"
+              disabled={loading}
+              onClick={() => navigate(-1)}
+            >
+              Назад
+            </button>
+          </div>
         </header>
 
         <Procedures

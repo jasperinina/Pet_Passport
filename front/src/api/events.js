@@ -51,6 +51,11 @@ export async function getDoctorVisit(id) {
 
 export async function updateDoctorVisit(id, data) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
+      return null;
+    }
+
     const response = await apiClient.put(`/api/doctor-visit/${id}`, data);
     
     notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
@@ -73,11 +78,16 @@ export async function updateDoctorVisit(id, data) {
 
 export async function deleteDoctorVisit(id) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
+      return null;
+    }
+
     const response = await apiClient.delete(`/api/doctor-visit/${id}`);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
 
-    return await apiClient.delete(`/api/doctor-visit/${id}`);
+    return response;
   } catch (error) {
     switch (error.status) {
       case 400:
@@ -141,6 +151,11 @@ export async function getVaccine(id) {
 
 export async function updateVaccine(id, data) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
+      return null;
+    }
+
     const response = await apiClient.put(`/api/vaccine/${id}`, data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
@@ -163,6 +178,11 @@ export async function updateVaccine(id, data) {
 
 export async function deleteVaccine(id) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
+      return null;
+    }
+
     const response = await apiClient.delete(`/api/vaccine/${id}`);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
@@ -231,6 +251,11 @@ export async function getTreatment(id) {
 
 export async function updateTreatment(id, data) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
+      return null;
+    }
+
     const response = await apiClient.put(`/api/treatment/${id}`, data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
@@ -253,6 +278,11 @@ export async function updateTreatment(id, data) {
 
 export async function deleteTreatment(id) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
+      return null;
+    }
+
     const response = await apiClient.delete(`/api/treatment/${id}`);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
@@ -315,6 +345,11 @@ export async function getEvents(petId, statuses) {
 
 export async function updateEventStatus(eventId, newStatus) {
   try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
+      return null;
+    }
+
     const response = await apiClient.patch(
       `/api/events/${eventId}/status`,
       { status: newStatus }

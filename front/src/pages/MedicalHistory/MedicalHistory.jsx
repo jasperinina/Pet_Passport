@@ -3,9 +3,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import Procedures from "../../components/ui/Procedures/Procedures";
 import Menu from "../../components/menu/Menu";
+import LoadingState from "../../components/events/LoadingState/LoadingState";
+import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 
 import { getEvents } from "../../api/events";
-import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import { EVENT_STATUSES } from "../../constants/eventConstants";
 
 const MedicalHistory = () => {
@@ -60,6 +61,14 @@ const MedicalHistory = () => {
         });
     }
   };
+
+  if (loading) {
+    return (
+      <section className="section container">
+        <LoadingState message="Загрузка истории..." />
+      </section>
+    );
+  }
 
   return (
     <div>

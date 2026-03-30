@@ -1,0 +1,25 @@
+@use '../../../styles/helpers/' as *;
+
+.loading-state {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+
+  &__spinner {
+    @include square(40);
+
+    border: rem(4) solid var(--color-dark);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

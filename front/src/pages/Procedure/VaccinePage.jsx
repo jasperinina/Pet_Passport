@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import EventPageHeader from "../../components/events/EventPageHeader";
 import EventCard from "../../components/events/EventCard/EventCard";
 import ReminderSection from "../../components/events/ReminderSection";
-import LoadingState from "../../components/events/LoadingState";
+import LoadingState from "../../components/events/LoadingState/LoadingState";
 import Menu from "../../components/menu/Menu";
 
 import { getVaccine, updateVaccine, deleteVaccine } from "../../api/events";

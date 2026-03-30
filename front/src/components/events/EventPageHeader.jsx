@@ -26,7 +26,7 @@ const EventPageHeader = ({
             value={title}
             onChange={(e) => onTitleChange?.(e.target.value)}
           />
-          <div className="section__actions">
+          <div className="section__actions section__actions--rows">
             <button
               className="button button--filled"
               type="button"
