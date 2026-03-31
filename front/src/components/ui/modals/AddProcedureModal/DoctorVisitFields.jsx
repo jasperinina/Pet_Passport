@@ -79,7 +79,7 @@ const DoctorVisitFields = ({
             name="doctor-visit-date-field"
             type="date"
             ref={dateRef}
-            value={eventDate}
+            value={eventDate ?? ""}
             onChange={(e) => setEventDate(e.target.value)}
             disabled={loading}
             required
@@ -93,7 +93,7 @@ const DoctorVisitFields = ({
             name="doctor-visit-time-field"
             type="time"
             ref={timeRef}
-            value={eventTime}
+            value={eventTime ?? ""}
             onChange={(e) => setEventTime(e.target.value)}
             disabled={loading}
             required

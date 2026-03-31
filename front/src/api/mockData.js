@@ -67,14 +67,42 @@ export const mockEvents = [
 export const mockEventTemplates = [
   {
     id: 1,
-    type: "vaccine",
+    eventType: 0,
     title: "Вакцинация от туберкулеза",
     medicine: "Вакцина БЦЖ"
   },
   {
     id: 2,
-    type: "treatment",
-    title: "Обработка от паразитов",
+    eventType: 2,
+    title: "Плановый осмотр",
+    clinic: "Ветеринарная клиника",
+    doctor: "Иванов И.И."
+  },
+  {
+    id: 3,
+    eventType: 1,
+    title: "Обработка от паразитов 2",
+    remedy: "Капли на холку",
+    parasite: "Блохи и клещи",
+  },
+  {
+    id: 4,
+    eventType: 1,
+    title: "Обработка от паразитов 3",
+    remedy: "Капли на холку",
+    parasite: "Блохи и клещи",
+  },
+  {
+    id: 5,
+    eventType: 1,
+    title: "Обработка от паразитов 4",
+    remedy: "Капли на холку",
+    parasite: "Блохи и клещи",
+  },
+  {
+    id: 6,
+    eventType: 1,
+    title: "Обработка от паразитов 5",
     remedy: "Капли на холку",
     parasite: "Блохи и клещи",
   }

@@ -58,6 +58,10 @@ const RecommendedProcedures = () => {
     setIsAddProcedureModalOpen(true);
   };
 
+  if (!isAddProcedureModalOpen) {
+    document.documentElement.classList.remove("modal-open");
+  }
+
   if (loading) {
     return (
       <section className="section container">
@@ -101,10 +105,7 @@ const RecommendedProcedures = () => {
       <ModalOverlay
         modalName="AddProcedureModal"
         isOpen={isAddProcedureModalOpen}
-        onClose={() => {
-          setIsAddProcedureModalOpen(false);
-          setEditingEvent(null);
-        }}
+        onClose={() => setIsAddProcedureModalOpen(false)}
         petId={petId ? parseInt(petId, 10) : null}
         onSuccess={handleProcedureAdded}
         event={editingEvent}

@@ -60,7 +60,7 @@ const VaccineFields = ({
             name="vaccine-date-field"
             type="date"
             ref={dateRef}
-            value={eventDate}
+            value={eventDate ?? ""}
             onChange={(e) => setEventDate(e.target.value)}
             disabled={loading}
             required
@@ -74,7 +74,7 @@ const VaccineFields = ({
             name="vaccine-time-field"
             type="time"
             ref={timeRef}
-            value={eventTime}
+            value={eventTime ?? ""}
             onChange={(e) => setEventTime(e.target.value)}
             disabled={loading}
             required

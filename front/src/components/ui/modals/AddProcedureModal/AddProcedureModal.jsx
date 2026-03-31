@@ -27,9 +27,7 @@ const AddProcedureModal = ({
   onSuccess,
   event = null
 }) => {
-  const [procedureType, setProcedureType] = useState(
-    PROCEDURE_TYPES.DOCTOR_VISIT
-  );
+  const [procedureType, setProcedureType] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Общие поля
@@ -60,7 +58,18 @@ const AddProcedureModal = ({
     if (!isOpen) return;
 
     if (event) {
-      setProcedureType(event.type);
+      switch (event.eventType) {
+        case 2:
+          setProcedureType(PROCEDURE_TYPES.DOCTOR_VISIT);
+          break;
+        case 0:
+          setProcedureType(PROCEDURE_TYPES.VACCINE);
+          break;
+        case 1:
+          setProcedureType(PROCEDURE_TYPES.TREATMENT);
+          break;
+      }
+
       setTitle(event.title || "");
 
       let dateStr;
@@ -80,26 +89,26 @@ const AddProcedureModal = ({
       setEventDate(dateStr);
       setEventTime(timeStr);
 
-      setReminderEnabled(event.reminderEnabled || false);
+      setReminderEnabled(event.reminderEnabled ??false);
       setReminderValue(event.reminderValue ?? 5);
-      setReminderUnit(event.reminderUnit || PERIOD_UNITS.MINUTE);
+      setReminderUnit(event.reminderUnit ?? PERIOD_UNITS.MINUTE);
 
-      switch (event.type) {
-        case PROCEDURE_TYPES.DOCTOR_VISIT:
-          setClinic(event.clinic || "");
-          setDoctor(event.doctor || "");
-          setDiagnosis(event.diagnosis || "");
-          setRecommendations(event.recommendations || "");
-          setReferrals(event.referrals || "");
+      switch (event.eventType) {
+        case 2:
+          setClinic(event.clinic ?? "");
+          setDoctor(event.doctor ?? "");
+          setDiagnosis(event.diagnosis ?? "");
+          setRecommendations(event.recommendations ?? "");
+          setReferrals(event.referrals ?? "");
           break;
-        case PROCEDURE_TYPES.VACCINE:
-          setMedicine(event.medicine || "");
-          setPeriodUnit(event.periodUnit || PERIOD_UNITS.MONTH);
+        case 0:
+          setMedicine(event.medicine ?? "");
+          setPeriodUnit(event.periodUnit ?? PERIOD_UNITS.MONTH);
           break;
-        case PROCEDURE_TYPES.TREATMENT:
-          setRemedy(event.remedy || "");
-          setParasite(event.parasite || "");
-          setPeriodUnit(event.periodUnit || PERIOD_UNITS.MONTH);
+        case 1:
+          setRemedy(event.remedy ?? "");
+          setParasite(event.parasite ?? "");
+          setPeriodUnit(event.periodUnit ?? PERIOD_UNITS.MONTH);
           break;
         default:
           break;
@@ -175,11 +184,11 @@ const AddProcedureModal = ({
 
   const getDefaultTitle = () => {
     switch (procedureType) {
-      case PROCEDURE_TYPES.DOCTOR_VISIT:
+      case PROCEDURE_TYPES.DOCTOR_VISIT || 2:
         return "Посещение врача";
-      case PROCEDURE_TYPES.VACCINE:
+      case PROCEDURE_TYPES.VACCINE || 0:
         return "Вакцинация";
-      case PROCEDURE_TYPES.TREATMENT:
+      case PROCEDURE_TYPES.TREATMENT || 1:
         return "Обработка";
       default:
         return "Процедура";
