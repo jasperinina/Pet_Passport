@@ -7,7 +7,13 @@ import API_BASE_URL from "../../../../api/config";
 import { FILE_UPLOAD, ERROR_MESSAGES } from "../../../../constants/config";
 import NotificationService from "../../../../services/notificationService";
 
-const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
+const EditPetModal = ({
+  isOpen,
+  onClose,
+  isClosing,
+  pet,
+  onSuccess
+}) => {
   const [formData, setFormData] = useState({
     name: "",
     breed: "",
@@ -278,7 +284,7 @@ const EditPetModal = ({ isOpen, onClose, pet, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form className={`form ${isClosing ? "form--closing" : ""}`} onSubmit={handleSubmit}>
       <div className="form__inner">
         <header className="form__header">
           <h2 className="form__title h1">Изменить данные</h2>

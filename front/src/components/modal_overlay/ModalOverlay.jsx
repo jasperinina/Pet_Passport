@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+
 import styles from "./ModalOverlay.module.scss";
 
 import AddProcedureModal from "../ui/modals/AddProcedureModal/AddProcedureModal";
@@ -12,16 +14,35 @@ const ModalOverlay = ({
   petId = null,
   event = null
 }) => {
-  if (!isOpen) return null;
+  const [isClosing, setIsClosing] = useState(false);
 
-  document.documentElement.classList.add("modal-open");
+  useEffect(() => {
+    if (isOpen) {
+      document.documentElement.classList.add("modal-open");
+    } else {
+      document.documentElement.classList.remove("modal-open");
+    }
+    return () => document.documentElement.classList.remove("modal-open");
+  }, [isOpen]);
+
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 300);
+  };
+
+  if (!isOpen && !isClosing) return null;
 
   return (
-    <div className={styles["modal-overlay"]}>
+    <div className={`${styles["modal-overlay"]} ${isClosing ? styles["modal-overlay--closing"] : ""}`}>
+      <div className={styles["modal-overlay__background"]} onClick={handleClose}></div>
       {modalName === "AddProcedureModal" ? (
         <AddProcedureModal
           isOpen={isOpen}
-          onClose={onClose}
+          onClose={handleClose}
+          isClosing={isClosing}
           petId={petId}
           onSuccess={onSuccess}
           event={event}
@@ -29,14 +50,12 @@ const ModalOverlay = ({
       ) : modalName === "EditPetModal" ? (
         <EditPetModal
           isOpen={isOpen}
-          onClose={onClose}
+          onClose={handleClose}
+          isClosing={isClosing}
           pet={pet}
           onSuccess={onSuccess}
         />
-      ) : (
-        <div></div>
-      )}
-      <div className={styles["modal-overlay__background"]} onClick={onClose}></div>  
+      ) : null}
     </div>
   );
 };

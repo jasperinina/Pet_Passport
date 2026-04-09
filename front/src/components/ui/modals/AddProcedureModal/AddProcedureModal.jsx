@@ -23,6 +23,7 @@ const PROCEDURE_TYPES = EVENT_TYPES;
 const AddProcedureModal = ({
   isOpen,
   onClose,
+  isClosing,
   petId,
   onSuccess,
   event = null
@@ -287,7 +288,7 @@ const AddProcedureModal = ({
   if (!isOpen) return null;
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form className={`form ${isClosing ? "form--closing" : ""}`} onSubmit={handleSubmit}>
       <div className="form__inner">
         <header className="form__header">
           <h2 className="form__title h1">Добавить процедуру</h2>

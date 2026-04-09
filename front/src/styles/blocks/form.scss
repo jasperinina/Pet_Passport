@@ -7,10 +7,21 @@
   border-radius: var(--border-radius);
   z-index: 2;
   overflow: auto;
+  animation: fadeIn 0.3s;
 
-  @include mobile-s {
-    height: 100%;
-    border-radius: 0;
+  @include mobile {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    animation: slideIn 0.3s;
+
+    &--closing {
+      animation: slideOut 0.3s ease forwards;
+    }
+  }
+
+  @include mobile-above {
+    &--closing {
+      animation: fadeOut 0.3s ease forwards;
+    }
   }
 
   &__error {
@@ -21,7 +32,7 @@
     padding: rem(12) rem(16);
 
     &:not(:last-child) {
-      margin-bottom: 24px;
+      margin-bottom: rem(24);
     }
   }
   
@@ -122,4 +133,24 @@
       width: 100%;
     }
   }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slideOut {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
 }
