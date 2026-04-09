@@ -32,6 +32,23 @@
     }
   }
 
+  &__back-button {
+    display: flex;
+    align-items: center;
+    row-gap: rem(4);
+    color: var(--color-dark);
+
+    &-icon {
+      @include square(16);
+      @include flex-center;
+    }
+
+    &-text {
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
   &__separator {
     display: block;
     margin-inline: rem(28);

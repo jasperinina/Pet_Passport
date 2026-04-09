@@ -60,14 +60,6 @@ const EventPageHeader = ({
               Редактировать
             </button>
             <button
-              className="button button--outlined"
-              type="button"
-              disabled={loading}
-              onClick={() => navigate(-1)}
-            >
-              Назад
-            </button>
-            <button
               className="button button--transparent"
               type="button"
               disabled={loading}

@@ -40,10 +40,11 @@
       grid-template-columns: repeat(2, 1fr);
       row-gap: rem(10);
       width: 100%;
+    }
 
-      & .button:last-child {
-        grid-column: 1 / -1;
-      }
+    @include mobile-s {
+      grid-template-columns: none;
+      grid-template-rows: repeat(2, 1fr);
     }
 
     &--rows {

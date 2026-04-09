@@ -79,16 +79,6 @@ const RecommendedProcedures = () => {
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Рекомендуемые процедуры</h2>
-          <div className="section__actions">
-            <button
-              className="button button--outlined"
-              type="button"
-              disabled={loading}
-              onClick={() => navigate(-1)}
-            >
-              Назад
-            </button>
-          </div>
         </header>
 
         <Procedures
