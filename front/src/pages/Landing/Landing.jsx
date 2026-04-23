@@ -6,12 +6,12 @@ import styles from "./Landing.module.scss";
 import Header from "../../components/landing/header/Header";
 
 import PaymentType from "../../components/landing/payment_type/PaymentType";
-import ProblemCard from "../../components/landing/problem-card/ProblemCard";
+import ProblemCard from "../../components/landing/problem_card/ProblemCard";
 
-import ProblemCardIcon1 from "../../assets/icons/landing/problem-card/problem-card-1.svg?react";
-import ProblemCardIcon2 from "../../assets/icons/landing/problem-card/problem-card-2.svg?react";
-import ProblemCardIcon3 from "../../assets/icons/landing/problem-card/problem-card-3.svg?react";
-import ProblemCardIcon4 from "../../assets/icons/landing/problem-card/problem-card-4.svg?react";
+import ProblemCardIcon1 from "../../assets/icons/landing/problem_card/problem-card-1.svg?react";
+import ProblemCardIcon2 from "../../assets/icons/landing/problem_card/problem-card-2.svg?react";
+import ProblemCardIcon3 from "../../assets/icons/landing/problem_card/problem-card-3.svg?react";
+import ProblemCardIcon4 from "../../assets/icons/landing/problem_card/problem-card-4.svg?react";
 
 import FeatureImage1 from "../../assets/images/landing/features-1.png";
 import FeatureImage2 from "../../assets/images/landing/features-2.png";
@@ -22,10 +22,9 @@ import FloatingTextarea from "../../components/landing/floating_textarea/Floatin
 
 import NotificationService from "../../services/notificationService";
 import { FILE_UPLOAD } from "../../constants/config";
-import FeatureCard from "../../components/landing/feature-card/FeatureCard";
-import FeedbackForm from "../../components/landing/feedback-form/FeedbackForm";
+import FeatureCard from "../../components/landing/feature_card/FeatureCard";
+import FeedbackForm from "../../components/landing/feedback_form/FeedbackForm";
 import Footer from "../../components/landing/footer/Footer";
-
 
 const Landing = () => {
   const tgBotUrl = import.meta.env.VITE_TG_BOT_URL || "";
@@ -79,7 +78,6 @@ const Landing = () => {
             <a
               className={`${styles.landing__action} button button--light`}
               href={webUrl}
-              target="_blank"
             >
               <svg
                 className={styles["landing__action-icon"]}
@@ -229,7 +227,6 @@ const Landing = () => {
               <a
                 className={`${styles.landing__action} button button--light`}
                 href={webUrl}
-                target="_blank"
               >
                 <svg
                   className={styles["landing__action-icon"]}

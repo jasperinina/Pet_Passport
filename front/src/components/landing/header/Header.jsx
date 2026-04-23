@@ -39,7 +39,6 @@ const Header = ({ webUrl, gitHubUrl, privacyPolicyOpened = false }) => {
           <a
             className={`${styles.header__action} button button--filled`}
             href={webUrl}
-            target="_blank"
           >
             <svg
               className={styles["header__action-icon"]}

@@ -16,6 +16,7 @@ class ApiClient {
   async request(endpoint, options = {}, requestOptions = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
@@ -37,7 +38,7 @@ class ApiClient {
     }
   }
 
-  async handleResponse(response, settings) {
+  async handleResponse(response) {
     if (!response.ok) {
       let errorText;
       try {

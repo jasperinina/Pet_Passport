@@ -10,6 +10,19 @@ export const mockGetPet = async (id) => {
   return { ...mockPet, id };
 };
 
+export const mockGetCurrentUserPet = async (telegramId) => {
+  // Имитация задержки сети
+  await new Promise(resolve => setTimeout(resolve, 500));
+
+  if (!telegramId || import.meta.env.VITE_MOCK_AUTHENTICATED === 'false') {
+    const error = new Error('Unauthorized');
+    error.status = 401;
+    throw error;
+  }
+
+  return mockPet;
+};
+
 export const mockGetEvents = async (petId, statuses) => {
   // Имитация задержки сети
   await new Promise(resolve => setTimeout(resolve, 300));
