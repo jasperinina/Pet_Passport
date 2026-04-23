@@ -1,0 +1,23 @@
+@use '../helpers/' as *;
+
+.contacts-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: rem(28);
+
+  &__item {
+    &-text {
+      &:not(:last-child) {
+        margin-bottom: rem(8);
+      }
+    }
+
+    &-link {
+      @include fluid-text(16, 14);
+
+      color: var(--color-dark);
+      text-decoration: none;
+      font-weight: 600;
+    }
+  }
+}

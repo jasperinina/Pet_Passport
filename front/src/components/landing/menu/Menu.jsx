@@ -2,35 +2,24 @@ import styles from "./Menu.module.scss";
 
 import Logo from "../../logo/Logo";
 
-const Menu = () => {
+const Menu = ({ items }) => {
   return (
     <nav className={styles.menu}>
       <Logo path="/landing" />
       <ul className={styles.menu__list}>
-        <li className={styles.menu__item}>
-          <a
-            className={styles.menu__link}
-            href="#problems"
+        {items.map((item, index) => (
+          <li
+            className={styles.menu__item}
+            key={index}
           >
-              Проблема
-          </a>
-        </li>
-        <li className={styles.menu__item}>
-          <a
-            className={styles.menu__link}
-            href="#features"
-          >
-            Функции
-          </a>
-        </li>
-        <li className={styles.menu__item}>
-          <a
-            className={styles.menu__link}
-            href="#instruction"
-          >
-            Как работает?
-          </a>
-        </li>
+            <a
+              className={styles.menu__link}
+              href={item.link}
+            >
+              {item.text}
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
   );

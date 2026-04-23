@@ -2,11 +2,21 @@ import styles from "./Header.module.scss";
 
 import Menu from "../menu/Menu";
 
-const Header = ({ webUrl, gitHubUrl }) => {
+const Header = ({ webUrl, gitHubUrl, privacyPolicyOpened = false }) => {
+  const menuItems = [
+    { text: "Проблема", link: "#problems" },
+    { text: "Функции", link: "#features" },
+    { text: "Как работает?", link: "#instruction" },
+  ];
+
+  const modifiedItems = privacyPolicyOpened
+    ? menuItems.map(item => ({ ...item, link: `/landing${item.link}` }))
+    : menuItems;
+
   return (
     <header className={styles.header}>
       <div className={`${styles.header__inner} container`}>
-        <Menu />
+        <Menu items={modifiedItems} />
         <div className={styles.header__actions}>
           <a
             className={`${styles.header__action} button button--outlined`}

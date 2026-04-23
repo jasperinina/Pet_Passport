@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 import styles from "./Landing.module.scss";
 
@@ -39,6 +40,20 @@ const Landing = () => {
   const [whatExpected, setWhatExpected] = useState("");
 
   const [errorReportSelected, setErrorReportSelected] = useState(true);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const elementId = location.hash.substring(1);
+      const element = document.getElementById(elementId);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, [location]);
 
   return (
     <div className={styles.landing}>

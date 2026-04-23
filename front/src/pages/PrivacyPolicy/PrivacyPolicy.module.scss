@@ -1,0 +1,115 @@
+@use '../../styles/helpers/' as *;
+
+.privacy-policy {
+  padding: rem(10);
+  background-color: var(--color-light-gray);
+  overflow-x: hidden;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    row-gap: rem(24);
+
+    &:not(:first-child) {
+      margin-top: rem(70);
+    }
+
+    &:not(:last-child) {
+      margin-bottom: rem(70);
+    }
+  }
+
+  &__tabs {
+    display: flex;
+    align-items: center;
+    column-gap: rem(12);
+
+    &-item {
+      @include fluid-text(14, 12);
+
+      color: var(--color-dark);
+      text-decoration: none;
+
+      &:not(:last-child) {
+        position: relative;
+        padding-right: rem(12);
+
+        &::after {
+          position: absolute;
+          content: '';
+          top: 50%;
+          right: 0;
+          transform: translateY(-50%);
+          width: rem(1);
+          height: rem(12);
+          background-color: var(--color-dark);
+        }
+      }
+      
+      &--selected {
+        color: var(--color-gray);
+      }
+    }
+  }
+
+  &__title {
+    @include fluid-text(56, 32);
+
+    line-height: 100%;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    row-gap: rem(10);
+
+    &:not(:last-child) {
+      margin-bottom: rem(120);
+    }
+  }
+
+  &__section {
+    padding: rem(36);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+
+    &-title {
+      @include fluid-text(36, 24);
+
+      font-weight: 700;
+
+      &:not(:last-child) {
+        margin-bottom: rem(28);
+      }
+    }
+
+    &-body {
+      @include fluid-text(14, 12);
+
+      display: flex;
+      flex-direction: column;
+      row-gap: rem(16);
+    }
+
+    &-list {
+      list-style: none;
+
+      & li {
+        position: relative;
+        padding-left: rem(22);
+
+        &::before {
+          @include square(6);
+
+          position: absolute;
+          content: '';
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          background-color: var(--color-gray);
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
