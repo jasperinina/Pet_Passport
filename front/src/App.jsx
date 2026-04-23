@@ -1,7 +1,7 @@
 import "./styles/globals.scss";
 
-import { useState, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { useState, useEffect, lazy } from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import NotificationBanner from "./components/notification_banner/NotificationBanner";
 import Header from "./components/header/Header";
@@ -16,9 +16,13 @@ import { getPet } from "./api/pets";
 import { useNotification } from "./context/NotificationContext";
 import NotificationService from "./services/notificationService";
 import RecommendedProcedures from "./pages/RecommendedProcedures/RecommendedProcedures";
+import PrivacyPolicy from "./pages/PrivacyPolicy/PrivacyPolicy";
+
+const Landing = lazy(() => import("./pages/Landing/Landing"));
 
 function App() {
   const { showError, showSuccess, showWarning, showInfo } = useNotification();
+  const location = useLocation();
 
   useEffect(() => {
     NotificationService.init(
@@ -58,13 +62,16 @@ function App() {
     };
   }, []);
 
+  const isLandingPage = location.pathname === "/landing";
+  const isPrivacyPolicyPage = location.pathname === "/privacy-policy";
+
   return (
     <div className="app-wrapper">
       {/* NotificationBanner доступен во всем приложении */}
       <NotificationBanner />
 
       {/* Header теперь сам навигирует через useNavigate */}
-      <Header petName={pet?.name} />
+      {!isLandingPage && !isPrivacyPolicyPage && <Header petName={pet?.name} />}
 
       <main>
         <Routes>
@@ -75,6 +82,9 @@ function App() {
           <Route path="/doctor-visit/:eventId" element={<DoctorVisitPage />} />
           <Route path="/vaccine/:eventId" element={<VaccinePage />} />
           <Route path="/treatment/:eventId" element={<TreatmentPage />} />
+
+          <Route path="/landing" element={<Landing />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Routes>
       </main>
     </div>

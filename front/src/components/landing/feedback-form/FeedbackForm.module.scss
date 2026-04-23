@@ -1,0 +1,143 @@
+@use '../../../styles/helpers/' as *;
+
+.feedback-form {
+  padding: rem(36);
+  width: 100%;
+  background-color: var(--color-light);
+  border-radius: var(--border-radius);
+
+  &:not(:first-child) {
+    margin-top: rem(36);
+  }
+
+  &__header {
+    text-align: center;
+  }
+
+  &__description {
+    &:not(:first-child) {
+      margin-top: rem(12);
+    }
+  }
+
+  &__body {
+    &:not(:first-child) {
+      margin-top: rem(28);
+    }
+  }
+
+  &__textareas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: rem(10);
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    row-gap: rem(8);
+  }
+
+  &__screenshot {
+    display: flex;
+    align-items: center;
+
+    &:not(:first-child) {
+      margin-top: rem(16);
+    }
+
+    &-label {
+      @include fluid-text(14, 12);
+
+      display: flex;
+      align-items: center;
+      color: var(--color-dark);
+
+      @include hover {
+        opacity: 0.6;
+      }
+
+      &--not-allowed {
+        cursor: not-allowed;
+      }
+
+      &-text {
+        &:not(:first-child) {
+          margin-left: rem(10);
+        }
+      }
+    }
+
+    &-input {
+      display: none;
+    }
+
+    &-remove {
+      @include flex-center;
+
+      color: var(--color-dark);
+
+      &:not(:first-child) {
+        margin-left: rem(5);
+      }
+    }
+  }
+
+  &__privacy-policy {
+    display: flex;
+    align-items: center;
+    column-gap: rem(12);
+    
+    &:not(:first-child) {
+      margin-top: rem(28);
+    }
+
+    &-checkbox {
+      @include square(24);
+
+      border: var(--border);
+      border-radius: rem(5);
+      cursor: pointer;
+
+      @include hover {
+        border-color: var(--color-dark);
+      }
+
+      &:checked {
+        @include flex-center;
+
+        background-color: var(--color-dark);
+        border-color: var(--color-dark);
+
+        &::after {
+          content: '';
+          margin-bottom: rem(2);
+          width: rem(6);
+          height: rem(12);
+          border: solid var(--color-light);
+          border-width: 0 rem(2) rem(2) 0;
+          transform: rotate(45deg);
+        }
+      }
+    }
+
+    &-text {
+      & a {
+        color: var(--color-dark);
+      }
+    }
+  }
+
+  &__footer {
+    &:not(:first-child) {
+      margin-top: rem(28);
+    }
+  }
+
+  &__button {
+    @include flex-center;
+
+    column-gap: rem(5);
+    width: 100%;
+  }
+}

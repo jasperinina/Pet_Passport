@@ -1,0 +1,48 @@
+@use '../../../styles/helpers/' as *;
+
+.floating-textarea {
+  &__wrapper {
+    padding: rem(20);
+    height: rem(150);
+    background-color: var(--color-light-gray);
+    border: var(--border);
+    border-color: transparent;
+    border-radius: var(--border-radius-small);
+    transition-duration: var(--transition-duration);
+
+    @include hover {
+      border-color: var(--color-dark);
+    }
+
+    &:focus-within {
+      outline: none;
+      border-color: var(--color-dark);
+    }
+  }
+
+  &__input {
+    @include fluid-text(14, 12);
+
+    width: 100%;
+    height: rem(87);
+    color: var(--color-dark);
+    background-color: transparent;
+    border: none;
+    resize: none;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: var(--color-dark);
+    }
+  }
+
+  &__label {
+    @include fluid-text(12, 10);
+
+    color: var(--color-gray);
+    background-color: var(--color-light-gray);
+  }
+}

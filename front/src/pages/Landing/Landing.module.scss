@@ -1,0 +1,243 @@
+@use '../../styles/helpers/' as *;
+
+.landing {
+  padding: rem(10);
+  background-color: var(--color-light-gray);
+  overflow-x: hidden;
+
+  &__section {
+    margin-top: rem(120);
+
+    &-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    &-title {
+      @include fluid-text(36, 24);
+
+      line-height: 100%;
+      font-weight: 700;
+      text-align: center;
+
+      & span {
+        color: var(--color-gray);
+      }
+    }
+
+    &-body {
+      width: 100%;
+
+      &:not(:first-child) {
+        margin-top: rem(48);
+      }
+    }
+  }
+
+  &__action {
+    display: flex;
+    align-items: center;
+    column-gap: rem(10);
+    cursor: pointer;
+  }
+
+  &__hero {
+    height: rem(800);
+    background: url('../../assets/images/landing/hero-bg.png') center / cover no-repeat;
+    border-radius: var(--border-radius);
+
+    &:not(:first-child) {
+      padding-top: rem(60);
+    }
+
+    &-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      row-gap: rem(24);
+      text-align: center;
+      color: var(--color-light);
+
+      &:not(:first-child) {
+        margin-top: rem(32);
+      }
+
+      &:not(:last-child) {
+        margin-bottom: rem(40);
+      }
+    }
+
+    &-title {
+      @include fluid-text(56, 32);
+
+      color: var(--color-light);
+      line-height: 100%;
+    }
+
+    &-description {
+      @include fluid-text(18, 14);
+    }
+
+    &-footer {
+      display: flex;
+      align-items: center;
+      column-gap: rem(10);
+    }
+  }
+}
+
+.problems {
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: rem(10);
+    list-style: none;
+  }
+}
+
+.features {
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: rem(10);
+    list-style: none;
+  }
+}
+
+.instruction {
+  background: radial-gradient(
+    55.51% 55.59% at 47.16% 50%,
+    #000037 0%,
+    #3f167f 100%
+  );
+  border-radius: var(--border-radius);
+
+  &__inner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: rem(62);
+    padding-top: rem(30);
+  }
+
+  &__title {
+    color: var(--color-light);
+    text-align: start;
+  }
+
+  &__list {
+    list-style: none;
+
+    &:not(:first-child) {
+      margin-top: rem(48);
+    }
+  }
+
+  &__item {
+    --counterContent: counter(custom-counter);
+    
+    counter-increment: custom-counter;
+
+    &:not(:first-child) {
+      padding-top: rem(20);
+    }
+
+    &:not(:last-child) {
+      padding-bottom: rem(20);
+      border-bottom: rem(1) solid rgba($color: #FFFFFF, $alpha: 0.3);
+    }
+
+    &-text {
+      display: flex;
+      align-items: center;
+      column-gap: rem(12);
+      color: var(--color-light);
+
+      &::before {
+        @include fluid-text(14, 12);
+        @include square(24);
+        @include flex-center;
+
+        content: var(--counterContent);
+        color: var(--color-dark);
+        font-weight: 700;
+        background-color: var(--color-light);
+        border-radius: 50%;
+      }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    column-gap: rem(10);
+
+    &:not(:first-child) {
+      margin-top: rem(48);
+    }
+  }
+}
+
+.feedback {
+  &:not(:last-child) {
+    margin-bottom: rem(120);
+  }
+
+  &__description {
+    text-align: center;
+
+    &:not(:first-child) {
+      margin-top: rem(24);
+    }
+  }
+
+  &__menu {
+    position: relative;
+    width: 100%;
+
+    &:not(:first-child) {
+      margin-top: rem(48);
+    }
+
+    &-list {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      column-gap: rem(44);
+      list-style: none;
+    }
+
+    &-item {
+      display: flex;
+      align-items: center;
+      column-gap: rem(12);
+      padding-bottom: rem(16);
+      border-bottom: rem(2) solid transparent;
+      cursor: pointer;
+      transition-duration: var(--transition-duration);
+
+      @include hover {
+        color: var(--color-dark);
+        border-color: var(--color-dark);
+      }
+
+      &--selected {
+        color: var(--color-dark);
+        border-color: var(--color-dark);
+      }
+    }
+
+    &::after {
+      position: absolute;
+      content: '';
+      width: calc(100% + rem(10) * 2);
+      bottom: 0;
+      left: rem(-10);
+      right: 0;
+      height: rem(1);
+      background-color: var(--color-gray-alt);
+    }
+  }
+}

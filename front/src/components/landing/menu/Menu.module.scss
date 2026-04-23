@@ -1,0 +1,20 @@
+@use '../../../styles/helpers/' as *;
+
+.menu {
+  display: flex;
+  align-items: center;
+  column-gap: rem(50);
+
+  &__list {
+    display: flex;
+    align-items: center;
+    column-gap: rem(28);
+  }
+
+  &__link {
+    @include fluid-text(14, 12);
+
+    padding-block: rem(10);
+    text-decoration: none;
+  }
+}

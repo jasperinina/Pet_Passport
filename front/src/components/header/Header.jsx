@@ -2,9 +2,9 @@ import styles from "./Header.module.scss";
 
 import { useNavigate, useLocation } from "react-router-dom";
 
+import Logo from "../logo/Logo";
 import Menu from "../menu/Menu";
 
-import Logo from "../../assets/icons/logo.svg";
 import PetIcon from "../../assets/icons/cat.svg";
 
 const Header = ({ petName }) => {
@@ -29,21 +29,7 @@ const Header = ({ petName }) => {
       <div className={styles.header__inner}>
         <div className={styles.header__info}>
           {isHomePage ? (
-            <button
-              className={`${styles.header__logo} logo`}
-              type="button"
-              aria-label="Перейти на главную страницу"
-              title="Перейти на главную страницу"
-              onClick={() => goTo("/")}
-            >
-              <img
-                className="logo__image"
-                src={Logo}
-                alt=""
-                width="42" height="32"
-              />
-              <span className="logo__text h3">PetPassport</span>
-            </button>
+            <Logo />
           ) : (
             <button
               className={styles["header__back-button"]}

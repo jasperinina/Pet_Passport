@@ -32,4 +32,15 @@
     color: var(--color-gray);
     background-color: transparent;
   }
+
+  &--light {
+    color: var(--color-dark);
+    background-color: var(--color-light);
+  }
+
+  &--blured {
+    color: var(--color-light);
+    background-color: rgba($color: #FFFFFF, $alpha: 0.1);
+    backdrop-filter: blur(rem(5));
+  }
 }

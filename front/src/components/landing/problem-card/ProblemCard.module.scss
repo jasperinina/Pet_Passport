@@ -1,0 +1,40 @@
+@use '../../../styles/helpers/' as *;
+
+.problem-card {
+  background-color: var(--color-light);
+  border-radius: var(--border-radius);
+
+  &__inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: rem(20);
+  }
+
+  &__icon-wrapper {
+    @include square(32);
+    @include flex-center;
+
+    &:not(:last-child) {
+      margin-bottom: rem(28);
+    }
+
+    & svg {
+      color: var(--color-blue);
+    }
+  }
+
+  &__title {
+    &:not(:last-child) {
+      margin-bottom: rem(12);
+    }
+  }
+
+  &__description {
+    @include fluid-text(14, 12);
+
+    & p {
+      white-space: pre-line;
+    }
+  }
+}

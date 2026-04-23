@@ -107,6 +107,8 @@ button {
 
 input[type="checkbox"] {
   margin: 0;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 select {

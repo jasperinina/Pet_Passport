@@ -1,0 +1,26 @@
+@use '../../../styles/helpers/' as *;
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: rem(30) rem(20) 0 rem(20);
+  background-color: var(--color-light);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+
+  &__description {
+    &:not(:first-child) {
+      margin-top: rem(12);
+    }
+  }
+
+  &__image {
+    filter: drop-shadow(0 rem(50) rem(80) rgba($color: #36187D, $alpha: 0.3));
+    -webkit-filter: drop-shadow(0 rem(50) rem(80) rgba($color: #36187D, $alpha: 0.3));
+
+    &:not(:first-child) {
+      margin-top: rem(30);
+    }
+  }
+}
