@@ -1,6 +1,6 @@
 import styles from "./Logo.module.scss";
 
-const Logo = ({ light = false, path = "/" }) => {
+const Logo = ({ light = false, path = "/landing" }) => {
   const color = light ? styles["logo--light"] : "";
 
   return (

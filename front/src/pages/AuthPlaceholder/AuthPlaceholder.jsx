@@ -1,6 +1,6 @@
 import styles from "./AuthPlaceholder.module.scss";
 
-import Logo from "../../components/logo/Logo"
+import Logo from "../../components/logo/Logo";
 
 const AuthPlaceholder = () => {
   const tgBotUrl = import.meta.env.VITE_TG_BOT_URL || "";
