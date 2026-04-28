@@ -15,12 +15,15 @@ class ApiClient {
 
   async request(endpoint, options = {}, requestOptions = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    const isFormData = options.body instanceof FormData;
     const config = {
       credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers: isFormData
+        ? { ...options.headers }
+        : {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
       ...options,
     };
 
@@ -58,12 +61,22 @@ class ApiClient {
     }
 
     const contentType = response.headers.get('content-type');
+    const text = await response.text();
+
+    if (!text) {
+      return {};
+    }
+
     if (contentType?.includes('application/json')) {
-      const text = await response.text();
       return text ? JSON.parse(text) : {};
     }
-    
-    return response.body;
+
+    if (contentType?.includes('text/plain')) {
+      const numericValue = Number(text);
+      return Number.isNaN(numericValue) ? text : numericValue;
+    }
+
+    return text;
   }
 
   async get(endpoint, requestOptions = {}) {
@@ -87,11 +100,13 @@ class ApiClient {
   }
 
   async put(endpoint, data, requestOptions = {}) {
+    const isFormData = data instanceof FormData;
+
     return await this.request(
       endpoint,
       {
         method: 'PUT',
-        body: JSON.stringify(data),
+        body: isFormData ? data : JSON.stringify(data),
       },
       requestOptions
     );

@@ -11,14 +11,18 @@ export async function createPet(petData) {
     
     return response;
   } catch (error) {
+    let message = ERROR_MESSAGES.GLOBAL.DEFAULT;
+
     switch (error.status) {
       case 400:
-        notifyError(ERROR_MESSAGES.PET.BAD_REQUEST);
+        message = ERROR_MESSAGES.PET.BAD_REQUEST;
         break;
       default:
-        notifyError(ERROR_MESSAGES.GLOBAL.DEFAULT);
         break;
     }
+
+    notifyError(message);
+    throw new Error(message);
   }
 }
 
@@ -160,12 +164,6 @@ export async function deletePetPhoto(petId, photoId) {
     }
 
     const response = await apiClient.delete(`/api/Pets/${petId}/photos/${photoId}`);
-
-    const contentType = response.headers.get('content-type');
-    if (contentType?.includes('application/json')) {
-      const text = await response.text();
-      if (text) return JSON.parse(text);
-    }
 
     notifySuccess(SUCCESS_MESSAGES.FILE.DELETED);
 

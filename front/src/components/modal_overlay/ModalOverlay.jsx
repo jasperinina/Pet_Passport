@@ -4,12 +4,14 @@ import styles from "./ModalOverlay.module.scss";
 
 import AddProcedureModal from "../ui/modals/AddProcedureModal/AddProcedureModal";
 import EditPetModal from "../ui/modals/EditPetModal/EditPetModal";
+import AddPetModal from "../ui/modals/AddPetModal/AddPetModal";
 
 const ModalOverlay = ({
   modalName,
   isOpen,
   onClose,
   onSuccess = null,
+  ownerId = null,
   pet = null,
   petId = null,
   event = null
@@ -54,6 +56,14 @@ const ModalOverlay = ({
           isClosing={isClosing}
           pet={pet}
           onSuccess={onSuccess}
+        />
+      ) : modalName === "AddPetModal" ? (
+        <AddPetModal
+          isOpen={isOpen}
+          onClose={handleClose}
+          isClosing={isClosing}
+          onSuccess={onSuccess}
+          ownerId={ownerId}
         />
       ) : null}
     </div>

@@ -1,0 +1,58 @@
+@use '../../styles/helpers/' as *;
+
+.auth {
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: 2rem;
+    padding: rem(19) rem(28);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+
+    @include mobile {
+      padding: rem(12) rem(16);
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    row-gap: rem(32);
+    
+    &:not(:first-child) {
+      margin-top: rem(132);
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    row-gap: rem(12);
+    padding: rem(24);
+    background-color: var(--color-light);
+    border-radius: var(--border-radius);
+
+    &-button {
+      width: 100%;
+    }
+
+    &-link {
+      @include fluid-text(14, 12);
+
+      color: var(--color-gray);
+    }
+  }
+
+  &__error {
+    width: 100%;
+    color: var(--color-red);
+    background: var(--color-light-red);
+    border: rem(1) solid var(--color-red-alt);
+    border-radius: var(--border-radius-small);
+    padding: rem(12) rem(16);
+  }
+}

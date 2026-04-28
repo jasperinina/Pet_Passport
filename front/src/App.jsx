@@ -5,6 +5,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 
 import NotificationBanner from "./components/notification_banner/NotificationBanner";
 import Header from "./components/header/Header";
+import Pets from "./pages/Pets/Pets";
 import UpcomingProcedures from "./pages/UpcomingProcedures/UpcomingProcedures";
 import MedicalHistory from "./pages/MedicalHistory/MedicalHistory";
 import DoctorVisitPage from "./pages/Procedure/DoctorVisitPage";
@@ -62,6 +63,7 @@ function App() {
     };
   }, [loadPet]);
 
+  const isPetsPage = location.pathname === "/pets";
   const isLandingPage = location.pathname === "/landing";
   const isPrivacyPolicyPage = location.pathname === "/privacy-policy";
   const params = new URLSearchParams(location.search);
@@ -74,13 +76,14 @@ function App() {
       <NotificationBanner />
 
       {/* Header теперь сам навигирует через useNavigate */}
-      {!isLandingPage && !isPrivacyPolicyPage && !isRootWithoutPetId && (
+      {!isPetsPage && !isLandingPage && !isPrivacyPolicyPage && !isRootWithoutPetId && (
         <Header petName={pet?.name} />
       )}
 
       <main>
         <Routes>
           <Route path="/" element={<RootPetGate />} />
+          <Route path="/pets" element={<Pets />} />
           <Route path="/upcoming" element={<UpcomingProcedures />} />
           <Route path="/recommendations" element={<RecommendedProcedures />} />
           <Route path="/history" element={<MedicalHistory />} />

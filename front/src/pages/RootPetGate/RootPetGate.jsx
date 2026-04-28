@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import LoadingState from "../../components/events/LoadingState/LoadingState";
-import { getCurrentUserPet, isUnauthorizedError } from "../../api/auth";
-import AuthPlaceholder from "../AuthPlaceholder/AuthPlaceholder";
+import { getCurrentUserPet, getStoredOwnerId, isUnauthorizedError } from "../../api/auth";
+import Auth from "../Auth/Auth";
 import Home from "../Home/Home";
 
 const RootPetGate = () => {
@@ -37,6 +37,11 @@ const RootPetGate = () => {
       } catch (error) {
         if (!isMounted) return;
 
+        if (getStoredOwnerId() && !isUnauthorizedError(error)) {
+          navigate("/pets", { replace: true });
+          return;
+        }
+
         if (!isUnauthorizedError(error)) {
           console.error("Ошибка проверки авторизации:", error);
         }
@@ -57,7 +62,7 @@ const RootPetGate = () => {
   }
 
   if (status === "auth-required") {
-    return <AuthPlaceholder />;
+    return <Auth />;
   }
 
   return (
