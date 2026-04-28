@@ -1,6 +1,7 @@
 import styles from "./AuthPlaceholder.module.scss";
 
 import Logo from "../../components/logo/Logo";
+import OpenLanding from "../../components/landing/open_landing/OpenLanding";
 
 const AuthPlaceholder = () => {
   const tgBotUrl = import.meta.env.VITE_TG_BOT_URL || "";
@@ -43,6 +44,7 @@ const AuthPlaceholder = () => {
             <div className={styles["landing__action-text"]}>Telegram Bot</div>
           </a>
         )}
+        <OpenLanding />
       </div>
     </section>
   );
