@@ -8,9 +8,13 @@ RUN npm install
 # Копируем остальной код
 COPY . .
 
-# Передаём переменную для Vite (URL бэкенда)
-ARG VITE_API_BASE_URL=http://localhost:81
+# Передаём переменные для Vite
+ARG VITE_API_BASE_URL
+ARG VITE_TG_BOT_URL
+ARG VITE_GITHUB_URL
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_TG_BOT_URL=${VITE_TG_BOT_URL}
+ENV VITE_GITHUB_URL=${VITE_GITHUB_URL}
 
 # Сборка фронтенда
 RUN npm run build
