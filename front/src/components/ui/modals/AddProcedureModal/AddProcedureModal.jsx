@@ -37,7 +37,7 @@ const AddProcedureModal = ({
   const [eventTime, setEventTime] = useState("10:00");
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderValue, setReminderValue] = useState(5);
-  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
+  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.DAY);
 
   // Поля для посещения врача
   const [clinic, setClinic] = useState("");
@@ -92,7 +92,7 @@ const AddProcedureModal = ({
 
       setReminderEnabled(event.reminderEnabled ??false);
       setReminderValue(event.reminderValue ?? 5);
-      setReminderUnit(event.reminderUnit ?? PERIOD_UNITS.MINUTE);
+      setReminderUnit(event.reminderUnit ?? PERIOD_UNITS.DAY);
 
       switch (event.eventType) {
         case 2:
@@ -127,7 +127,7 @@ const AddProcedureModal = ({
       setEventTime("10:00");
       setReminderEnabled(false);
       setReminderValue(5);
-      setReminderUnit(PERIOD_UNITS.MINUTE);
+      setReminderUnit(PERIOD_UNITS.DAY);
 
       // Доктор
       setClinic("");
@@ -167,9 +167,6 @@ const AddProcedureModal = ({
     switch (unit) {
       case PERIOD_UNITS.DAY:
         nextDate.setDate(nextDate.getDate() + value);
-        break;
-      case PERIOD_UNITS.WEEK:
-        nextDate.setDate(nextDate.getDate() + value * 7);
         break;
       case PERIOD_UNITS.MONTH:
         nextDate.setMonth(nextDate.getMonth() + value);
@@ -215,7 +212,7 @@ const AddProcedureModal = ({
         eventDate: eventDateISO,
         reminderEnabled,
         reminderValue: reminderEnabled ? reminderValue : 0,
-        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
+        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.DAY,
       };
 
       let result;

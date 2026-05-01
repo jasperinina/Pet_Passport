@@ -1,11 +1,32 @@
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants/config.js';
-import NotificationService, { notifyError, notifySuccess } from '../services/notificationService.js';
+import { notifyError, notifySuccess } from '../services/notificationService.js';
 import { apiClient } from './apiClient.js';
 import { USE_MOCK_API, mockGetPet } from './mockApi.js';
 
+const appendIfPresent = (formData, key, value) => {
+  if (value !== undefined && value !== null && value !== '') {
+    formData.append(key, value);
+  }
+};
+
+const buildPetCreateFormData = (petData) => {
+  const formData = new FormData();
+
+  appendIfPresent(formData, 'name', petData.name);
+  appendIfPresent(formData, 'breed', petData.breed);
+  appendIfPresent(formData, 'weightKg', petData.weightKg);
+  appendIfPresent(formData, 'birthDate', petData.birthDate);
+
+  petData.photos?.forEach((photo) => {
+    formData.append('photos', photo);
+  });
+
+  return formData;
+};
+
 export async function createPet(petData) {
   try {
-    const response = await apiClient.post('/api/Pets', petData);
+    const response = await apiClient.post('/api/v2/pets', buildPetCreateFormData(petData));
     
     notifySuccess(SUCCESS_MESSAGES.PET.CREATED);
     
@@ -32,7 +53,7 @@ export async function getPet(id) {
       return await mockGetPet(id);
     }
 
-    const response = await apiClient.get(`/api/Pets/${id}`);
+    const response = await apiClient.get(`/api/v2/pets/${id}`);
     
     return response;
   } catch (error) {
@@ -57,7 +78,7 @@ export async function updatePet(id, petData) {
       return null;
     }
 
-    const response = await apiClient.put(`/api/Pets/${id}`, petData);
+    const response = await apiClient.put(`/api/v2/pets/${id}`, petData);
 
     notifySuccess(SUCCESS_MESSAGES.PET.UPDATED);
 
@@ -74,6 +95,32 @@ export async function updatePet(id, petData) {
         notifyError(ERROR_MESSAGES.PET.NO_UPDATED);
         break;
     }
+  }
+}
+
+export async function deletePet(id) {
+  try {
+    if (USE_MOCK_API) {
+      notifySuccess(SUCCESS_MESSAGES.PET.DELETED);
+      return null;
+    }
+
+    const response = await apiClient.delete(`/api/v2/pets/${id}`);
+
+    notifySuccess(SUCCESS_MESSAGES.PET.DELETED);
+
+    return response;
+  } catch (error) {
+    switch (error.status) {
+      case 404:
+        notifyError(ERROR_MESSAGES.PET.NOT_FOUND);
+        break;
+      default:
+        notifyError(ERROR_MESSAGES.PET.NO_DELETED);
+        break;
+    }
+
+    throw error;
   }
 }
 
@@ -96,13 +143,13 @@ export async function uploadPetPhoto(petId, file, telegramFileId = null) {
     formData.append('file', file);
 
     const url =
-      `/api/pets/${petId}/upload${telegramFileId ? `?telegramFileId=${encodeURIComponent(telegramFileId)}` : ''}`;
+      `/api/v2/pets/${petId}/upload${telegramFileId ? `?telegramFileId=${encodeURIComponent(telegramFileId)}` : ''}`;
     
     const response = await apiClient.upload(url, formData);
     
     if (!response) return null;
 
-    if (!response.photoUrl || !response.url) {
+    if (!response.photoUrl && !response.url) {
       notifyError(ERROR_MESSAGES.FILE.RESPONSE_NO_CONTAINS_URL);
       return null;
     }
@@ -136,7 +183,7 @@ export async function updatePetPhotos(petId, options = {}) {
   deletePhotoIds.forEach(id => formData.append('deletePhotoIds', id.toString()));
 
   try {
-    const response = await apiClient.put(`/api/Pets/${petId}/photos`, formData);
+    const response = await apiClient.put(`/api/v2/pets/${petId}/photos`, formData);
 
     notifySuccess(SUCCESS_MESSAGES.FILE.UPDATED);
 
@@ -163,7 +210,7 @@ export async function deletePetPhoto(petId, photoId) {
       return null;
     }
 
-    const response = await apiClient.delete(`/api/Pets/${petId}/photos/${photoId}`);
+    const response = await apiClient.delete(`/api/v2/pets/${petId}/photos/${photoId}`);
 
     notifySuccess(SUCCESS_MESSAGES.FILE.DELETED);
 

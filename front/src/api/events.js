@@ -11,7 +11,7 @@ export async function createDoctorVisit(data) {
       return null;
     }
 
-    const response = await apiClient.post('/api/doctor-visit', data);
+    const response = await apiClient.post('/api/v2/doctor-visit', data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
 
@@ -33,7 +33,7 @@ export async function createDoctorVisit(data) {
 
 export async function getDoctorVisit(id) {
   try {
-    return await apiClient.get(`/api/doctor-visit/${id}`);
+    return await apiClient.get(`/api/v2/doctor-visit/${id}`);
   } catch (error) {
     switch (error.status) {
       case 400:
@@ -56,7 +56,7 @@ export async function updateDoctorVisit(id, data) {
       return null;
     }
 
-    const response = await apiClient.put(`/api/doctor-visit/${id}`, data);
+    const response = await apiClient.put(`/api/v2/doctor-visit/${id}`, data);
     
     notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
     
@@ -83,7 +83,7 @@ export async function deleteDoctorVisit(id) {
       return null;
     }
 
-    const response = await apiClient.delete(`/api/doctor-visit/${id}`);
+    const response = await apiClient.delete(`/api/v2/events/${id}`);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
 
@@ -111,7 +111,7 @@ export async function createVaccine(data) {
       return null;
     }
 
-    const response = await apiClient.post('/api/vaccine', data);
+    const response = await apiClient.post('/api/v2/vaccine', data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
 
@@ -133,7 +133,7 @@ export async function createVaccine(data) {
 
 export async function getVaccine(id) {
   try {
-    return await apiClient.get(`/api/vaccine/${id}`);
+    return await apiClient.get(`/api/v2/vaccine/${id}`);
   } catch (error) {
     switch (error.status) {
       case 400:
@@ -156,7 +156,7 @@ export async function updateVaccine(id, data) {
       return null;
     }
 
-    const response = await apiClient.put(`/api/vaccine/${id}`, data);
+    const response = await apiClient.put(`/api/v2/vaccine/${id}`, data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
 
@@ -183,7 +183,7 @@ export async function deleteVaccine(id) {
       return null;
     }
 
-    const response = await apiClient.delete(`/api/vaccine/${id}`);
+    const response = await apiClient.delete(`/api/v2/events/${id}`);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
 
@@ -211,7 +211,7 @@ export async function createTreatment(data) {
       return null;
     }
 
-    const response = await apiClient.post('/api/treatment', data);
+    const response = await apiClient.post('/api/v2/treatment', data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.CREATED);
 
@@ -233,7 +233,7 @@ export async function createTreatment(data) {
 
 export async function getTreatment(id) {
   try {
-    return await apiClient.get(`/api/treatment/${id}`);
+    return await apiClient.get(`/api/v2/treatment/${id}`);
   } catch (error) {
     switch (error.status) {
       case 400:
@@ -256,7 +256,7 @@ export async function updateTreatment(id, data) {
       return null;
     }
 
-    const response = await apiClient.put(`/api/treatment/${id}`, data);
+    const response = await apiClient.put(`/api/v2/treatment/${id}`, data);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
 
@@ -283,7 +283,7 @@ export async function deleteTreatment(id) {
       return null;
     }
 
-    const response = await apiClient.delete(`/api/treatment/${id}`);
+    const response = await apiClient.delete(`/api/v2/events/${id}`);
 
     notifySuccess(SUCCESS_MESSAGES.EVENT.DELETED);
 
@@ -324,17 +324,20 @@ export async function getEvents(petId, statuses) {
       return await mockGetEvents(petId, statuses);
     }
 
-    let url = `/api/events/${petId}`;
+    let url = `/api/v2/events/${petId}`;
 
-    if (statuses && statuses.length > 0) {
-      const queryParams = statuses.map(s => `status=${s}`).join('&');
-      url += `?${queryParams}`;
+    if (statuses && statuses.length === 1) {
+      url += `?status=${statuses[0]}`;
     }
 
     const response = await apiClient.get(url);
 
     if (response.status === 404) {
       notifyError(ERROR_MESSAGES.EVENT.EVENTS_NOT_FOUND);
+    }
+
+    if (statuses && statuses.length > 1) {
+      return response.filter((event) => statuses.includes(event.status));
     }
 
     return response;
@@ -351,7 +354,7 @@ export async function updateEventStatus(eventId, newStatus) {
     }
 
     const response = await apiClient.patch(
-      `/api/events/${eventId}/status`,
+      `/api/v2/events/${eventId}/status`,
       { status: newStatus }
     );
 

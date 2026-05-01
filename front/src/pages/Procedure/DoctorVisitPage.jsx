@@ -42,7 +42,7 @@ const DoctorVisitPage = () => {
 
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderValue, setReminderValue] = useState(5);
-  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
+  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.DAY);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -79,7 +79,7 @@ const DoctorVisitPage = () => {
 
         setReminderEnabled(visit.reminderEnabled || false);
         setReminderValue(visit.reminderValue ?? 5);
-        setReminderUnit(visit.reminderUnit ?? PERIOD_UNITS.MINUTE);
+        setReminderUnit(visit.reminderUnit ?? PERIOD_UNITS.DAY);
       } catch (err) {
         console.error("Ошибка загрузки приема:", err);
 
@@ -115,7 +115,7 @@ const DoctorVisitPage = () => {
         referrals: visitData.directions,
         reminderEnabled,
         reminderValue: reminderEnabled ? reminderValue : 0,
-        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
+        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.DAY,
       });
       
       // Обновляем отображаемые дату и время после сохранения

@@ -31,7 +31,7 @@ const VaccinePage = () => {
 
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderValue, setReminderValue] = useState(5);
-  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
+  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.DAY);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -62,7 +62,7 @@ const VaccinePage = () => {
 
         setReminderEnabled(vaccine.reminderEnabled || false);
         setReminderValue(vaccine.reminderValue ?? 5);
-        setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.MINUTE);
+        setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.DAY);
       } catch (err) {
         console.error("Ошибка загрузки вакцинации:", err);
 
@@ -95,7 +95,7 @@ const VaccinePage = () => {
         periodUnit: cardsData.periodUnit,
         reminderEnabled,
         reminderValue: reminderEnabled ? reminderValue : 0,
-        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MINUTE,
+        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.DAY,
       });
       
       // Обновляем отображаемые дату и время после сохранения

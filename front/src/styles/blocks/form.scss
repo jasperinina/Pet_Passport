@@ -3,6 +3,7 @@
 .form {
   width: 100%;
   max-width: rem(806);
+  height: 100%;
   background-color: var(--color-light);
   border-radius: var(--border-radius);
   z-index: 2;
@@ -10,6 +11,7 @@
   animation: fadeIn 0.3s;
 
   @include mobile {
+    max-height: rem(850);
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     animation: slideIn 0.3s;
 

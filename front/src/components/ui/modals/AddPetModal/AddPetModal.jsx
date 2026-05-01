@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import { createPet } from "../../../../api/pets";
 import { getStoredOwnerId } from "../../../../api/auth";
+import PetPhotoPicker from "../../PetPhotoPicker/PetPhotoPicker";
 
 const EMPTY_FORM_DATA = {
   name: "",
@@ -20,6 +21,18 @@ const AddPetModal = ({
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM_DATA);
   const [error, setError] = useState("");
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
+  const selectedPhotosRef = useRef([]);
+
+  useEffect(() => {
+    selectedPhotosRef.current = selectedPhotos;
+  }, [selectedPhotos]);
+
+  useEffect(() => {
+    return () => {
+      selectedPhotosRef.current.forEach((photo) => URL.revokeObjectURL(photo.previewUrl));
+    };
+  }, []);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -32,11 +45,17 @@ const AddPetModal = ({
     };
   }, [isOpen]);
 
+  const resetForm = () => {
+    setFormData(EMPTY_FORM_DATA);
+    selectedPhotosRef.current.forEach((photo) => URL.revokeObjectURL(photo.previewUrl));
+    setSelectedPhotos([]);
+    setError("");
+  };
+
   const handleClose = () => {
     if (loading) return;
 
-    setFormData(EMPTY_FORM_DATA);
-    setError("");
+    resetForm();
     onClose();
   };
 
@@ -81,6 +100,7 @@ const AddPetModal = ({
         weightKg: weight,
         birthDate: formData.birthDate || null,
         ownerId: resolvedOwnerId,
+        photos: selectedPhotos.map((photo) => photo.file),
       };
 
       const createdPetId = await createPet(payload);
@@ -94,8 +114,7 @@ const AddPetModal = ({
       };
 
       onSuccess?.(createdPet);
-      setFormData(EMPTY_FORM_DATA);
-      setError("");
+      resetForm();
       onClose();
     } catch (err) {
       setError(err.message || "Не удалось создать питомца");
@@ -198,6 +217,16 @@ const AddPetModal = ({
                 value={formData.birthDate}
                 onChange={handleChange}
                 disabled={loading}
+              />
+            </li>
+            <li className="form__item">
+              <div className="form__item-label h3">Фотографии</div>
+              <PetPhotoPicker
+                inputId="add-pet-photo-input"
+                selectedPhotos={selectedPhotos}
+                setSelectedPhotos={setSelectedPhotos}
+                loading={loading}
+                onError={setError}
               />
             </li>
           </ul>

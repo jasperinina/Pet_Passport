@@ -1,8 +1,14 @@
+import { useNavigate, useLocation } from "react-router-dom";
+
 import styles from "./PetCard.module.scss";
 
 import PetPhotos from "../PetPhotos/PetPhotos";
 
 const PetCard = ({setIsAddProcedureModalOpen, setIsEditModalOpen, pet}) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const search = location.search || "";
+
   const getAgeWord = (age) => {
     const lastDigit = age % 10;
     const lastTwoDigits = age % 100;
@@ -76,7 +82,14 @@ const PetCard = ({setIsAddProcedureModalOpen, setIsEditModalOpen, pet}) => {
             Добавить процедуру
           </button>
           <button
-            className="button button--outlined"
+            className="button button--outlined hidden-mobile"
+            type="button"
+            onClick={() => navigate(`/recommendations${search}`)}
+          >
+            Рекомендуемые процедуры
+          </button>
+          <button
+            className="button button--transparent"
             type="button"
             onClick={() => setIsEditModalOpen(true)}
           >

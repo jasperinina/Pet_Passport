@@ -1,6 +1,6 @@
 import { ERROR_MESSAGES } from '../constants/config';
-import NotificationService from '../services/notificationService';
 import API_BASE_URL from './config';
+import { clearTokens, getAccessToken, getRefreshToken, setTokens } from './tokenStorage';
 
 class ApiClient {
   constructor(baseURL, options = {}) {
@@ -16,8 +16,9 @@ class ApiClient {
   async request(endpoint, options = {}, requestOptions = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const isFormData = options.body instanceof FormData;
+    const accessToken = getAccessToken();
     const config = {
-      credentials: 'include',
+      credentials: 'same-origin',
       headers: isFormData
         ? { ...options.headers }
         : {
@@ -27,10 +28,35 @@ class ApiClient {
       ...options,
     };
 
+    if (accessToken && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
     const settings = { ...this.config, ...requestOptions };
 
     try {
       const response = await fetch(url, config);
+
+      if (
+        response.status === 401 &&
+        !settings.skipAuthRefresh &&
+        !endpoint.startsWith('/api/v2/auth/')
+      ) {
+        const refreshed = await this.refreshAccessToken();
+
+        if (refreshed) {
+          const retryConfig = {
+            ...config,
+            headers: {
+              ...config.headers,
+              Authorization: `Bearer ${refreshed.accessToken}`,
+            },
+          };
+
+          const retryResponse = await fetch(url, retryConfig);
+          return await this.handleResponse(retryResponse, settings);
+        }
+      }
 
       return await this.handleResponse(response, settings);
     } catch (error) {
@@ -89,11 +115,13 @@ class ApiClient {
   }
 
   async post(endpoint, data, requestOptions = {}) {
+    const isFormData = data instanceof FormData;
+
     return await this.request(
       endpoint,
       {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: isFormData ? data : JSON.stringify(data),
       },
       requestOptions
     );
@@ -143,6 +171,35 @@ class ApiClient {
       },
       requestOptions
     );
+  }
+
+  async refreshAccessToken() {
+    const refreshToken = getRefreshToken();
+
+    if (!refreshToken) return null;
+
+    try {
+      const response = await fetch(`${this.baseURL}/api/v2/auth/refresh`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        clearTokens();
+        return null;
+      }
+
+      const tokens = await response.json();
+      setTokens(tokens);
+      return tokens;
+    } catch {
+      clearTokens();
+      return null;
+    }
   }
 }
 

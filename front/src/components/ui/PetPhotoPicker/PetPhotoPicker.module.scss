@@ -1,0 +1,83 @@
+@use '../../../styles/helpers/' as *;
+
+.pet-photo-picker {
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(rem(80), rem(100)));
+    gap: rem(12);
+    margin-bottom: rem(16);
+  }
+
+  &__item {
+    position: relative;
+  }
+
+  &__image {
+    width: 100%;
+    height: rem(100);
+    object-fit: cover;
+    border: var(--border);
+    border-radius: var(--border-radius-small);
+
+    &--opacity {
+      opacity: 0.6;
+    }
+  }
+
+  &__remove-button {
+    @include fluid-text(18, 14);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    position: absolute;
+    top: rem(4);
+    right: rem(4);
+    width: rem(24);
+    height: rem(24);
+    font-weight: 700;
+    color: var(--color-light);
+    background-color: rgba(211, 47, 47, 0.9);
+    border: none;
+    border-radius: 50%;
+
+    @include hover {
+      opacity: 0.6;
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  &__label {
+    @include fluid-text(14, 12);
+
+    display: inline-block;
+    padding: rem(8) rem(16);
+    color: var(--color-dark);
+    background-color: var(--color-gray-alt);
+    border-radius: var(--border-radius-small);
+
+    @include hover {
+      opacity: 0.6;
+    }
+
+    &--disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__caption {
+    @include fluid-text(14, 12);
+
+    margin-top: rem(8);
+  }
+}

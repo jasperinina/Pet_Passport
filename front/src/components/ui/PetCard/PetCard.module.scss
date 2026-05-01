@@ -20,7 +20,6 @@
     width: 100%;
     padding-block: rem(28);
     padding-inline: rem(36);
-    height: rem(367);
     background-color: var(--color-light);
     border-radius: var(--border-radius);
 
@@ -64,17 +63,23 @@
   }
 
   &__footer {
-    display: flex;
+    display: grid;
     align-items: center;
-    column-gap: rem(10);
+    grid-template-columns: repeat(2, 1fr);
+    gap: rem(10);
 
     @include tablet {
+      display: flex;
       flex-direction: column;
-      align-items: start;
-      row-gap: rem(10);
 
       & button {
         width: 100%;
+      }
+    }
+
+    & button {
+      &:last-child {
+        grid-column: 1 / -1;
       }
     }
   }

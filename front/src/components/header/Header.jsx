@@ -7,16 +7,11 @@ import Menu from "../menu/Menu";
 
 import PetIcon from "../../assets/icons/cat.svg";
 
-const Header = ({ petName }) => {
+const Header = ({ petName, petId }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const search = location.search || ""; // содержит ?id=...
 
   const petIcon = PetIcon;
-
-  const goTo = (path) => {
-    navigate(`${path}${search}`);
-  };
 
   const goBack = () => {
     navigate(-1);
@@ -52,7 +47,12 @@ const Header = ({ petName }) => {
             </button>
           )}
           <span className={`${styles.header__separator} hidden-mobile`}></span>
-          <div className={styles.header__pet}>
+          <button
+            className={styles.header__pet}
+            title="Открыть карточку питомца"
+            aria-label="Открыть карточку питомца"
+            onClick={() => navigate(`/?id=${petId}`)}
+          >
             <img
               className={`${styles['header__pet-image']}`}
               src={petIcon}
@@ -60,7 +60,7 @@ const Header = ({ petName }) => {
               width="20" height="20"
             />
             <span className={`${styles['header__pet-name']}`}>{petName}</span>
-          </div>
+          </button>
         </div>
         <Menu isMobileHidden={true} />
       </div>

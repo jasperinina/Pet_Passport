@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from "react";
 
 import { updatePet, uploadPetPhoto, deletePetPhoto } from "../../../../api/pets";
 import API_BASE_URL from "../../../../api/config";
-import { FILE_UPLOAD, ERROR_MESSAGES } from "../../../../constants/config";
+import { ERROR_MESSAGES } from "../../../../constants/config";
 import NotificationService from "../../../../services/notificationService";
+import PetPhotoPicker from "../../PetPhotoPicker/PetPhotoPicker";
 
 const EditPetModal = ({
   isOpen,
@@ -21,33 +22,42 @@ const EditPetModal = ({
     birthDate: "",
   });
   const [loading, setLoading] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [selectedPhotos, setSelectedPhotos] = useState([]);
   const [petPhotos, setPetPhotos] = useState([]);
-  const fileInputRef = useRef(null);
+  const selectedPhotosRef = useRef([]);
 
-  // ✅ ref для date input
-  const birthDateRef = useRef(null);
+  useEffect(() => {
+    selectedPhotosRef.current = selectedPhotos;
+  }, [selectedPhotos]);
 
-  const openPicker = (ref) => {
-    const el = ref.current;
-    if (!el) return;
-    el.focus();
-    el.showPicker?.(); // Chrome/Edge
-    el.click(); // fallback
-  };
+  useEffect(() => {
+    return () => {
+      selectedPhotosRef.current.forEach((photo) => URL.revokeObjectURL(photo.previewUrl));
+    };
+  }, []);
 
   useEffect(() => {
     if (!isOpen || !pet) return;
 
-    setFormData({
-      name: pet.name || "",
-      breed: pet.breed || "",
-      weightKg: pet.weightKg || "",
-      birthDate: pet.birthDate || "",
+    let isMounted = true;
+
+    queueMicrotask(() => {
+      if (!isMounted) return;
+
+      setFormData({
+        name: pet.name || "",
+        breed: pet.breed || "",
+        weightKg: pet.weightKg || "",
+        birthDate: pet.birthDate || "",
+      });
+      setPetPhotos(pet.photos || []);
+      selectedPhotosRef.current.forEach((photo) => URL.revokeObjectURL(photo.previewUrl));
+      setSelectedPhotos([]);
     });
-    setPetPhotos(pet.photos || []);
-    setSelectedFile(null);
+
+    return () => {
+      isMounted = false;
+    };
   }, [isOpen, pet]);
 
   useEffect(() => {
@@ -61,8 +71,16 @@ const EditPetModal = ({
     };
   }, [isOpen]);
 
+  const clearSelectedPhotos = () => {
+    selectedPhotosRef.current.forEach((photo) => URL.revokeObjectURL(photo.previewUrl));
+    setSelectedPhotos([]);
+  };
+
   const handleClose = () => {
-    if (!loading) onClose();
+    if (!loading) {
+      clearSelectedPhotos();
+      onClose();
+    }
   };
 
   const handleChange = (e) => {
@@ -70,75 +88,6 @@ const EditPetModal = ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
-  };
-
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.INVALID_FILE_TYPE,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-
-      return;
-    }
-
-    if (file.size > FILE_UPLOAD.MAX_SIZE) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.FILE_TOO_LARGE,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-
-      return;
-    }
-
-    setSelectedFile(file);
-  };
-
-  const handlePhotoUpload = async () => {
-    if (!selectedFile || !pet?.id) {
-      NotificationService.showError?.(
-        "Файл не выбран или питомец не найден",
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-
-      return;
-    }
-
-    try {
-      setUploadingPhoto(true);
-
-      const result = await uploadPetPhoto(pet.id, selectedFile);
-
-      const photoUrl = result.photoUrl || result.url;
-      const photoId = result.id || result.photoId;
-
-      if (!photoUrl || !photoId) {
-        throw new Error("Неверный формат ответа от сервера");
-      }
-
-      setPetPhotos((prev) => [...prev, { id: photoId, url: photoUrl }]);
-      setSelectedFile(null);
-
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (err) {
-      const errorMessage = err.message || "Ошибка загрузки фотографии";
-
-      NotificationService.showError?.(
-        errorMessage,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    } finally {
-      setUploadingPhoto(false);
-    }
   };
 
   const getPhotoUrl = (photoUrl) => {
@@ -194,37 +143,34 @@ const EditPetModal = ({
     setLoading(true);
 
     try {
-      if (selectedFile) {
+      if (selectedPhotos.length > 0) {
         try {
-          setUploadingPhoto(true);
+          const uploadedPhotos = [];
 
-          const result = await uploadPetPhoto(pet.id, selectedFile);
+          for (const photo of selectedPhotos) {
+            const result = await uploadPetPhoto(pet.id, photo.file);
 
-          if (!result) {
-            onClose();
-            setLoading(false);
-            setUploadingPhoto(false);
-            return;
+            if (!result) {
+              onClose();
+              setLoading(false);
+              return;
+            }
+
+            const photoUrl = result.photoUrl || result.url;
+            const photoId = result.Id || result.id || result.photoId;
+
+            if (!photoUrl || !photoId) {
+              throw new Error("Неверный формат ответа от сервера");
+            }
+
+            uploadedPhotos.push({
+              id: photoId,
+              url: photoUrl,
+            });
           }
 
-          const photoUrl = result.photoUrl || result.url;
-          const photoId = result.Id || result.id || result.photoId;
-
-          if (!photoUrl || !photoId) {
-            throw new Error("Неверный формат ответа от сервера");
-          }
-
-          const newPhoto = {
-            id: photoId,
-            url: photoUrl,
-          };
-
-          setPetPhotos((prev) => [...prev, newPhoto]);
-          setSelectedFile(null);
-
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
+          setPetPhotos((prev) => [...prev, ...uploadedPhotos]);
+          clearSelectedPhotos();
         } catch (photoError) {
           NotificationService.showError?.(
             photoError.message || "Ошибка загрузки фотографии",
@@ -234,10 +180,7 @@ const EditPetModal = ({
           console.error("Ошибка загрузки фото:", photoError);
 
           setLoading(false);
-          setUploadingPhoto(false);
           return;
-        } finally {
-          setUploadingPhoto(false);
         }
       }
 
@@ -306,7 +249,7 @@ const EditPetModal = ({
               <input
                 className="form__item-input input"
                 id="edit-pet-name-input"
-                name="edit-pet-name-input"
+                name="name"
                 type="text"
                 placeholder="Введите имя"
                 value={formData.name}
@@ -319,7 +262,7 @@ const EditPetModal = ({
               <input
                 className="form__item-input input"
                 id="edit-pet-breed-input"
-                name="edit-pet-breed-input"
+                name="breed"
                 type="text"
                 placeholder="Введите породу"
                 value={formData.breed}
@@ -332,7 +275,7 @@ const EditPetModal = ({
               <input
                 className="form__item-input input"
                 id="edit-pet-weight-input"
-                name="edit-pet-weight-input"
+                name="weightKg"
                 type="number"
                 step="0.1"
                 min="0"
@@ -347,7 +290,7 @@ const EditPetModal = ({
               <input
                 className="form__item-input input"
                 id="edit-pet-birth-date-input"
-                name="edit-pet-birth-date-input"
+                name="birthDate"
                 type="date"
                 value={formData.birthDate}
                 onChange={handleChange}
@@ -378,62 +321,13 @@ const EditPetModal = ({
                   ))}
                 </ul>
               )}
-              {petPhotos.length < 4 && (
-                <div>
-                  <label
-                    className={`${styles["edit-pet-modal__photo-file-label"]} ${loading || uploadingPhoto ? `${styles["edit-pet-modal__photo-file-label--not-allowed"]} ${styles["edit-pet-modal__photo-file-label--opacity"]}` : ""}`}
-                    htmlFor="edit-pet-photo-input"
-                  >
-                    {selectedFile ? selectedFile.name : "Выбрать фото"}
-                  </label>
-                  <input
-                    className={styles["edit-pet-modal__photo-file-input"]}
-                    id="edit-pet-photo-input"
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    disabled={loading || uploadingPhoto}
-                  />
-                  {selectedFile && (
-                    <div className={styles["edit-pet-modal__photo-file-preview"]}>
-                      <div className={styles["edit-pet-modal__photo-file-preview-inner"]}>
-                        <img
-                          className={styles["edit-pet-modal__photo-file-preview-image"]}
-                          src={URL.createObjectURL(selectedFile)}
-                          alt="Предпросмотр"
-                          width="80" height="80" loading="lazy"
-                        />
-                        <span className={styles["edit-pet-modal__photo-file-preview-name"]}>
-                          {selectedFile.name}
-                        </span>
-                        <button
-                          className={`${styles["edit-pet-modal__photo-file-preview-button"]} ${loading || uploadingPhoto ? styles["edit-pet-modal__photo-file-preview-button--not-allowed"] : ""} button button--outlined`}
-                          type="button"
-                          onClick={() => {
-                            setSelectedFile(null);
-                            if (fileInputRef.current) {
-                              fileInputRef.current.value = "";
-                            }
-                          }}
-                          disabled={loading || uploadingPhoto}
-                        >
-                          Убрать
-                        </button>
-                      </div>
-                      <p>
-                        Фото будет загружено при нажатии кнопки "Сохранить"
-                      </p>
-                    </div>
-                  )}
-                  {petPhotos.length > 0 && (
-                    <p>Загружено: {petPhotos.length} / 4</p>
-                  )}
-                </div>
-              )}
-              {petPhotos.length >= 4 && (
-                <p>Достигнут лимит фотографий (максимум 4)</p>
-              )}
+              <PetPhotoPicker
+                inputId="edit-pet-photo-input"
+                selectedPhotos={selectedPhotos}
+                setSelectedPhotos={setSelectedPhotos}
+                currentPhotoCount={petPhotos.length}
+                loading={loading}
+              />
             </li>
           </ul>
         </div>

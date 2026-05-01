@@ -1,11 +1,13 @@
 import { apiClient } from './apiClient.js';
 import { USE_MOCK_API, mockGetCurrentUserPet } from './mockApi.js';
+import { clearTokens, getAccessToken, getRefreshToken, setTokens } from './tokenStorage.js';
 
-const TELEGRAM_OWNER_ENDPOINT = '/api/Owners/by-telegram';
 const OWNER_ID_STORAGE_KEY = 'petPassportOwnerId';
 
 export const isUnauthorizedError = (error) =>
   error?.status === 401 || error?.status === 403;
+
+export const hasStoredAuth = () => Boolean(getAccessToken());
 
 export const getTelegramUserId = () => {
   const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
@@ -14,6 +16,8 @@ export const getTelegramUserId = () => {
 };
 
 export const getStoredOwnerId = () => {
+  if (!getAccessToken()) return null;
+
   const ownerId = window.localStorage.getItem(OWNER_ID_STORAGE_KEY);
   return ownerId ? Number(ownerId) : null;
 };
@@ -25,6 +29,7 @@ export const setStoredOwnerId = (ownerId) => {
 
 export const clearStoredOwnerId = () => {
   window.localStorage.removeItem(OWNER_ID_STORAGE_KEY);
+  clearTokens();
 };
 
 const normalizeOwnerId = (result) => {
@@ -32,69 +37,72 @@ const normalizeOwnerId = (result) => {
   return result?.ownerId ?? result?.OwnerId ?? null;
 };
 
-const getTelegramUser = () => window.Telegram?.WebApp?.initDataUnsafe?.user ?? null;
+const getTelegramInitData = () => window.Telegram?.WebApp?.initData ?? null;
 
-export async function loginOwner(credentials) {
-  const result = await apiClient.post('/api/Owners/login', credentials);
+const saveAuthResponse = (result) => {
   const ownerId = normalizeOwnerId(result);
 
-  if (!ownerId) {
-    throw new Error('Сервер не вернул ID владельца');
+  if (!result?.accessToken || !result?.refreshToken || !ownerId) {
+    throw new Error('Сервер не вернул данные авторизации');
   }
 
+  setTokens(result);
   setStoredOwnerId(ownerId);
   return ownerId;
+};
+
+export async function loginOwner(credentials) {
+  const result = await apiClient.post('/api/v2/auth/login', credentials);
+  return saveAuthResponse(result);
 }
 
 export async function registerOwner(credentials) {
-  const result = await apiClient.post('/api/Owners/register-login', credentials);
-  const ownerId = normalizeOwnerId(result);
-
-  if (!ownerId) {
-    throw new Error('Сервер не вернул ID владельца');
-  }
-
-  setStoredOwnerId(ownerId);
-  return ownerId;
+  const result = await apiClient.post('/api/v2/auth/register', credentials);
+  return saveAuthResponse(result);
 }
 
-export async function getOwnerPets(ownerId = getStoredOwnerId()) {
-  if (!ownerId) {
+export async function getOwnerPets() {
+  if (!getAccessToken()) {
     const error = new Error('Пользователь не авторизован');
     error.status = 401;
     throw error;
   }
 
-  return await apiClient.get(`/api/Owners/${ownerId}/pets`);
+  return await apiClient.get('/api/v2/pets');
 }
 
-export async function registerTelegramOwner(telegramUser = getTelegramUser()) {
-  const telegramId = telegramUser?.id ?? getTelegramUserId();
+export async function loginTelegramOwner() {
+  const initData = getTelegramInitData();
 
-  if (!telegramId) {
+  if (!initData) {
     const error = new Error('Telegram пользователь не найден');
     error.status = 401;
     throw error;
   }
 
-  const ownerId = await apiClient.post('/api/Owners/register', {
-    telegramId,
-    telegramNick: telegramUser?.username ?? telegramUser?.first_name ?? null,
-  });
+  const result = await apiClient.post('/api/v2/auth/telegram', { initData });
+  return saveAuthResponse(result);
+}
 
-  if (!ownerId) {
-    throw new Error('Сервер не вернул ID владельца');
+export async function logoutOwner() {
+  const refreshToken = getRefreshToken();
+
+  try {
+    if (refreshToken) {
+      await apiClient.post(
+        '/api/v2/auth/logout',
+        { refreshToken },
+        { skipAuthRefresh: true }
+      );
+    }
+  } finally {
+    clearStoredOwnerId();
   }
-
-  setStoredOwnerId(ownerId);
-  return ownerId;
 }
 
 export async function getCurrentUserPet(telegramId = getTelegramUserId()) {
-  const ownerId = getStoredOwnerId();
-
-  if (ownerId) {
-    const pets = await getOwnerPets(ownerId);
+  if (getAccessToken()) {
+    const pets = await getOwnerPets();
     const pet = pets?.[0] ?? null;
 
     if (!pet?.id && !pet?.Id) {
@@ -114,26 +122,9 @@ export async function getCurrentUserPet(telegramId = getTelegramUserId()) {
     return await mockGetCurrentUserPet(telegramId);
   }
 
-  let owner;
-
-  try {
-    owner = await apiClient.get(`${TELEGRAM_OWNER_ENDPOINT}/${telegramId}`);
-  } catch (error) {
-    if (error.status !== 404) {
-      throw error;
-    }
-
-    const registeredOwnerId = await registerTelegramOwner();
-    const noPetError = new Error('У пользователя не найден питомец');
-    noPetError.ownerId = registeredOwnerId;
-    throw noPetError;
-  }
-
-  if (owner?.ownerId || owner?.OwnerId) {
-    setStoredOwnerId(owner.ownerId ?? owner.OwnerId);
-  }
-
-  const pet = owner?.pets?.[0] ?? null;
+  await loginTelegramOwner();
+  const pets = await getOwnerPets();
+  const pet = pets?.[0] ?? null;
 
   if (!pet?.id && !pet?.Id) {
     throw new Error('У Telegram пользователя не найден питомец');

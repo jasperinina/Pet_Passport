@@ -33,7 +33,7 @@ const TreatmentPage = () => {
 
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderValue, setReminderValue] = useState(5);
-  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.MINUTE);
+  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.DAY);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -65,7 +65,7 @@ const TreatmentPage = () => {
 
         setReminderEnabled(treatment.reminderEnabled || false);
         setReminderValue(treatment.reminderValue ?? 5);
-        setReminderUnit(treatment.reminderUnit ?? PERIOD_UNITS.MINUTE);
+        setReminderUnit(treatment.reminderUnit ?? PERIOD_UNITS.DAY);
       } catch (err) {
         console.error("Ошибка загрузки обработки:", err);
 

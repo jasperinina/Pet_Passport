@@ -14,6 +14,7 @@ import TreatmentPage from "./pages/Procedure/TreatmentPage";
 import RootPetGate from "./pages/RootPetGate/RootPetGate";
 
 import { getPet } from "./api/pets";
+import { hasStoredAuth } from "./api/auth";
 import { useNotification } from "./context/NotificationContext";
 import NotificationService from "./services/notificationService";
 import RecommendedProcedures from "./pages/RecommendedProcedures/RecommendedProcedures";
@@ -66,6 +67,7 @@ function App() {
   const isPetsPage = location.pathname === "/pets";
   const isLandingPage = location.pathname === "/landing";
   const isPrivacyPolicyPage = location.pathname === "/privacy-policy";
+  const isAuthenticated = hasStoredAuth();
   const params = new URLSearchParams(location.search);
   const hasPetId = params.has("id") || params.has("Id");
   const isRootWithoutPetId = location.pathname === "/" && !hasPetId;
@@ -76,8 +78,8 @@ function App() {
       <NotificationBanner />
 
       {/* Header теперь сам навигирует через useNavigate */}
-      {!isPetsPage && !isLandingPage && !isPrivacyPolicyPage && !isRootWithoutPetId && (
-        <Header petName={pet?.name} />
+      {isAuthenticated && !isPetsPage && !isLandingPage && !isPrivacyPolicyPage && !isRootWithoutPetId && (
+        <Header petName={pet?.name} petId={pet?.id ?? pet?.Id} />
       )}
 
       <main>

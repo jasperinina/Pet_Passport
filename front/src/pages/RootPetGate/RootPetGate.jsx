@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import LoadingState from "../../components/events/LoadingState/LoadingState";
-import { getCurrentUserPet, getStoredOwnerId, isUnauthorizedError } from "../../api/auth";
+import { getCurrentUserPet, getStoredOwnerId, hasStoredAuth, isUnauthorizedError } from "../../api/auth";
 import Auth from "../Auth/Auth";
 import Home from "../Home/Home";
 
@@ -20,6 +20,11 @@ const RootPetGate = () => {
     let isMounted = true;
 
     const resolveCurrentPet = async () => {
+      if (!hasStoredAuth()) {
+        setStatus("auth-required");
+        return;
+      }
+
       if (petId) {
         setStatus("ready");
         return;
@@ -57,12 +62,12 @@ const RootPetGate = () => {
     };
   }, [location.pathname, location.search, navigate, petId]);
 
-  if (petId) {
-    return <Home />;
-  }
-
   if (status === "auth-required") {
     return <Auth />;
+  }
+
+  if (petId) {
+    return <Home />;
   }
 
   return (

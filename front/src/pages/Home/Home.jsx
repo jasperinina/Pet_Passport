@@ -96,7 +96,6 @@ const Home = () => {
     return null;
   }
 
-  // TODO: Как открывается ProcedureDetailsModal?
   return (
     <div>
       <section className="section container">
@@ -121,13 +120,6 @@ const Home = () => {
               onClick={() => navigate(`/upcoming${search}`)}
             >
               Посмотреть все
-            </button>
-            <button
-              className="section__action hidden-mobile"
-              type="button"
-              onClick={() => navigate(`/recommendations${search}`)}
-            >
-              Рекомендации
             </button>
           </div>
         </header>
@@ -154,12 +146,6 @@ const Home = () => {
           </button>
         </div>
       </section>
-
-      {/* <ProcedureDetailsModal
-        isOpen={isDetailsModalOpen}
-        onClose={() => setIsDetailsModalOpen(false)}
-        event={selectedEvent}
-      /> */}
 
       <ModalOverlay
         modalName="AddProcedureModal"
