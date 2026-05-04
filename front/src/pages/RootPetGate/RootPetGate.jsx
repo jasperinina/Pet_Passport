@@ -65,13 +65,8 @@ const RootPetGate = () => {
 
       try {
         setStatus("checking");
-        const pet = await getCurrentUserPet();
-        if (!isMounted) return;
 
-        const resolvedPetId = pet.id ?? pet.Id;
-        const params = new URLSearchParams(location.search);
-        params.set("id", resolvedPetId);
-        navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+        navigate("/pets", { replace: true });
       } catch (error) {
         if (!isMounted) return;
 
