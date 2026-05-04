@@ -7,7 +7,13 @@ import { getCurrentUserPet, getStoredOwnerId, hasStoredAuth, isUnauthorizedError
 import Auth from "../Auth/Auth";
 import Home from "../Home/Home";
 
-const hasTelegramContext = () => { try { return isTMA(); } catch { return false; } };
+const hasTelegramContext = () => {
+  try {
+    return isTMA() || Boolean(window.Telegram?.WebApp?.initData);
+  } catch {
+    return Boolean(window.Telegram?.WebApp?.initData);
+  }
+};
 
 const RootPetGate = () => {
   const location = useLocation();
