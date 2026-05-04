@@ -1,40 +1,49 @@
 @use '../../styles/helpers/' as *;
 
 .pets {
+  position: relative;
+  height: 100dvh;
+
   &__header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    column-gap: 2rem;
+    column-gap: rem(28);
     padding: rem(19) rem(28);
     background-color: var(--color-light);
     border-radius: var(--border-radius);
 
-    @include mobile {
-      padding: rem(12) rem(16);
+    &-separator {
+      width: rem(1);
+      height: rem(24);
+      background-color: var(--color-gray-alt);
+      border-radius: rem(1);
     }
 
-    &-add-button {
+    &-actions {
       display: flex;
       align-items: center;
       column-gap: rem(10);
+    }
 
-      &-icon {
-        @include square(24);
-
-        rotate: 45deg;
-      }
+    @include mobile {
+      justify-content: space-between;
+      padding: rem(12) rem(16);
     }
   }
 
   &__body {
+    @include abs-center;
+
     display: flex;
     flex-direction: column;
-    row-gap: rem(20);
+    align-items: center;
+    row-gap: rem(50);
+    padding-inline: var(--container-padding-x);
+    max-width: rem(806);
+    width: 100%;
 
-    &--empty {
-      align-items: center;
-      margin-top: rem(171);
+    @include mobile {
+      row-gap: rem(32);
     }
   }
 
@@ -43,25 +52,39 @@
     flex-direction: column;
     align-items: center;
     row-gap: rem(32);
-    padding: rem(30);
-    max-width: rem(320);
+    padding: rem(50);
+    max-width: rem(806);
+    width: 100%;
     background-color: var(--color-light);
     border-radius: var(--border-radius);
 
     &-image {
+      @include square(100);
+
       position: relative;
+      padding: rem(18) rem(18) rem(17) rem(17);
+      color: var(--color-gray-alt);
+      background-color: var(--color-light-gray);
+      border-radius: var(--border-radius);
+
+      & svg {
+        &:first-child {
+          width: 100%;
+          height: 100%;
+        }
+      }
 
       &-cross {
-        @include square(48);
+        @include square(32);
         @include flex-center;
 
         position: absolute;
         bottom: 0;
         right: 0;
-        transform: translate(25%, 25%);
-        padding: rem(10);
+        transform: translate(20%, 20%);
+        padding: rem(9);
         color: var(--color-light);
-        background-color: var(--color-dark);
+        background-color: var(--color-gray);
         border-radius: 50%;
       }
     }
@@ -70,24 +93,48 @@
       text-align: center;
     }
 
+    &-title {
+      @include fluid-text(36, 20);
+    }
+
     &-description {
-      color: var(--color-dark);
+      @include fluid-text(18, 12);
+
+      color: var(--color-dark-alt);
 
       &:not(:first-child) {
-        margin-top: rem(12);
+        margin-top: rem(16);
       }
+    }
+
+    &-add-button {
+      max-width: rem(300);
+      width: 100%;
+    }
+
+    @include mobile {
+      padding: rem(24) rem(20);
     }
   }
 
   &__title {
-    margin-top: rem(28);
+    @include fluid-text(56, 32);
+
+    margin-top: rem(110);
+
+    @include mobile {
+      align-self: start;
+    }
   }
 
   &__list {
     display: flex;
     flex-direction: column;
     row-gap: rem(10);
+    width: 100%;
+    max-height: rem(470);
     list-style: none;
+    overflow: auto;
   }
 
   &__item {
@@ -95,8 +142,8 @@
     display: flex;
     align-items: center;
     column-gap: rem(16);
-    padding: rem(5) rem(44) rem(5) rem(5);
-    max-width: rem(350);
+    padding: rem(20);
+    width: 100%;
     background-color: var(--color-light);
     border-radius: var(--border-radius);
     cursor: pointer;
@@ -111,7 +158,12 @@
     }
 
     &-image {
-      border-radius: rem(15);
+      @include square(70);
+
+      padding: rem(15);
+      color: var(--color-gray-alt);
+      background-color: var(--color-light-gray);
+      border-radius: var(--border-radius-small-alt);
     }
 
     &-info {
@@ -152,22 +204,30 @@
         opacity: 0.7;
       }
     }
+
+    @include mobile {
+      padding: rem(5);
+    }
   }
 
   &__add-button {
-    @include square(48);
-    @include flex-center;
+    width: 100%;
 
-    position: fixed;
-    bottom: rem(20);
-    right: rem(20);
-    padding: rem(10);
-    color: var(--color-light);
-    background-color: var(--color-dark);
-    border-radius: 50%;
+    &--mobile {
+      @include square(48);
+      @include flex-center;
 
-    &-icon {
-      rotate: 45deg;
+      position: fixed;
+      bottom: rem(20);
+      right: rem(20);
+      padding: rem(10);
+      color: var(--color-light);
+      background-color: var(--color-dark);
+      border-radius: 50%;
+
+      & svg {
+        rotate: 45deg;
+      }
     }
   }
 }

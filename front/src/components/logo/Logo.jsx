@@ -1,6 +1,6 @@
 import styles from "./Logo.module.scss";
 
-const Logo = ({ light = false, path = "/landing" }) => {
+const Logo = ({ light = false, mobile = false, path = "/landing" }) => {
   const color = light ? styles["logo--light"] : "";
 
   return (
@@ -18,7 +18,8 @@ const Logo = ({ light = false, path = "/landing" }) => {
           fill="#36187D" stroke="#36187D" strokeWidth="0.2"
         />
       </svg>
-      <span className={`${styles.logo__text} h3`}>PetPassport</span>
+      <span className={`${styles.logo__text} h3 hidden-mobile`}>PetPassport</span>
+      <span className={`${styles.logo__text} h3 visible-mobile`}>PetP.</span>
     </a>
   );
 };

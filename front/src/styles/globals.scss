@@ -1,6 +1,11 @@
 @use './helpers/' as *;
 
 html {
+  &.auth-page {
+    overflow: hidden;
+    scrollbar-gutter: auto;
+  }
+
   &.modal-open {
     overflow: hidden !important;
     scrollbar-width: none;

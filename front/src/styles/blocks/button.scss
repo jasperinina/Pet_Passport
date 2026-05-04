@@ -43,4 +43,11 @@
     background-color: rgba($color: #FFFFFF, $alpha: 0.1);
     backdrop-filter: blur(rem(5));
   }
+
+  &--gray {
+    padding: rem(14) rem(16);
+    color: var(--color-gray);
+    background-color: var(--color-light-gray);
+    border-radius: var(--border-radius-small-alt);
+  }
 }
