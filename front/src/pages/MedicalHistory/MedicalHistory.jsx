@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Procedures from "../../components/ui/Procedures/Procedures";
-import Menu from "../../components/menu/Menu";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
+import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 
 import { getEvents } from "../../api/events";
 import { EVENT_STATUSES } from "../../constants/eventConstants";
@@ -72,10 +72,6 @@ const MedicalHistory = () => {
 
   return (
     <div>
-      <section className="container">
-        <Menu />
-      </section>
-
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Медицинская история</h2>
@@ -97,12 +93,19 @@ const MedicalHistory = () => {
       </section>
 
       <ModalOverlay
-        modalName="AddProcedureModal"
         isOpen={isAddProcedureModalOpen}
         onClose={() => setIsAddProcedureModalOpen(false)}
-        petId={petId ? parseInt(petId, 10) : null}
-        onSuccess={handleProcedureAdded}
-      />
+      >
+        {({ isOpen, isClosing, onClose }) => (
+          <AddProcedureModal
+            isOpen={isOpen}
+            onClose={onClose}
+            isClosing={isClosing}
+            petId={petId ? parseInt(petId, 10) : null}
+            onSuccess={handleProcedureAdded}
+          />
+        )}
+      </ModalOverlay>
     </div>
   );
 };

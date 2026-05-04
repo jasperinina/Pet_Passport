@@ -6,7 +6,7 @@
   padding-inline: var(--container-padding-x);
 
   &:last-child {
-    @include mobile {
+    @include tablet {
       margin-bottom: rem(100);
     }
   }
@@ -24,6 +24,18 @@
 
 .visible-mobile {
   @include mobile-above {
+    display: none !important;
+  }
+}
+
+.hidden-tablet {
+  @include tablet {
+    display: none !important;
+  }
+}
+
+.visible-tablet {
+  @include tablet-above {
     display: none !important;
   }
 }

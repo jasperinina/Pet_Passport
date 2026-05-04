@@ -1,17 +1,19 @@
 @use '../helpers/' as *;
 
 .form {
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: rem(806);
-  height: 100%;
+  max-height: calc(100dvh - #{rem(40)});
   background-color: var(--color-light);
   border-radius: var(--border-radius);
   z-index: 2;
-  overflow: auto;
+  overflow: hidden;
   animation: fadeIn 0.3s;
 
   @include mobile {
-    max-height: rem(850);
+    max-height: calc(100dvh - #{rem(20)});
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     animation: slideIn 0.3s;
 
@@ -39,7 +41,11 @@
   }
   
   &__inner {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     padding: rem(40);
+    max-height: inherit;
 
     @include mobile {
       padding: rem(20);
@@ -67,7 +73,9 @@
   }
 
   &__body {
+    min-height: 0;
     padding-block: rem(40);
+    overflow: auto;
   }
 
   &__list {
@@ -77,12 +85,9 @@
     row-gap: rem(28);
     padding-right: rem(10);
     width: 100%;
-    max-height: rem(659);
-    overflow: auto;
 
     @include mobile {
       row-gap: rem(20);
-      max-height: rem(550);
     }
   }
 
@@ -122,6 +127,7 @@
   }
 
   &__footer {
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     column-gap: rem(10);

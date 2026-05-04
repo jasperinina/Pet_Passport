@@ -5,9 +5,9 @@ import MenuButton from "./MenuButton";
 import ProcedureIcon from "../../assets/icons/procedures.svg";
 import HistoryIcon from "../../assets/icons/history.svg";
 
-const Menu = ({ isMobileHidden = false }) => {
+const Menu = ({ isTabletHidden = false }) => {
   return (
-    <nav className={`${styles.menu} ${isMobileHidden ? "hidden-mobile" : "visible-mobile"}`}>
+    <nav className={`${styles.menu} ${isTabletHidden ? "hidden-tablet" : "visible-tablet"}`}>
       <ul className={styles.menu__list}>
         <li className={styles.menu__item}>
           <MenuButton
@@ -16,7 +16,7 @@ const Menu = ({ isMobileHidden = false }) => {
             text="Предстоящие процедуры"
           />
         </li>
-        <span className={`${styles.menu__separator} visible-mobile`}></span>
+        <span className={`${styles.menu__separator} visible-tablet`}></span>
         <li className={styles.menu__item}>
           <MenuButton
             route="history"

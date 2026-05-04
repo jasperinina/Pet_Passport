@@ -1,0 +1,46 @@
+@use '../../../../styles/helpers/' as *;
+
+.profile-modal {
+  &__body {
+    padding-block: rem(40);
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    row-gap: rem(16);
+  }
+
+  &__value {
+    @include fluid-text(18, 14);
+
+    color: var(--color-dark-alt);
+  }
+
+  &__footer {
+    display: grid;
+    grid-template-columns: 1fr rem(49);
+    column-gap: rem(10);
+  }
+
+  &__delete-button {
+    @include square(49);
+    @include flex-center;
+
+    padding: rem(14) rem(14) rem(15) rem(15);
+    color: var(--color-gray);
+    border: rem(1) solid var(--color-gray-alt);
+    border-radius: var(--border-radius-small);
+    transition-duration: var(--transition-duration);
+
+    @include hover {
+      color: var(--color-red);
+      border-color: var(--color-red);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}

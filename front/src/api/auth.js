@@ -113,6 +113,18 @@ export async function logoutOwner() {
   }
 }
 
+export async function getAccount() {
+  return await apiClient.get('/api/v2/account');
+}
+
+export async function deleteAccount() {
+  try {
+    return await apiClient.delete('/api/v2/account');
+  } finally {
+    clearStoredOwnerId();
+  }
+}
+
 export async function getCurrentUserPet(telegramId = getTelegramUserId()) {
   if (getAccessToken()) {
     const pets = await getOwnerPets();

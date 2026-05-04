@@ -57,10 +57,9 @@
     background-color: var(--color-gray-alt);
   }
 
-  &__pet {
+  &__actions {
     display: flex;
     align-items: center;
-    column-gap: rem(8);
-    color: var(--color-gray);
+    column-gap: rem(10);
   }
 }

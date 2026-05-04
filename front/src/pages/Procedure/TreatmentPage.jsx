@@ -6,7 +6,6 @@ import EventCard from "../../components/events/EventCard/EventCard";
 import EventSection from "../../components/events/EventSection/EventSection";
 import ReminderSection from "../../components/events/ReminderSection";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
-import Menu from "../../components/menu/Menu";
 
 import { getTreatment, updateTreatment, deleteTreatment } from "../../api/events";
 import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../../constants/eventConstants";
@@ -168,10 +167,6 @@ const TreatmentPage = () => {
 
   return (
     <div>
-      <section className="container">
-        <Menu />
-      </section>
-
       <section className="section container">
         <div className="section__grid">
           <EventPageHeader

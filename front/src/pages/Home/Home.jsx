@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import Menu from "../../components/menu/Menu";
 import PetCard from "../../components/ui/PetCard/PetCard";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
+import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
+import EditPetModal from "../../components/ui/modals/EditPetModal/EditPetModal";
 
 import { getPet } from "../../api/pets";
 import { getEvents } from "../../api/events";
@@ -80,10 +81,6 @@ const Home = () => {
     window.dispatchEvent(new CustomEvent("petUpdated"));
   };
 
-  if (!isAddProcedureModalOpen || !isEditModalOpen) {
-    document.documentElement.classList.remove("modal-open");
-  }
-
   if (loading) {
     return (
       <section className="section container">
@@ -104,10 +101,6 @@ const Home = () => {
           setIsEditModalOpen={setIsEditModalOpen}
           pet={pet}
         />
-      </section>
-
-      <section className="container">
-        <Menu />
       </section>
 
       <section className="section container">
@@ -148,19 +141,33 @@ const Home = () => {
       </section>
 
       <ModalOverlay
-        modalName="AddProcedureModal"
         isOpen={isAddProcedureModalOpen}
         onClose={() => setIsAddProcedureModalOpen(false)}
-        petId={pet?.id}
-        onSuccess={handleProcedureAdded}
-      />
+      >
+        {({ isOpen, isClosing, onClose }) => (
+          <AddProcedureModal
+            isOpen={isOpen}
+            onClose={onClose}
+            isClosing={isClosing}
+            petId={pet?.id}
+            onSuccess={handleProcedureAdded}
+          />
+        )}
+      </ModalOverlay>
       <ModalOverlay
-        modalName="EditPetModal"
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        pet={pet}
-        onSuccess={handleUpdateSuccess}
-      />
+      >
+        {({ isOpen, isClosing, onClose }) => (
+          <EditPetModal
+            isOpen={isOpen}
+            onClose={onClose}
+            isClosing={isClosing}
+            pet={pet}
+            onSuccess={handleUpdateSuccess}
+          />
+        )}
+      </ModalOverlay>
     </div>
   );
 };

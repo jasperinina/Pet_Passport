@@ -3,14 +3,11 @@ import { useNavigate } from "react-router-dom";
 
 import styles from "./Pets.module.scss";
 
-import Logo from "../../components/logo/Logo";
+import Header from "../../components/header/Header";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
+import AddPetModal from "../../components/ui/modals/AddPetModal/AddPetModal";
 import { getOwnerPets, getStoredOwnerId, isUnauthorizedError } from "../../api/auth";
 import { deletePet } from "../../api/pets";
-import HeaderAction from "../../components/header/action/HeaderAction";
-
-import CatIcon from "../../assets/icons/pets/cat.svg";
-import ProfileIcon from "../../assets/icons/profile.svg";
 
 const Pets = () => {
   const navigate = useNavigate();
@@ -94,23 +91,13 @@ const Pets = () => {
   return (
     <div>
       <section className={`${styles.pets} section container`}>
-        <header className={styles.pets__header}>
-          <Logo />
-          <div className={`${styles["pets__header-separator"]} hidden-mobile`}></div>
-          <div className={styles["pets__header-actions"]}>
-            <HeaderAction
-              icon={CatIcon}
-              text={selectedPetName ? selectedPetName : "Выберите питомца"}
-              onClick={() => selectedPetId ? navigate(`/?id=${selectedPetId}`) : {}}
-              hasSecondIcon
-            />
-            <HeaderAction
-              icon={ProfileIcon}
-              text="Профиль"
-              onClick={() => {}}
-            />
-          </div>
-        </header>
+        <Header
+          petName={selectedPetName}
+          petId={selectedPetId}
+          hideMenu
+          className=""
+          innerClassName={styles.pets__header}
+        />
         <div className={styles.pets__content}>
           {loading ? (
             <div className={`${styles.pets__body} ${styles["pets__body--empty"]}`}>
@@ -361,12 +348,19 @@ const Pets = () => {
         </div>
       </section>
       <ModalOverlay
-        modalName="AddPetModal"
         isOpen={isAddPetModalOpen}
         onClose={() => setIsAddPetModalOpen(false)}
-        onSuccess={handlePetAdded}
-        ownerId={ownerId}
-      />
+      >
+        {({ isOpen, isClosing, onClose }) => (
+          <AddPetModal
+            isOpen={isOpen}
+            onClose={onClose}
+            isClosing={isClosing}
+            onSuccess={handlePetAdded}
+            ownerId={ownerId}
+          />
+        )}
+      </ModalOverlay>
     </div>
   );
 };

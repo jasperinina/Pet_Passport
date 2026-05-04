@@ -3,8 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import Procedures from "../../components/ui/Procedures/Procedures";
-import Menu from "../../components/menu/Menu";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
+import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 
 import { getEvents } from "../../api/events";
 import NotificationService from "../../services/notificationService";
@@ -65,10 +65,6 @@ const UpcomingProcedures = () => {
 
   return (
     <div>
-      <section className="container">
-        <Menu />
-      </section>
-
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Предстоящие процедуры</h2>
@@ -98,12 +94,19 @@ const UpcomingProcedures = () => {
       </section>
 
       <ModalOverlay
-        modalName="AddProcedureModal"
         isOpen={isAddProcedureModalOpen}
         onClose={() => setIsAddProcedureModalOpen(false)}
-        petId={petId ? parseInt(petId, 10) : null}
-        onSuccess={handleProcedureAdded}
-      />
+      >
+        {({ isOpen, isClosing, onClose }) => (
+          <AddProcedureModal
+            isOpen={isOpen}
+            onClose={onClose}
+            isClosing={isClosing}
+            petId={petId ? parseInt(petId, 10) : null}
+            onSuccess={handleProcedureAdded}
+          />
+        )}
+      </ModalOverlay>
     </div>
   );
 };

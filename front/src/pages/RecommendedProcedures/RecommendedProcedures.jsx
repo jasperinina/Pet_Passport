@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-import Menu from "../../components/menu/Menu";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
+import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 
 import { getEventTemplates } from "../../api/events";
+import NotificationService from "../../services/notificationService";
+import { ERROR_MESSAGES } from "../../constants/config";
 
 const RecommendedProcedures = () => {
   const navigate = useNavigate();
@@ -58,10 +60,6 @@ const RecommendedProcedures = () => {
     setIsAddProcedureModalOpen(true);
   };
 
-  if (!isAddProcedureModalOpen) {
-    document.documentElement.classList.remove("modal-open");
-  }
-
   if (loading) {
     return (
       <section className="section container">
@@ -72,10 +70,6 @@ const RecommendedProcedures = () => {
 
   return (
     <div>
-      <div className="container">
-        <Menu />
-      </div>
-
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Рекомендуемые процедуры</h2>
@@ -93,13 +87,20 @@ const RecommendedProcedures = () => {
       </section>
 
       <ModalOverlay
-        modalName="AddProcedureModal"
         isOpen={isAddProcedureModalOpen}
         onClose={() => setIsAddProcedureModalOpen(false)}
-        petId={petId ? parseInt(petId, 10) : null}
-        onSuccess={handleProcedureAdded}
-        event={editingEvent}
-      />
+      >
+        {({ isOpen, isClosing, onClose }) => (
+          <AddProcedureModal
+            isOpen={isOpen}
+            onClose={onClose}
+            isClosing={isClosing}
+            petId={petId ? parseInt(petId, 10) : null}
+            onSuccess={handleProcedureAdded}
+            event={editingEvent}
+          />
+        )}
+      </ModalOverlay>
     </div>
   );
 };

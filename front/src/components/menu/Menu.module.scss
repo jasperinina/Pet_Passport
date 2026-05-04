@@ -1,7 +1,7 @@
 @use '../../styles/helpers/' as *;
 
 .menu {
-  @include mobile {
+  @include tablet {
     position: fixed;
     bottom: rem(20);
     left: rem(20);
@@ -18,7 +18,7 @@
     align-items: center;
     column-gap: rem(28);
 
-    @include mobile {
+    @include tablet {
       display: grid;
       grid-template-columns: auto rem(1) auto;
     }
