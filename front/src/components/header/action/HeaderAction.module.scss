@@ -1,0 +1,27 @@
+@use '../../../styles/helpers/' as *;
+
+.header-action {
+  display: flex;
+  align-items: center;
+  column-gap: rem(8);
+
+  &__text {
+    @include fluid-text(14, 12);
+
+    font-weight: 500;
+  }
+
+  &__icon {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  @include mobile {
+    width: auto;
+    flex-shrink: 0;
+
+    &:nth-child(1) {
+      order: 1;
+    }
+  }
+}
