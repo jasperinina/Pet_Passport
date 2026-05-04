@@ -236,7 +236,6 @@ const Pets = () => {
           onClick={() => setIsAddPetModalOpen(true)}
         >
           <svg
-            className={styles["pets__add-button-icon"]}
             width="28" height="28" viewBox="0 0 28 28"
             fill="none"
           >
