@@ -1,3 +1,4 @@
+import { isTMA, retrieveRawInitData } from '@tma.js/sdk-react';
 import { apiClient } from './apiClient.js';
 import { USE_MOCK_API, mockGetCurrentUserPet } from './mockApi.js';
 import { clearTokens, getAccessToken, getRefreshToken, setTokens } from './tokenStorage.js';
@@ -37,7 +38,13 @@ const normalizeOwnerId = (result) => {
   return result?.ownerId ?? result?.OwnerId ?? null;
 };
 
-const getTelegramInitData = () => window.Telegram?.WebApp?.initData ?? null;
+const getTelegramInitData = () => {
+  try {
+    return isTMA() ? (retrieveRawInitData() ?? null) : null;
+  } catch {
+    return null;
+  }
+};
 
 const saveAuthResponse = (result) => {
   const ownerId = normalizeOwnerId(result);

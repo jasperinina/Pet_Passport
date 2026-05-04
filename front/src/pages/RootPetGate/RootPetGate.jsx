@@ -1,3 +1,4 @@
+import { isTMA } from "@tma.js/sdk-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -6,7 +7,7 @@ import { getCurrentUserPet, getStoredOwnerId, hasStoredAuth, isUnauthorizedError
 import Auth from "../Auth/Auth";
 import Home from "../Home/Home";
 
-const hasTelegramContext = () => Boolean(window.Telegram?.WebApp?.initData);
+const hasTelegramContext = () => { try { return isTMA(); } catch { return false; } };
 
 const RootPetGate = () => {
   const location = useLocation();
