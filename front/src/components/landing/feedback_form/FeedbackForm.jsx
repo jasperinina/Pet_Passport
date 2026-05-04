@@ -4,11 +4,13 @@ import styles from "./FeedbackForm.module.scss";
 
 import FloatingTextarea from "../floating_textarea/FloatingTextarea";
 
-import NotificationService from "../../../services/notificationService";
+import { sendFeedback } from "../../../api/feedback";
+import { notifyError, notifySuccess } from "../../../services/notificationService";
 
-import { FILE_UPLOAD } from "../../../constants/config";
+import { ERROR_MESSAGES, FILE_UPLOAD } from "../../../constants/config";
 
 const FeedbackForm = ({
+  type,
   title,
   description,
   labels,
@@ -25,7 +27,6 @@ const FeedbackForm = ({
   );
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const fileInputRef = useRef(null);
 
   const [acceptedPolicy, setAcceptedPolicy] = useState(false);
@@ -39,19 +40,13 @@ const FeedbackForm = ({
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.INVALID_FILE_TYPE,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+      notifyError(ERROR_MESSAGES.FILE.INVALID_TYPE);
 
       return;
     }
 
     if (file.size > FILE_UPLOAD.MAX_SIZE) {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.FILE_TOO_LARGE,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
+      notifyError(ERROR_MESSAGES.FILE.TOO_LARGE);
 
       return;
     }
@@ -59,13 +54,44 @@ const FeedbackForm = ({
     setSelectedFile(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Отправка формы
+
+    if (loading) return;
+
+    const fields = labels.reduce((acc, label, index) => {
+      acc[label] = values[fieldNames[index]].trim();
+      return acc;
+    }, {});
+
+    if (selectedFile) {
+      fields["Скриншот"] = selectedFile.name;
+    }
+
+    try {
+      setLoading(true);
+      await sendFeedback({ type, fields });
+
+      setValues(Object.fromEntries(fieldNames.map((name) => [name, ""])));
+      setSelectedFile(null);
+      setAcceptedPolicy(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      notifySuccess("Спасибо, сообщение отправлено");
+    } catch {
+      notifyError("Не удалось отправить сообщение. Попробуйте позже");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form className={`${styles["feedback-form"]} container`}>
+    <form
+      className={`${styles["feedback-form"]} container`}
+      onSubmit={handleSubmit}
+    >
       <header className={styles["feedback-form__header"]}>
         <h3 className={`${styles["feedback-form__title"]} h3`}>
           {title}
@@ -91,7 +117,7 @@ const FeedbackForm = ({
           {allowScreenshot && (
             <div className={styles["feedback-form__screenshot"]}>
               <label
-                className={`${styles["feedback-form__screenshot-label"]} ${loading || uploadingPhoto ? `${styles["feedback-form__screenshot-label--not-allowed"]} ${styles["feedback-form__screenshot-label--opacity"]}` : ""}`}
+                className={`${styles["feedback-form__screenshot-label"]} ${loading ? `${styles["feedback-form__screenshot-label--not-allowed"]} ${styles["feedback-form__screenshot-label--opacity"]}` : ""}`}
                 htmlFor="screenshot-input"
               >
                 <svg
@@ -123,7 +149,7 @@ const FeedbackForm = ({
                       fileInputRef.current.value = "";
                     }
                   }}
-                  disabled={loading || uploadingPhoto}
+                  disabled={loading}
                 >
                   <div className="visually-hidden">Убрать</div>
                   <svg
@@ -145,7 +171,7 @@ const FeedbackForm = ({
                 type="file"
                 accept="image/*"
                 onChange={handleFileSelect}
-                disabled={loading || uploadingPhoto}
+                disabled={loading}
               />
             </div>
           )}
@@ -156,6 +182,7 @@ const FeedbackForm = ({
             type="checkbox"
             checked={acceptedPolicy}
             onChange={(e) => setAcceptedPolicy(e.target.checked)}
+            disabled={loading}
             required
           />
           <div className={styles["feedback-form__privacy-policy-text"]}>
@@ -167,8 +194,11 @@ const FeedbackForm = ({
         <button
           className={`${styles["feedback-form__button"]} button button--filled`}
           type="submit"
+          disabled={loading}
         >
-          <div className={styles["feedback-form__button-text"]}>{buttonText}</div>
+          <div className={styles["feedback-form__button-text"]}>
+            {loading ? "Отправляем..." : buttonText}
+          </div>
           <svg
             className={styles["feedback-form__button-icon"]}
             width="20" height="20" viewBox="0 0 20 20"

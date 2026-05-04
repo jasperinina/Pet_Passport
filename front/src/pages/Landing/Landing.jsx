@@ -18,10 +18,7 @@ import FeatureImage2 from "../../assets/images/landing/features-2.png";
 import FeatureImage3 from "../../assets/images/landing/features-3.png";
 
 import InstructionImage from "../../assets/images/landing/instruction-image.png";
-import FloatingTextarea from "../../components/landing/floating_textarea/FloatingTextarea";
 
-import NotificationService from "../../services/notificationService";
-import { FILE_UPLOAD } from "../../constants/config";
 import FeatureCard from "../../components/landing/feature_card/FeatureCard";
 import FeedbackForm from "../../components/landing/feedback_form/FeedbackForm";
 import Footer from "../../components/landing/footer/Footer";
@@ -35,12 +32,6 @@ const Landing = () => {
   const gitHubUrl = import.meta.env.VITE_GITHUB_URL || "";
   const webUrl = "/";
   const privacyPolicyUrl = "/privacy-policy";
-
-  const [loading, setLoading] = useState(false);
-
-  const [whatHappened, setWhatHappened] = useState("");
-  const [whereHappened, setWhereHappened] = useState("");
-  const [whatExpected, setWhatExpected] = useState("");
 
   const [errorReportSelected, setErrorReportSelected] = useState(true);
 
@@ -385,6 +376,7 @@ const Landing = () => {
           </nav>
           {errorReportSelected ? (
             <FeedbackForm
+              type="error"
               title="Сообщить об ошибке"
               description="Сообщите об ошибке — это поможет нам быстрее её исправить"
               labels={["Что произошло?", "Где это произошло?", "Что вы ожидали?"]}
@@ -396,6 +388,7 @@ const Landing = () => {
             />
           ) : (
             <FeedbackForm
+              type="feature"
               title="Предложить функцию"
               description="Поделитесь идеей — мы развиваем приложение вместе с пользователями"
               labels={["Какой функции не хватает?", "Зачем она вам нужна?", "Как вы сейчас это делаете?"]}

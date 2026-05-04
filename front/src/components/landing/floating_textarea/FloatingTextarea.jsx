@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import styles from "./FloatingTextarea.module.scss";
 
 const FloatingTextarea = ({
@@ -10,9 +8,6 @@ const FloatingTextarea = ({
   onChange,
   required = true
 }) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const hasValue = value && value.trim().length > 0;
-
   return (
     <div className={styles["floating-textarea__wrapper"]}>
       <label
@@ -27,8 +22,6 @@ const FloatingTextarea = ({
         name={name}
         value={value}
         onChange={onChange}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
         required={required}
         placeholder={placeholder}
       />
