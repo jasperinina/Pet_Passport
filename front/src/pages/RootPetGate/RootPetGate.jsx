@@ -99,7 +99,7 @@ const RootPetGate = () => {
     return <Auth />;
   }
 
-  if (petId) {
+  if (status === "ready" && petId) {
     return <Home key={authAttempt} />;
   }
 
