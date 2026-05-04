@@ -190,6 +190,7 @@ class ApiClient {
 
       if (!response.ok) {
         clearTokens();
+        window.dispatchEvent(new Event('auth-expired'));
         return null;
       }
 
@@ -198,6 +199,7 @@ class ApiClient {
       return tokens;
     } catch {
       clearTokens();
+      window.dispatchEvent(new Event('auth-expired'));
       return null;
     }
   }
