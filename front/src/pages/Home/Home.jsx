@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 import PetCard from "../../components/ui/PetCard/PetCard";
@@ -25,12 +25,12 @@ const Home = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
 
-  const getPetIdFromUrl = () => {
-    const params = new URLSearchParams(window.location.search);
+  const getPetIdFromUrl = useCallback(() => {
+    const params = new URLSearchParams(location.search);
     return params.get("id") || params.get("Id");
-  };
+  }, [location.search]);
 
-  const loadPet = async () => {
+  const loadPet = useCallback(async ({ showLoading = true } = {}) => {
     const petId = getPetIdFromUrl();
 
     if (!petId) {
@@ -44,7 +44,10 @@ const Home = () => {
     }
 
     try {
-      setLoading(true);
+      if (showLoading) {
+        setLoading(true);
+      }
+
       const petData = await getPet(parseInt(petId, 10));
       setPet(petData);
     } catch (err) {
@@ -53,31 +56,35 @@ const Home = () => {
         ERROR_MESSAGES.ERROR_TITLE
       );
     } finally {
-      setLoading(false);
+      if (showLoading) {
+        setLoading(false);
+      }
     }
-  };
+  }, [getPetIdFromUrl]);
 
-  const loadUpcomingEvents = async () => {
+  const loadUpcomingEvents = useCallback(async () => {
     const petId = getPetIdFromUrl();
     if (!petId) return;
 
     try {
       const events = await getEvents(parseInt(petId, 10), [EVENT_STATUSES.UPCOMING]);
       setUpcomingEvents(events.slice(0, 3));
-    } catch (err) {
+    } catch {
       setUpcomingEvents([]);
     }
-  };
+  }, [getPetIdFromUrl]);
 
   useEffect(() => {
-    loadPet();
-    loadUpcomingEvents();
-  }, []);
+    queueMicrotask(() => {
+      loadPet();
+      loadUpcomingEvents();
+    });
+  }, [loadPet, loadUpcomingEvents]);
 
   const handleProcedureAdded = () => loadUpcomingEvents();
 
   const handleUpdateSuccess = () => {
-    loadPet();
+    loadPet({ showLoading: false });
     window.dispatchEvent(new CustomEvent("petUpdated"));
   };
 

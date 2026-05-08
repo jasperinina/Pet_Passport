@@ -80,9 +80,6 @@ class ApiClient {
       const error = new Error(errorMessage);
       error.status = response.status;
 
-      // TODO: Временно, чтобы узнать статусы ошибок
-      console.error(error);
-
       throw error;
     }
 

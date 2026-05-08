@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 
 import styles from "./ModalOverlay.module.scss";
 
+const CLOSE_ANIMATION_MS = 300;
+
 const ModalOverlay = ({
   isOpen,
   onClose,
@@ -10,20 +12,20 @@ const ModalOverlay = ({
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || isClosing) {
       document.documentElement.classList.add("modal-open");
-    } else {
-      document.documentElement.classList.remove("modal-open");
+      return () => document.documentElement.classList.remove("modal-open");
     }
-    return () => document.documentElement.classList.remove("modal-open");
-  }, [isOpen]);
+  }, [isClosing, isOpen]);
 
   const handleClose = () => {
+    if (isClosing) return;
+
     setIsClosing(true);
     setTimeout(() => {
       onClose();
       setIsClosing(false);
-    }, 300);
+    }, CLOSE_ANIMATION_MS);
   };
 
   if (!isOpen && !isClosing) return null;
@@ -32,7 +34,7 @@ const ModalOverlay = ({
     <div className={`${styles["modal-overlay"]} ${isClosing ? styles["modal-overlay--closing"] : ""}`}>
       <div className={styles["modal-overlay__background"]} onClick={handleClose}></div>
       {typeof children === "function"
-        ? children({ isOpen, isClosing, onClose: handleClose })
+        ? children({ isOpen: isOpen || isClosing, isClosing, onClose: handleClose })
         : children}
     </div>
   );

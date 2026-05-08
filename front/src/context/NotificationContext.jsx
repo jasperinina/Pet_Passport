@@ -1,4 +1,5 @@
-import { createContext, useCallback, useContext, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { NOTIFICATION_TYPES } from "../constants/config";
 
@@ -17,6 +18,28 @@ export const useNotification = () => {
 export const NotificationProvider = ({ children }) => {
   const [notification, setNotification] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
+  const closeTimerRef = useRef(null);
+  const clearTimerRef = useRef(null);
+
+  const clearNotificationTimers = useCallback(() => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    if (clearTimerRef.current) {
+      clearTimeout(clearTimerRef.current);
+      clearTimerRef.current = null;
+    }
+  }, []);
+
+  const closeNotification = useCallback(() => {
+    setIsVisible(false);
+    clearTimerRef.current = setTimeout(() => {
+      setNotification(null);
+      clearTimerRef.current = null;
+    }, 300);
+  }, []);
 
   const showNotification = useCallback(({
     message,
@@ -24,21 +47,24 @@ export const NotificationProvider = ({ children }) => {
     type = NOTIFICATION_TYPES.ERROR,
     autoCloseTime = 5000
   }) => {
+    clearNotificationTimers();
     setNotification({ message, title, type });
     setIsVisible(true);
 
     if (autoCloseTime > 0) {
-      setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(() => setNotification(null), 300);
+      closeTimerRef.current = setTimeout(() => {
+        closeTimerRef.current = null;
+        closeNotification();
       }, autoCloseTime);
     }
-  }, []);
+  }, [clearNotificationTimers, closeNotification]);
 
   const hideNotification = useCallback(() => {
-    setIsVisible(false);
-    setTimeout(() => setNotification(null), 300);
-  }, []);
+    clearNotificationTimers();
+    closeNotification();
+  }, [clearNotificationTimers, closeNotification]);
+
+  useEffect(() => clearNotificationTimers, [clearNotificationTimers]);
 
   const showError = useCallback((message, title = null, autoCloseTime = 5000) => {
     showNotification({ message, title, type: NOTIFICATION_TYPES.ERROR, autoCloseTime });

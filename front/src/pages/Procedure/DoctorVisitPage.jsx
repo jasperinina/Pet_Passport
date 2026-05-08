@@ -16,6 +16,7 @@ import { PERIOD_UNITS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
+import { logger } from "../../utils/logger";
 
 const DoctorVisitPage = () => {
   const { eventId } = useParams();
@@ -80,7 +81,7 @@ const DoctorVisitPage = () => {
         setReminderValue(visit.reminderValue ?? 5);
         setReminderUnit(visit.reminderUnit ?? PERIOD_UNITS.DAY);
       } catch (err) {
-        console.error("Ошибка загрузки приема:", err);
+        logger.error("Ошибка загрузки приема:", err);
 
         NotificationService.showError?.(
           err.message || "Не удалось загрузить данные о приеме. Попробуйте позже.",
@@ -127,7 +128,7 @@ const DoctorVisitPage = () => {
       
       setIsEditing(false);
     } catch (err) {
-      console.error("Ошибка сохранения приема:", err);
+      logger.error("Ошибка сохранения приема:", err);
 
       NotificationService.showError?.(
         err.message || "Не удалось сохранить изменения.",
@@ -175,7 +176,7 @@ const DoctorVisitPage = () => {
       await deleteDoctorVisit(parseInt(eventId, 10));
       navigate(-1);
     } catch (err) {
-      console.error("Ошибка удаления приема:", err);
+      logger.error("Ошибка удаления приема:", err);
 
       NotificationService.showError?.(
         err.message || "Не удалось удалить прием.",

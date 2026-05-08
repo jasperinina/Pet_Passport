@@ -12,6 +12,7 @@ import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../../constants/
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
+import { logger } from "../../utils/logger";
 
 const TreatmentPage = () => {
   const { eventId } = useParams();
@@ -66,7 +67,7 @@ const TreatmentPage = () => {
         setReminderValue(treatment.reminderValue ?? 5);
         setReminderUnit(treatment.reminderUnit ?? PERIOD_UNITS.DAY);
       } catch (err) {
-        console.error("Ошибка загрузки обработки:", err);
+        logger.error("Ошибка загрузки обработки:", err);
 
         NotificationService.showError?.(
           err.message || "Не удалось загрузить данные об обработке. Попробуйте позже.",
@@ -111,7 +112,7 @@ const TreatmentPage = () => {
       
       setIsEditing(false);
     } catch (err) {
-      console.error("Ошибка сохранения обработки:", err);
+      logger.error("Ошибка сохранения обработки:", err);
 
       NotificationService.showError?.(
         err.message || "Не удалось сохранить изменения.",
@@ -152,7 +153,7 @@ const TreatmentPage = () => {
       await deleteTreatment(parseInt(eventId, 10));
       navigate(-1);
     } catch (err) {
-      console.error("Ошибка удаления обработки:", err);
+      logger.error("Ошибка удаления обработки:", err);
 
       NotificationService.showError?.(
         err.message || "Не удалось удалить обработку.",

@@ -7,6 +7,7 @@ import API_BASE_URL from "../../../../api/config";
 import { ERROR_MESSAGES } from "../../../../constants/config";
 import NotificationService from "../../../../services/notificationService";
 import PetPhotoPicker from "../../PetPhotoPicker/PetPhotoPicker";
+import { logger } from "../../../../utils/logger";
 
 const EditPetModal = ({
   isOpen,
@@ -132,7 +133,7 @@ const EditPetModal = ({
         ERROR_MESSAGES.ERROR_TITLE
       );
 
-      console.error("Ошибка удаления фото:", err);
+      logger.error("Ошибка удаления фото:", err);
     } finally {
       setLoading(false);
     }
@@ -177,7 +178,7 @@ const EditPetModal = ({
             ERROR_MESSAGES.ERROR_TITLE
           );
 
-          console.error("Ошибка загрузки фото:", photoError);
+          logger.error("Ошибка загрузки фото:", photoError);
 
           setLoading(false);
           return;
@@ -218,7 +219,7 @@ const EditPetModal = ({
         ERROR_MESSAGES.ERROR_TITLE
       );
 
-      console.error("Ошибка обновления питомца:", err);
+      logger.error("Ошибка обновления питомца:", err);
     } finally {
       setLoading(false);
     }

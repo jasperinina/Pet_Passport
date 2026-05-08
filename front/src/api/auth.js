@@ -42,13 +42,10 @@ const getTelegramInitData = () => {
   try {
     const fromSdk = isTMA() ? (retrieveRawInitData() ?? null) : null;
     const fromNative = window.Telegram?.WebApp?.initData || null;
-    const result = fromSdk ?? fromNative;
-    console.log('[TG auth] isTMA:', isTMA(), '| sdk initData:', fromSdk?.slice(0, 40), '| native initData:', fromNative?.slice(0, 40));
-    return result;
+    return fromSdk ?? fromNative;
   } catch (e) {
-    const fromNative = window.Telegram?.WebApp?.initData || null;
-    console.log('[TG auth] error in isTMA/sdk, native initData:', fromNative?.slice(0, 40), e);
-    return fromNative;
+    void e;
+    return window.Telegram?.WebApp?.initData || null;
   }
 };
 

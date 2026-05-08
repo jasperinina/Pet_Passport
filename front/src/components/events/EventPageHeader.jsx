@@ -1,8 +1,5 @@
-import { useNavigate } from "react-router-dom";
-
 const EventPageHeader = ({
   title,
-  eventId,
   isEditing,
   onEdit,
   onSave,
@@ -10,8 +7,6 @@ const EventPageHeader = ({
   onTitleChange,
   loading = false,
 }) => {
-  const navigate = useNavigate();
-
   return (
     <div className="section__grid--first-child">
       {isEditing ? (

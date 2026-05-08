@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -61,11 +61,14 @@ const withoutMarkdownNode = ({ node, ...props }) => {
 };
 
 const PrivacyPolicy = () => {
+  const location = useLocation();
   const navigate = useNavigate();
 
   const gitHubUrl = import.meta.env.VITE_GITHUB_URL || "";
   const webUrl = "/";
   const privacyPolicyUrl = "/privacy-policy";
+  const source = new URLSearchParams(location.search).get("from");
+  const logoPath = source === "auth" ? "/" : "/landing";
 
   const { intro, sections } = parsePrivacyPolicySections(policyText);
 
@@ -135,6 +138,7 @@ const PrivacyPolicy = () => {
       <Header
         webUrl={webUrl}
         gitHubUrl={gitHubUrl}
+        logoPath={logoPath}
         privacyPolicyOpened
       />
       <header className={`${styles["privacy-policy__header"]} container`}>

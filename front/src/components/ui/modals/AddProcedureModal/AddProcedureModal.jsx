@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import {
   createDoctorVisit,
@@ -20,6 +20,90 @@ import { NOTIFICATION_TITLES } from "../../../../constants/config";
 
 const PROCEDURE_TYPES = EVENT_TYPES;
 
+const getDefaultDate = () => new Date().toISOString().split("T")[0];
+
+const getProcedureTypeByEventType = (eventType) => {
+  switch (eventType) {
+    case 2:
+      return PROCEDURE_TYPES.DOCTOR_VISIT;
+    case 0:
+      return PROCEDURE_TYPES.VACCINE;
+    case 1:
+      return PROCEDURE_TYPES.TREATMENT;
+    default:
+      return PROCEDURE_TYPES.DOCTOR_VISIT;
+  }
+};
+
+const getEventDateFields = (eventDate) => {
+  if (!eventDate) {
+    return {
+      eventDate: getDefaultDate(),
+      eventTime: "10:00",
+    };
+  }
+
+  const eventDateTime = new Date(eventDate);
+
+  if (Number.isNaN(eventDateTime.getTime())) {
+    return {
+      eventDate: getDefaultDate(),
+      eventTime: "10:00",
+    };
+  }
+
+  return {
+    eventDate: eventDateTime.toISOString().split("T")[0],
+    eventTime: eventDateTime.toTimeString().slice(0, 5),
+  };
+};
+
+const getInitialFormState = (event = null) => ({
+  procedureType: event
+    ? getProcedureTypeByEventType(event.eventType)
+    : PROCEDURE_TYPES.DOCTOR_VISIT,
+  title: event?.title || "",
+  ...getEventDateFields(event?.eventDate),
+  reminderEnabled: event?.reminderEnabled ?? false,
+  reminderValue: event?.reminderValue ?? 5,
+  reminderUnit: event?.reminderUnit ?? PERIOD_UNITS.DAY,
+  clinic: event?.clinic ?? "",
+  doctor: event?.doctor ?? "",
+  diagnosis: event?.diagnosis ?? "",
+  recommendations: event?.recommendations ?? "",
+  referrals: event?.referrals ?? "",
+  medicine: event?.medicine ?? "",
+  periodUnit: event?.periodUnit ?? PERIOD_UNITS.MONTH,
+  remedy: event?.remedy ?? "",
+  parasite: event?.parasite ?? "",
+});
+
+const formReducer = (state, action) => {
+  switch (action.type) {
+    case "reset":
+      return action.payload;
+    case "field":
+      return {
+        ...state,
+        [action.name]: action.value,
+      };
+    case "procedureType":
+      return {
+        ...state,
+        procedureType: action.value,
+        title: "",
+      };
+    case "reminderOption":
+      return {
+        ...state,
+        reminderValue: action.value,
+        reminderUnit: action.unit,
+      };
+    default:
+      return state;
+  }
+};
+
 const AddProcedureModal = ({
   isOpen,
   onClose,
@@ -28,122 +112,22 @@ const AddProcedureModal = ({
   onSuccess,
   event = null
 }) => {
-  const [procedureType, setProcedureType] = useState("");
+  const [form, dispatch] = useReducer(formReducer, null, () =>
+    getInitialFormState(event)
+  );
   const [loading, setLoading] = useState(false);
-
-  // Общие поля
-  const [title, setTitle] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [eventTime, setEventTime] = useState("10:00");
-  const [reminderEnabled, setReminderEnabled] = useState(false);
-  const [reminderValue, setReminderValue] = useState(5);
-  const [reminderUnit, setReminderUnit] = useState(PERIOD_UNITS.DAY);
-
-  // Поля для посещения врача
-  const [clinic, setClinic] = useState("");
-  const [doctor, setDoctor] = useState("");
-  const [diagnosis, setDiagnosis] = useState("");
-  const [recommendations, setRecommendations] = useState("");
-  const [referrals, setReferrals] = useState("");
-
-  // Поля для вакцинации
-  const [medicine, setMedicine] = useState("");
-  const [periodUnit, setPeriodUnit] = useState(PERIOD_UNITS.MONTH);
-
-  // Поля для обработки
-  const [remedy, setRemedy] = useState("");
-  const [parasite, setParasite] = useState("");
 
   // Сброс формы при открытии
   useEffect(() => {
     if (!isOpen) return;
 
-    if (event) {
-      switch (event.eventType) {
-        case 2:
-          setProcedureType(PROCEDURE_TYPES.DOCTOR_VISIT);
-          break;
-        case 0:
-          setProcedureType(PROCEDURE_TYPES.VACCINE);
-          break;
-        case 1:
-          setProcedureType(PROCEDURE_TYPES.TREATMENT);
-          break;
-      }
-
-      setTitle(event.title || "");
-
-      let dateStr;
-      let timeStr;
-      if (event.eventDate) {
-        const eventDateTime = new Date(event.eventDate);
-        if (!isNaN(eventDateTime.getTime())) {
-          dateStr = eventDateTime.toISOString().split("T")[0];
-          timeStr = eventDateTime.toTimeString().slice(0, 5);
-        } else {
-          const now = new Date();
-          dateStr = now.toISOString().split("T")[0];
-          timeStr = "10:00";
-        }
-      }
-      
-      setEventDate(dateStr);
-      setEventTime(timeStr);
-
-      setReminderEnabled(event.reminderEnabled ??false);
-      setReminderValue(event.reminderValue ?? 5);
-      setReminderUnit(event.reminderUnit ?? PERIOD_UNITS.DAY);
-
-      switch (event.eventType) {
-        case 2:
-          setClinic(event.clinic ?? "");
-          setDoctor(event.doctor ?? "");
-          setDiagnosis(event.diagnosis ?? "");
-          setRecommendations(event.recommendations ?? "");
-          setReferrals(event.referrals ?? "");
-          break;
-        case 0:
-          setMedicine(event.medicine ?? "");
-          setPeriodUnit(event.periodUnit ?? PERIOD_UNITS.MONTH);
-          break;
-        case 1:
-          setRemedy(event.remedy ?? "");
-          setParasite(event.parasite ?? "");
-          setPeriodUnit(event.periodUnit ?? PERIOD_UNITS.MONTH);
-          break;
-        default:
-          break;
-      }
-    } else {
-      const now = new Date();
-      const dateStr = now.toISOString().split("T")[0];
-
-      setProcedureType(PROCEDURE_TYPES.DOCTOR_VISIT);
+    queueMicrotask(() => {
+      dispatch({
+        type: "reset",
+        payload: getInitialFormState(event),
+      });
       setLoading(false);
-
-      // Общие
-      setTitle("");
-      setEventDate(dateStr);
-      setEventTime("10:00");
-      setReminderEnabled(false);
-      setReminderValue(5);
-      setReminderUnit(PERIOD_UNITS.DAY);
-
-      // Доктор
-      setClinic("");
-      setDoctor("");
-      setDiagnosis("");
-      setRecommendations("");
-      setReferrals("");
-
-      // Вакцина
-      setMedicine("");
-      setPeriodUnit(PERIOD_UNITS.MONTH);
-
-      // Обработка
-      setRemedy("");
-      setParasite("");
-    }
+    });
   }, [isOpen, event]);
 
   // Блокируем скролл body, пока модалка открыта
@@ -181,12 +165,12 @@ const AddProcedureModal = ({
   };
 
   const getDefaultTitle = () => {
-    switch (procedureType) {
-      case PROCEDURE_TYPES.DOCTOR_VISIT || 2:
+    switch (form.procedureType) {
+      case PROCEDURE_TYPES.DOCTOR_VISIT:
         return "Посещение врача";
-      case PROCEDURE_TYPES.VACCINE || 0:
+      case PROCEDURE_TYPES.VACCINE:
         return "Вакцинация";
-      case PROCEDURE_TYPES.TREATMENT || 1:
+      case PROCEDURE_TYPES.TREATMENT:
         return "Обработка";
       default:
         return "Процедура";
@@ -194,8 +178,11 @@ const AddProcedureModal = ({
   };
 
   const handleReminderOptionClick = (value, unit) => {
-    setReminderValue(value);
-    setReminderUnit(unit);
+    dispatch({ type: "reminderOption", value, unit });
+  };
+
+  const setField = (name) => (value) => {
+    dispatch({ type: "field", name, value });
   };
 
   const handleSubmit = async (e) => {
@@ -203,63 +190,63 @@ const AddProcedureModal = ({
     setLoading(true);
 
     try {
-      const eventDateTime = new Date(`${eventDate}T${eventTime}`);
+      const eventDateTime = new Date(`${form.eventDate}T${form.eventTime}`);
       const eventDateISO = eventDateTime.toISOString();
 
       const baseData = {
         petId: parseInt(petId, 10),
-        title: title || getDefaultTitle(),
+        title: form.title || getDefaultTitle(),
         eventDate: eventDateISO,
-        reminderEnabled,
-        reminderValue: reminderEnabled ? reminderValue : 0,
-        reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.DAY,
+        reminderEnabled: form.reminderEnabled,
+        reminderValue: form.reminderEnabled ? form.reminderValue : 0,
+        reminderUnit: form.reminderEnabled ? form.reminderUnit : PERIOD_UNITS.DAY,
       };
 
       let result;
 
-      switch (procedureType) {
+      switch (form.procedureType) {
         case PROCEDURE_TYPES.DOCTOR_VISIT: {
           result = await createDoctorVisit({
             ...baseData,
-            clinic: clinic || null,
-            doctor: doctor || null,
-            diagnosis: diagnosis || null,
-            recommendations: recommendations || null,
-            referrals: referrals || null,
+            clinic: form.clinic || null,
+            doctor: form.doctor || null,
+            diagnosis: form.diagnosis || null,
+            recommendations: form.recommendations || null,
+            referrals: form.referrals || null,
           });
           break;
         }
 
         case PROCEDURE_TYPES.VACCINE: {
-          const vaccinePeriodValue = periodUnit !== null ? 1 : null;
+          const vaccinePeriodValue = form.periodUnit !== null ? 1 : null;
           const nextVaccinationDate =
-            vaccinePeriodValue && periodUnit !== null
-              ? calculateNextDate(eventDateTime, vaccinePeriodValue, periodUnit)
+            vaccinePeriodValue && form.periodUnit !== null
+              ? calculateNextDate(eventDateTime, vaccinePeriodValue, form.periodUnit)
               : null;
 
           result = await createVaccine({
             ...baseData,
-            medicine: medicine || null,
+            medicine: form.medicine || null,
             periodValue: vaccinePeriodValue,
-            periodUnit: periodUnit !== null ? periodUnit : null,
+            periodUnit: form.periodUnit !== null ? form.periodUnit : null,
             nextVaccinationDate: nextVaccinationDate?.toISOString() || null,
           });
           break;
         }
 
         case PROCEDURE_TYPES.TREATMENT: {
-          const treatmentPeriodValue = periodUnit !== null ? 1 : null;
+          const treatmentPeriodValue = form.periodUnit !== null ? 1 : null;
           const nextTreatmentDate =
-            treatmentPeriodValue && periodUnit !== null
-              ? calculateNextDate(eventDateTime, treatmentPeriodValue, periodUnit)
+            treatmentPeriodValue && form.periodUnit !== null
+              ? calculateNextDate(eventDateTime, treatmentPeriodValue, form.periodUnit)
               : null;
 
           result = await createTreatment({
             ...baseData,
-            remedy: remedy || null,
-            parasite: parasite || null,
+            remedy: form.remedy || null,
+            parasite: form.parasite || null,
             periodValue: treatmentPeriodValue,
-            periodUnit: periodUnit !== null ? periodUnit : null,
+            periodUnit: form.periodUnit !== null ? form.periodUnit : null,
             nextTreatmentDate: nextTreatmentDate?.toISOString() || null,
           });
           break;
@@ -274,8 +261,7 @@ const AddProcedureModal = ({
 
       if (onSuccess) onSuccess(result);
       onClose();
-    } catch (err) {
-      console.log(err);
+    } catch {
       notifyError(`При создании процедуры произошла ошибка`);
     } finally {
       setLoading(false);
@@ -314,10 +300,9 @@ const AddProcedureModal = ({
                   className="select__field"
                   id="add-procedure-type-select"
                   name="add-procedure-type-select"
-                  value={procedureType}
+                  value={form.procedureType}
                   onChange={(e) => {
-                    setProcedureType(e.target.value);
-                    setTitle("");
+                    dispatch({ type: "procedureType", value: e.target.value });
                   }}
                   disabled={loading}
                 >
@@ -327,58 +312,58 @@ const AddProcedureModal = ({
                 </select>
               </div>
             </li>
-            {procedureType === PROCEDURE_TYPES.DOCTOR_VISIT && (
+            {form.procedureType === PROCEDURE_TYPES.DOCTOR_VISIT && (
               <DoctorVisitFields
                 loading={loading}
-                title={title}
-                setTitle={setTitle}
-                eventDate={eventDate}
-                setEventDate={setEventDate}
-                eventTime={eventTime}
-                setEventTime={setEventTime}
-                clinic={clinic}
-                setClinic={setClinic}
-                doctor={doctor}
-                setDoctor={setDoctor}
-                diagnosis={diagnosis}
-                setDiagnosis={setDiagnosis}
-                recommendations={recommendations}
-                setRecommendations={setRecommendations}
-                referrals={referrals}
-                setReferrals={setReferrals}
+                title={form.title}
+                setTitle={setField("title")}
+                eventDate={form.eventDate}
+                setEventDate={setField("eventDate")}
+                eventTime={form.eventTime}
+                setEventTime={setField("eventTime")}
+                clinic={form.clinic}
+                setClinic={setField("clinic")}
+                doctor={form.doctor}
+                setDoctor={setField("doctor")}
+                diagnosis={form.diagnosis}
+                setDiagnosis={setField("diagnosis")}
+                recommendations={form.recommendations}
+                setRecommendations={setField("recommendations")}
+                referrals={form.referrals}
+                setReferrals={setField("referrals")}
               />
             )}
-            {procedureType === PROCEDURE_TYPES.VACCINE && (
+            {form.procedureType === PROCEDURE_TYPES.VACCINE && (
               <VaccineFields
                 loading={loading}
-                title={title}
-                setTitle={setTitle}
-                medicine={medicine}
-                setMedicine={setMedicine}
-                eventDate={eventDate}
-                setEventDate={setEventDate}
-                eventTime={eventTime}
-                setEventTime={setEventTime}
-                periodUnit={periodUnit}
-                setPeriodUnit={setPeriodUnit}
+                title={form.title}
+                setTitle={setField("title")}
+                medicine={form.medicine}
+                setMedicine={setField("medicine")}
+                eventDate={form.eventDate}
+                setEventDate={setField("eventDate")}
+                eventTime={form.eventTime}
+                setEventTime={setField("eventTime")}
+                periodUnit={form.periodUnit}
+                setPeriodUnit={setField("periodUnit")}
                 periodOptions={PERIOD_OPTIONS}
               />
             )}
-            {procedureType === PROCEDURE_TYPES.TREATMENT && (
+            {form.procedureType === PROCEDURE_TYPES.TREATMENT && (
               <TreatmentFields
                 loading={loading}
-                title={title}
-                setTitle={setTitle}
-                remedy={remedy}
-                setRemedy={setRemedy}
-                parasite={parasite}
-                setParasite={setParasite}
-                eventDate={eventDate}
-                setEventDate={setEventDate}
-                eventTime={eventTime}
-                setEventTime={setEventTime}
-                periodUnit={periodUnit}
-                setPeriodUnit={setPeriodUnit}
+                title={form.title}
+                setTitle={setField("title")}
+                remedy={form.remedy}
+                setRemedy={setField("remedy")}
+                parasite={form.parasite}
+                setParasite={setField("parasite")}
+                eventDate={form.eventDate}
+                setEventDate={setField("eventDate")}
+                eventTime={form.eventTime}
+                setEventTime={setField("eventTime")}
+                periodUnit={form.periodUnit}
+                setPeriodUnit={setField("periodUnit")}
                 periodOptions={PERIOD_OPTIONS}
               />
             )}
@@ -395,13 +380,19 @@ const AddProcedureModal = ({
                   id="add-procedure-telegram-notification-input"
                   name="add-procedure-telegram-notification-input"
                   type="checkbox"
-                  checked={reminderEnabled}
-                  onChange={(e) => setReminderEnabled(e.target.checked)}
+                  checked={form.reminderEnabled}
+                  onChange={(e) =>
+                    dispatch({
+                      type: "field",
+                      name: "reminderEnabled",
+                      value: e.target.checked,
+                    })
+                  }
                   disabled={loading}
                 />
               </div>
             </li>
-            {reminderEnabled && (
+            {form.reminderEnabled && (
               <li className="form__item form__item--row">
                 <label
                   className="form__item-label h3 toggle__label"
@@ -414,8 +405,8 @@ const AddProcedureModal = ({
                     <li className="toggle__item" key={`${option.value}-${option.unit}`}>
                       <button
                         className={`toggle__button ${
-                          reminderValue === option.value && 
-                          reminderUnit === option.unit 
+                          form.reminderValue === option.value && 
+                          form.reminderUnit === option.unit 
                             ? "toggle__button--active" 
                             : ""
                         }`}

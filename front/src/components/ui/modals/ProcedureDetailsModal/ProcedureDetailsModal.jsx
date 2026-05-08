@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 import CrossIcon from "../assets/icons/icon-cross.svg";
 
 const getTypeLabel = (type) => {
@@ -17,8 +15,6 @@ const getTypeLabel = (type) => {
 
 const ProcedureDetailsModal = ({ isOpen, onClose, event }) => {
   if (!isOpen) return null;
-
-  console.log("test");
 
   const handleClose = () => {
     if (onClose) onClose();

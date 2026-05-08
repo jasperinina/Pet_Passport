@@ -11,6 +11,7 @@ import { PERIOD_UNITS, PERIOD_OPTIONS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
+import { logger } from "../../utils/logger";
 
 const VaccinePage = () => {
   const { eventId } = useParams();
@@ -63,7 +64,7 @@ const VaccinePage = () => {
         setReminderValue(vaccine.reminderValue ?? 5);
         setReminderUnit(vaccine.reminderUnit ?? PERIOD_UNITS.DAY);
       } catch (err) {
-        console.error("Ошибка загрузки вакцинации:", err);
+        logger.error("Ошибка загрузки вакцинации:", err);
 
         NotificationService.showError?.(
           err.message || "Не удалось загрузить данные о вакцинации. Попробуйте позже.",
@@ -107,7 +108,7 @@ const VaccinePage = () => {
       
       setIsEditing(false);
     } catch (err) {
-      console.error("Ошибка сохранения вакцинации:", err);
+      logger.error("Ошибка сохранения вакцинации:", err);
 
       NotificationService.showError?.(
         err.message || "Не удалось сохранить изменения.",
@@ -148,7 +149,7 @@ const VaccinePage = () => {
       await deleteVaccine(parseInt(eventId, 10));
       navigate(-1);
     } catch (err) {
-      console.error("Ошибка удаления вакцинации:", err);
+      logger.error("Ошибка удаления вакцинации:", err);
 
       NotificationService.showError?.(
         err.message || "Не удалось удалить вакцинацию.",

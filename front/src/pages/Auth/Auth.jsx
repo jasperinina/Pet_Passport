@@ -28,6 +28,43 @@ import { loginOwner, registerOwner } from "../../api/auth";
 import { notifyError, notifySuccess } from "../../services/notificationService";
 import PrivacyPolicyCheckbox from "../../components/privacy_policy_checkbox/PrivacyPolicyCheckbox";
 
+const AUTH_DRAFT_STORAGE_KEY = "auth-form-draft";
+const AUTH_POLICY_STORAGE_KEY = "auth-form-policy";
+
+const getInitialAuthDraft = () => {
+  const fallbackDraft = {
+    isFirstScreenOpen: true,
+    isSignUpOpen: false,
+    signInData: {
+      login: "",
+      password: "",
+    },
+    signUpData: {
+      login: "",
+      password: "",
+    },
+  };
+
+  try {
+    const savedDraft = JSON.parse(sessionStorage.getItem(AUTH_DRAFT_STORAGE_KEY));
+
+    return {
+      ...fallbackDraft,
+      ...(savedDraft || {}),
+      signInData: {
+        ...fallbackDraft.signInData,
+        login: savedDraft?.signInData?.login || "",
+      },
+      signUpData: {
+        ...fallbackDraft.signUpData,
+        login: savedDraft?.signUpData?.login || "",
+      },
+    };
+  } catch {
+    return fallbackDraft;
+  }
+};
+
 const petIconRows = [
   [
     FishIcon,
@@ -109,22 +146,17 @@ const petIconRows = [
 
 const Auth = () => {
   const navigate = useNavigate();
-  const privacyPolicyUrl = "/privacy-policy";
+  const privacyPolicyUrl = "/privacy-policy?from=auth";
+  const [initialDraft] = useState(getInitialAuthDraft);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [isFirstScreenOpen, setIsFirstScreenOpen] = useState(true);
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const [isFirstScreenOpen, setIsFirstScreenOpen] = useState(initialDraft.isFirstScreenOpen);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(initialDraft.isSignUpOpen);
 
-  const [signInData, setSignInData] = useState({
-    login: "",
-    password: "",
-  });
-  const [signUpData, setSignUpData] = useState({
-    login: "",
-    password: "",
-  });
+  const [signInData, setSignInData] = useState(initialDraft.signInData);
+  const [signUpData, setSignUpData] = useState(initialDraft.signUpData);
 
   useEffect(() => {
     document.documentElement.classList.add("auth-page");
@@ -134,16 +166,27 @@ const Auth = () => {
     };
   }, []);
 
+  useEffect(() => {
+    sessionStorage.setItem(
+      AUTH_DRAFT_STORAGE_KEY,
+      JSON.stringify({
+        isFirstScreenOpen,
+        isSignUpOpen,
+        signInData: {
+          login: signInData.login,
+        },
+        signUpData: {
+          login: signUpData.login,
+        },
+      })
+    );
+  }, [isFirstScreenOpen, isSignUpOpen, signInData.login, signUpData.login]);
+
   const handleFirstScreenClose = (isSignUp) => {
     setIsFirstScreenOpen(false);
     if (isSignUp) {
       setIsSignUpOpen(true);
     }
-  };
-
-  const handleModeChange = (isSignUp) => {
-    setError("");
-    setIsSignUpOpen(isSignUp);
   };
 
   const handleChange = (setter) => (event) => {
@@ -177,6 +220,8 @@ const Auth = () => {
         login: data.login.trim(),
         password: data.password,
       });
+      sessionStorage.removeItem(AUTH_DRAFT_STORAGE_KEY);
+      sessionStorage.removeItem(AUTH_POLICY_STORAGE_KEY);
       notifySuccess(successMessage);
       navigate("/pets", { replace: true });
     } catch (err) {
@@ -360,6 +405,7 @@ const Auth = () => {
               <PrivacyPolicyCheckbox
                 url={privacyPolicyUrl}
                 loading={loading}
+                storageKey={AUTH_POLICY_STORAGE_KEY}
               />
               <button
                 className={`${styles["auth__form-button"]} button button--filled`}

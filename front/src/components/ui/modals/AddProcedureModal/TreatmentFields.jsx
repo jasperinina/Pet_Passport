@@ -19,14 +19,6 @@ const TreatmentFields = ({
   const dateRef = useRef(null);
   const timeRef = useRef(null);
 
-  const openPicker = (ref) => {
-    const el = ref.current;
-    if (!el) return;
-    el.focus();
-    el.showPicker?.(); // Chrome/Edge
-    el.click();        // fallback
-  };
-
   return (
     <ul className="form__list">
       <li className="form__item">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
@@ -9,10 +9,9 @@ import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddP
 import PlusIcon from "../../assets/icons/plus.svg?react";
 
 import { getEvents } from "../../api/events";
-import NotificationService from "../../services/notificationService";
-import { ERROR_MESSAGES } from "../../constants/config";
 import { EVENT_STATUSES } from "../../constants/eventConstants";
 import MobileButton from "../../components/mobile_button/MobileButton";
+import { useProceduresLoader } from "../../hooks/useProceduresLoader";
 
 const UpcomingProcedures = () => {
   const navigate = useNavigate();
@@ -21,42 +20,16 @@ const UpcomingProcedures = () => {
   const urlParams = new URLSearchParams(location.search);
   const petId = urlParams.get("id") || urlParams.get("Id");
 
-  const [procedures, setProcedures] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (petId) {
-      setLoading(true);
-      getEvents(parseInt(petId, 10), [EVENT_STATUSES.UPCOMING])
-        .then((events) => {
-          setProcedures(events);
-        })
-        .catch((err) => {
-          setProcedures([]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.PET.NO_ID,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    }
-  }, [petId]);
-
-  const handleProcedureAdded = () => {
-    if (petId) {
-      getEvents(parseInt(petId, 10), [EVENT_STATUSES.UPCOMING])
-        .then((events) => {
-          setProcedures(events);
-        })
-        .catch((err) => {
-          console.error("Ошибка загрузки процедур:", err);
-        });
-    }
-  };
+  const loadUpcomingProcedures = useCallback(
+    (currentPetId) => getEvents(currentPetId, [EVENT_STATUSES.UPCOMING]),
+    []
+  );
+  const { procedures, loading, reload } = useProceduresLoader({
+    petId,
+    load: loadUpcomingProcedures,
+    noPetError: true,
+  });
 
   if (loading) {
     return (
@@ -113,7 +86,7 @@ const UpcomingProcedures = () => {
             onClose={onClose}
             isClosing={isClosing}
             petId={petId ? parseInt(petId, 10) : null}
-            onSuccess={handleProcedureAdded}
+            onSuccess={reload}
           />
         )}
       </ModalOverlay>

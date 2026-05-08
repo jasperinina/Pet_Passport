@@ -22,45 +22,23 @@ import InstructionImage from "../../assets/images/landing/instruction-image.png"
 import FeatureCard from "../../components/landing/feature_card/FeatureCard";
 import FeedbackForm from "../../components/landing/feedback_form/FeedbackForm";
 import Footer from "../../components/landing/footer/Footer";
-
-const YANDEX_METRIKA_COUNTER_ID = 109026665;
-const YANDEX_METRIKA_SCRIPT_ID = "yandex-metrika-counter";
-const YANDEX_METRIKA_NOSCRIPT_ID = "yandex-metrika-noscript";
+import {
+  useYandexMetrika,
+  YANDEX_METRIKA_NOSCRIPT_ID,
+  YANDEX_METRIKA_WATCH_URL,
+} from "../../hooks/useYandexMetrika";
 
 const Landing = () => {
   const tgBotUrl = import.meta.env.VITE_TG_BOT_URL || "";
   const gitHubUrl = import.meta.env.VITE_GITHUB_URL || "";
   const webUrl = "/";
-  const privacyPolicyUrl = "/privacy-policy";
+  const privacyPolicyUrl = "/privacy-policy?from=landing";
 
   const [errorReportSelected, setErrorReportSelected] = useState(true);
 
   const location = useLocation();
 
-  useEffect(() => {
-    if (!document.getElementById(YANDEX_METRIKA_SCRIPT_ID)) {
-      const script = document.createElement("script");
-
-      script.id = YANDEX_METRIKA_SCRIPT_ID;
-      script.type = "text/javascript";
-      script.textContent = `
-        (function(m,e,t,r,i,k,a){
-          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-          m[i].l=1*new Date();
-          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_COUNTER_ID}', 'ym');
-
-        ym(${YANDEX_METRIKA_COUNTER_ID}, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-      `;
-
-      document.head.insertBefore(script, document.head.firstChild);
-    }
-
-    return () => {
-      document.getElementById(YANDEX_METRIKA_SCRIPT_ID)?.remove();
-    };
-  }, []);
+  useYandexMetrika();
 
   useEffect(() => {
     if (location.hash) {
@@ -79,7 +57,7 @@ const Landing = () => {
       <noscript id={YANDEX_METRIKA_NOSCRIPT_ID}>
         <div>
           <img
-            src={`https://mc.yandex.ru/watch/${YANDEX_METRIKA_COUNTER_ID}`}
+            src={YANDEX_METRIKA_WATCH_URL}
             style={{ position: "absolute", left: "-9999px" }}
             alt=""
           />

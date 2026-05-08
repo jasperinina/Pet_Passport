@@ -18,14 +18,29 @@ const ProcedureCard = ({
 }) => {
   const dateText = fullDate || date || "";
   const timeText = time || "";
+  const dateTimeValue = unformattedDateTime?.split("T")[0];
 
   const bellIcon = reminderEnabled ? BellOnIcon : BellOffIcon;
   const bellAlt = reminderEnabled
     ? "Напоминание включено"
     : "Напоминание выключено";
+  const handleKeyDown = (event) => {
+    if (!onClick) return;
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick();
+    }
+  };
   
   return (
-    <article className={styles["procedure-card"]} onClick={onClick}>
+    <article
+      className={styles["procedure-card"]}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+    >
       <header className={`${styles["procedure-card__header"]} ${isNotificationImageHidden ? styles["procedure-card__header--rows"] : ""}`}>
         <img
           className=
@@ -44,8 +59,8 @@ const ProcedureCard = ({
                 alt=""
               />
               <div className={styles["procedure-card__date-text"]}>
-                {dateText && (
-                  <time dateTime={unformattedDateTime.split('T')[0]}>{dateText}</time>
+                {dateText && dateTimeValue && (
+                  <time dateTime={dateTimeValue}>{dateText}</time>
                 )}
               </div>
             </div>

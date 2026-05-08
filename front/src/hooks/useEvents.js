@@ -23,7 +23,7 @@ export const useUpcomingEvents = (petId, limit = null) => {
   }, [petId, limit]);
 
   useEffect(() => {
-    loadEvents();
+    queueMicrotask(loadEvents);
   }, [loadEvents]);
 
   return { events, loading, error, reload: loadEvents };
@@ -51,9 +51,8 @@ export const usePastEvents = (petId) => {
   }, [petId]);
 
   useEffect(() => {
-    loadEvents();
+    queueMicrotask(loadEvents);
   }, [loadEvents]);
 
   return { events, loading, error, reload: loadEvents };
 };
-

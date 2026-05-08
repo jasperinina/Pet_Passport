@@ -311,12 +311,12 @@ export async function getEventTemplates() {
     }
 
     return await apiClient.get('/api/event-templates');
-  } catch (error) {
-    console.error(error);
+  } catch {
+    notifyError(ERROR_MESSAGES.GLOBAL.DEFAULT);
+    return [];
   }
 }
 
-// TODO: Блок catch
 // ========== Events Lists ==========
 export async function getEvents(petId, statuses) {
   try {
@@ -341,8 +341,9 @@ export async function getEvents(petId, statuses) {
     }
 
     return response;
-  } catch (error) {
-    console.error(error);
+  } catch {
+    notifyError(ERROR_MESSAGES.GLOBAL.DEFAULT);
+    return [];
   }
 }
 
@@ -361,7 +362,8 @@ export async function updateEventStatus(eventId, newStatus) {
     notifySuccess(SUCCESS_MESSAGES.EVENT.UPDATED);
 
     return response;
-  } catch (error) {
-    console.error(error);
+  } catch {
+    notifyError(ERROR_MESSAGES.GLOBAL.DEFAULT);
+    return null;
   }
 }

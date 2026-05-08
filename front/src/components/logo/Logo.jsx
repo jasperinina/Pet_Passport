@@ -1,6 +1,6 @@
 import styles from "./Logo.module.scss";
 
-const Logo = ({ light = false, mobile = false, path = "/pets" }) => {
+const Logo = ({ light = false, path = "/pets" }) => {
   const color = light ? styles["logo--light"] : "";
 
   return (

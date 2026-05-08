@@ -3,9 +3,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import LoadingState from "../../components/events/LoadingState/LoadingState";
-import { getCurrentUserPet, getStoredOwnerId, hasStoredAuth, isUnauthorizedError, loginTelegramOwner } from "../../api/auth";
+import { getStoredOwnerId, hasStoredAuth, isUnauthorizedError, loginTelegramOwner } from "../../api/auth";
 import Auth from "../Auth/Auth";
 import Home from "../Home/Home";
+import { logger } from "../../utils/logger";
 
 const hasTelegramContext = () => {
   try {
@@ -83,7 +84,7 @@ const RootPetGate = () => {
         }
 
         if (!isUnauthorizedError(error)) {
-          console.error("Ошибка проверки авторизации:", error);
+          logger.error("Ошибка проверки авторизации:", error);
         }
 
         setStatus("auth-required");

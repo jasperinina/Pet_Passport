@@ -1,17 +1,10 @@
 import styles from "./NotificationBanner.module.scss";
 
-import { useEffect, useState } from "react";
-
 import CrossButton from "../cross_button/CrossButton";
 import { useNotification } from "../../context/NotificationContext";
-import { NOTIFICATION_TYPES } from "../../constants/config";
 
 const NotificationBanner = () => {
   const { notification, isVisible, hideNotification } = useNotification();
-
-  useEffect(() => {
-    if (!notification || !isVisible) return;
-  }, [notification, isVisible]);
 
   if (!notification || !isVisible) return null;
 

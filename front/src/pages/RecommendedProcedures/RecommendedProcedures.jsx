@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Procedures from "../../components/ui/Procedures/Procedures";
@@ -7,8 +7,7 @@ import LoadingState from "../../components/events/LoadingState/LoadingState";
 import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 
 import { getEventTemplates } from "../../api/events";
-import NotificationService from "../../services/notificationService";
-import { ERROR_MESSAGES } from "../../constants/config";
+import { useProceduresLoader } from "../../hooks/useProceduresLoader";
 
 const RecommendedProcedures = () => {
   const navigate = useNavigate();
@@ -17,43 +16,14 @@ const RecommendedProcedures = () => {
   const urlParams = new URLSearchParams(location.search);
   const petId = urlParams.get("id") || urlParams.get("Id");
 
-  const [procedures, setProcedures] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
-
-  useEffect(() => {
-    if (petId) {
-      setLoading(true);
-      getEventTemplates()
-        .then((events) => {
-          setProcedures(events);
-        })
-        .catch((err) => {
-          setProcedures([]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      NotificationService.showError?.(
-        ERROR_MESSAGES.PET.NO_ID,
-        ERROR_MESSAGES.ERROR_TITLE
-      );
-    }
-  }, [petId]);
-
-  const handleProcedureAdded = () => {
-    if (petId) {
-      getEventTemplates()
-        .then((events) => {
-          setProcedures(events);
-        })
-        .catch((err) => {
-          console.error("Ошибка загрузки процедур:", err);
-        });
-    }
-  };
+  const loadRecommendedProcedures = useCallback(() => getEventTemplates(), []);
+  const { procedures, loading, reload } = useProceduresLoader({
+    petId,
+    load: loadRecommendedProcedures,
+    noPetError: true,
+  });
 
   const handleRecommendationClick = (event) => {
     setEditingEvent(event);
@@ -96,7 +66,7 @@ const RecommendedProcedures = () => {
             onClose={onClose}
             isClosing={isClosing}
             petId={petId ? parseInt(petId, 10) : null}
-            onSuccess={handleProcedureAdded}
+            onSuccess={reload}
             event={editingEvent}
           />
         )}

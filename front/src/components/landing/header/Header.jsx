@@ -2,7 +2,12 @@ import styles from "./Header.module.scss";
 
 import Menu from "../menu/Menu";
 
-const Header = ({ webUrl, gitHubUrl, privacyPolicyOpened = false }) => {
+const Header = ({
+  webUrl,
+  gitHubUrl,
+  privacyPolicyOpened = false,
+  logoPath = "/landing",
+}) => {
   const menuItems = [
     { text: "Проблема", link: "#problems" },
     { text: "Функции", link: "#features" },
@@ -16,7 +21,10 @@ const Header = ({ webUrl, gitHubUrl, privacyPolicyOpened = false }) => {
   return (
     <header className={styles.header}>
       <div className={`${styles.header__inner} container`}>
-        <Menu items={modifiedItems} />
+        <Menu
+          items={modifiedItems}
+          logoPath={logoPath}
+        />
         <div className={styles.header__actions}>
           <a
             className={`${styles.header__action} button button--outlined`}

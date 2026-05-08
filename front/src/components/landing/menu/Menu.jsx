@@ -2,10 +2,10 @@ import styles from "./Menu.module.scss";
 
 import Logo from "../../logo/Logo";
 
-const Menu = ({ items }) => {
+const Menu = ({ items, logoPath = "/landing" }) => {
   return (
     <nav className={styles.menu}>
-      <Logo path="/landing" />
+      <Logo path={logoPath} />
       <ul className={styles.menu__list}>
         {items.map((item, index) => (
           <li

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import styles from "./FeedbackForm.module.scss";
 
@@ -9,6 +9,21 @@ import { notifyError, notifySuccess } from "../../../services/notificationServic
 
 import { ERROR_MESSAGES, FILE_UPLOAD } from "../../../constants/config";
 import PrivacyPolicyCheckbox from "../../privacy_policy_checkbox/PrivacyPolicyCheckbox";
+
+const getInitialValues = (fieldNames, storageKey) => {
+  const fallbackValues = Object.fromEntries(fieldNames.map((name) => [name, ""]));
+
+  try {
+    const savedValues = JSON.parse(sessionStorage.getItem(storageKey));
+
+    return {
+      ...fallbackValues,
+      ...(savedValues || {}),
+    };
+  } catch {
+    return fallbackValues;
+  }
+};
 
 const FeedbackForm = ({
   type,
@@ -21,16 +36,19 @@ const FeedbackForm = ({
   privacyPolicyUrl,
   allowScreenshot = false
 }) => {
+  const draftStorageKey = `feedback-form-draft:${type}`;
+  const policyStorageKey = `feedback-form-policy:${type}`;
   const [loading, setLoading] = useState(false);
 
-  const [values, setValues] = useState(
-    Object.fromEntries(fieldNames.map((name) => [name, ""]))
-  );
+  const [values, setValues] = useState(() => getInitialValues(fieldNames, draftStorageKey));
 
   const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
+  const [policyResetIndex, setPolicyResetIndex] = useState(0);
 
-  const [acceptedPolicy, setAcceptedPolicy] = useState(false);
+  useEffect(() => {
+    sessionStorage.setItem(draftStorageKey, JSON.stringify(values));
+  }, [draftStorageKey, values]);
 
   const handleChange = (name, value) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -75,7 +93,9 @@ const FeedbackForm = ({
 
       setValues(Object.fromEntries(fieldNames.map((name) => [name, ""])));
       setSelectedFile(null);
-      setAcceptedPolicy(false);
+      sessionStorage.removeItem(draftStorageKey);
+      sessionStorage.removeItem(policyStorageKey);
+      setPolicyResetIndex((currentIndex) => currentIndex + 1);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -178,8 +198,10 @@ const FeedbackForm = ({
           )}
         </div>
         <PrivacyPolicyCheckbox
+          key={policyResetIndex}
           url={privacyPolicyUrl}
           loading={loading}
+          storageKey={policyStorageKey}
         />
       </div>
       <footer className={styles["feedback-form__footer"]}>

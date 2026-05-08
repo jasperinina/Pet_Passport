@@ -12,6 +12,12 @@
     border-color: var(--color-dark);
   }
 
+  &:focus-visible {
+    border-color: var(--color-dark);
+    outline: rem(3) solid var(--color-blue-alt);
+    outline-offset: rem(3);
+  }
+
   &__header {
     display: flex;
     align-items: center;

@@ -26,9 +26,8 @@ export const usePetData = (petId) => {
   }, [petId]);
 
   useEffect(() => {
-    loadPet();
+    queueMicrotask(loadPet);
   }, [loadPet]);
 
   return { pet, loading, error, reload: loadPet };
 };
-

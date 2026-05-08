@@ -14,7 +14,6 @@ const Footer = ({ privacyPolicyUrl }) => {
           <a
             className={styles.footer__link}
             href={privacyPolicyUrl}
-            target="_blank"
           >
             Политика конфиденциальности
           </a>

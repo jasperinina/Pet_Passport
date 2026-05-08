@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import Procedures from "../../components/ui/Procedures/Procedures";
@@ -8,6 +8,7 @@ import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddP
 
 import { getEvents } from "../../api/events";
 import { EVENT_STATUSES } from "../../constants/eventConstants";
+import { useProceduresLoader } from "../../hooks/useProceduresLoader";
 
 const MedicalHistory = () => {
   const navigate = useNavigate();
@@ -16,51 +17,23 @@ const MedicalHistory = () => {
   const urlParams = new URLSearchParams(location.search);
   const petId = urlParams.get("id") || urlParams.get("Id");
 
-  const [procedures, setProcedures] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (petId) {
-      setLoading(true);
+  const loadHistoryProcedures = useCallback(
+    (currentPetId) =>
       getEvents(
-        parseInt(petId, 10),
+        currentPetId,
         [
           EVENT_STATUSES.INDEFINITE,
           EVENT_STATUSES.COMPLETED,
-          EVENT_STATUSES.CANCELLED
+          EVENT_STATUSES.CANCELLED,
         ]
-      )
-        .then((events) => {
-          setProcedures(events);
-        })
-        .catch((err) => {
-          setProcedures([]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
-  }, [petId]);
-
-  const handleProcedureAdded = () => {
-    if (petId) {
-      getEvents(
-        parseInt(petId, 10),
-        [
-          EVENT_STATUSES.INDEFINITE,
-          EVENT_STATUSES.COMPLETED,
-          EVENT_STATUSES.CANCELLED
-        ]
-      )
-        .then((events) => {
-          setProcedures(events);
-        })
-        .catch((err) => {
-          console.error("Ошибка загрузки истории:", err);
-        });
-    }
-  };
+      ),
+    []
+  );
+  const { procedures, loading, reload } = useProceduresLoader({
+    petId,
+    load: loadHistoryProcedures,
+  });
 
   if (loading) {
     return (
@@ -102,7 +75,7 @@ const MedicalHistory = () => {
             onClose={onClose}
             isClosing={isClosing}
             petId={petId ? parseInt(petId, 10) : null}
-            onSuccess={handleProcedureAdded}
+            onSuccess={reload}
           />
         )}
       </ModalOverlay>
