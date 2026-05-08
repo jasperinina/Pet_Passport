@@ -2,8 +2,9 @@ import styles from "./Procedures.module.scss";
 
 import ProcedureCard from "../ProcedureCard/ProcedureCard";
 
+import { EVENT_STATUSES } from "../../../constants/eventConstants";
 import { formatEventDateTime } from "../../../utils/dateUtils";
-import { getEventPath, getEventTypeName } from "../../../utils/eventUtils";
+import { getEventPath, getEventStatusMeta, getEventTypeName } from "../../../utils/eventUtils";
 
 const Procedures = ({
   events,
@@ -25,6 +26,7 @@ const Procedures = ({
       ) : (
         <ul className={styles["procedures__list"]}>
           {events.map((event) => {
+            const status = event.status ?? event.Status;
             const { date, time, fullDate } = formatEventDateTime(
               event.eventDate
             );
@@ -38,6 +40,7 @@ const Procedures = ({
                   time={time}
                   fullDate={fullDate}
                   typeName={getEventTypeName(event.type)}
+                  status={status !== EVENT_STATUSES.UPCOMING ? getEventStatusMeta(status) : null}
                   reminderEnabled={event.reminderEnabled === undefined ? false : event.reminderEnabled}
                   isNotificationImageHidden={isNotificationImageHidden}
                   isRecommendation={isRecommendation}

@@ -7,8 +7,8 @@ import EventSection from "../../components/events/EventSection/EventSection";
 import ReminderSection from "../../components/events/ReminderSection";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
 
-import { getTreatment, updateTreatment, deleteTreatment } from "../../api/events";
-import { PERIOD_UNITS, PERIOD_OPTIONS, REMINDER_OPTIONS } from "../../constants/eventConstants";
+import { getTreatment, updateTreatment, deleteTreatment, updateEventStatus } from "../../api/events";
+import { EVENT_STATUSES, PAST_EVENT_STATUS_OPTIONS, PERIOD_UNITS, PERIOD_OPTIONS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
@@ -22,6 +22,8 @@ const TreatmentPage = () => {
 
   const [treatmentTitle, setTreatmentTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
+  const [eventStatus, setEventStatus] = useState(null);
+  const [initialEventStatus, setInitialEventStatus] = useState(null);
 
   const [cardsData, setCardsData] = useState({
     date: "",
@@ -46,8 +48,12 @@ const TreatmentPage = () => {
 
         const treatment = await getTreatment(parseInt(eventId, 10));
 
+        const status = treatment.status ?? treatment.Status ?? null;
+
         setTreatmentTitle(treatment.title || "Обработка");
         setEventDateRaw(treatment.eventDate);
+        setEventStatus(status);
+        setInitialEventStatus(status);
 
         const { date, time } = formatEventDateTime(treatment.eventDate);
         const dateInput = formatDateForInput(treatment.eventDate);
@@ -101,6 +107,11 @@ const TreatmentPage = () => {
         reminderValue: reminderEnabled ? reminderValue : 0,
         reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.MONTH,
       });
+
+      if (eventStatus !== null && eventStatus !== initialEventStatus) {
+        await updateEventStatus(parseInt(eventId, 10), eventStatus);
+        setInitialEventStatus(eventStatus);
+      }
       
       // Обновляем отображаемые дату и время после сохранения
       const { date, time } = formatEventDateTime(eventDateRaw);
@@ -166,6 +177,8 @@ const TreatmentPage = () => {
     return <LoadingState message="Загрузка данных об обработке..." />;
   }
 
+  const isPastProcedure = eventStatus !== null && eventStatus !== EVENT_STATUSES.UPCOMING;
+
   return (
     <div>
       <section className="section container">
@@ -199,6 +212,16 @@ const TreatmentPage = () => {
             }}
             type="datetime"
           />
+          {isPastProcedure && (
+            <EventCard
+              label="Статус"
+              value={eventStatus}
+              isEditing={isEditing}
+              onChange={setEventStatus}
+              type="select"
+              options={PAST_EVENT_STATUS_OPTIONS}
+            />
+          )}
           <EventCard
             label="Препарат"
             value={cardsData.remedy}

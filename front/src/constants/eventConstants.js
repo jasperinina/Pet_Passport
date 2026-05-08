@@ -30,3 +30,9 @@ export const EVENT_STATUSES = {
   COMPLETED: 2,
   CANCELLED: 3
 };
+
+export const PAST_EVENT_STATUS_OPTIONS = [
+  { value: EVENT_STATUSES.INDEFINITE, label: "Неопределено" },
+  { value: EVENT_STATUSES.COMPLETED, label: "Выполнено" },
+  { value: EVENT_STATUSES.CANCELLED, label: "Отменено" },
+];

@@ -35,17 +35,21 @@
     align-items: center;
     column-gap: rem(10);
 
-    // @include mobile {
-    //   display: grid;
-    //   grid-template-columns: repeat(2, 1fr);
-    //   row-gap: rem(10);
-    //   width: 100%;
-    // }
+    @include mobile {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      row-gap: rem(10);
+      width: 100%;
+    }
 
-    // @include mobile-s {
-    //   grid-template-columns: none;
-    //   grid-template-rows: repeat(2, 1fr);
-    // }
+    @include mobile-s {
+      grid-template-columns: none;
+      grid-template-rows: repeat(2, 1fr);
+
+      &--row {
+        grid-template-rows: 100%;
+      }
+    }
 
     &--rows {
       @include mobile {

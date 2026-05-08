@@ -6,8 +6,8 @@ import EventCard from "../../components/events/EventCard/EventCard";
 import ReminderSection from "../../components/events/ReminderSection";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
 
-import { getVaccine, updateVaccine, deleteVaccine } from "../../api/events";
-import { PERIOD_UNITS, PERIOD_OPTIONS } from "../../constants/eventConstants";
+import { getVaccine, updateVaccine, deleteVaccine, updateEventStatus } from "../../api/events";
+import { EVENT_STATUSES, PAST_EVENT_STATUS_OPTIONS, PERIOD_UNITS, PERIOD_OPTIONS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
@@ -21,6 +21,8 @@ const VaccinePage = () => {
 
   const [vaccineTitle, setVaccineTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
+  const [eventStatus, setEventStatus] = useState(null);
+  const [initialEventStatus, setInitialEventStatus] = useState(null);
 
   const [cardsData, setCardsData] = useState({
     date: "",
@@ -44,8 +46,12 @@ const VaccinePage = () => {
 
         const vaccine = await getVaccine(parseInt(eventId, 10));
 
+        const status = vaccine.status ?? vaccine.Status ?? null;
+
         setVaccineTitle(vaccine.title || "Вакцинация");
         setEventDateRaw(vaccine.eventDate);
+        setEventStatus(status);
+        setInitialEventStatus(status);
 
         const { date, time } = formatEventDateTime(vaccine.eventDate);
         const dateInput = formatDateForInput(vaccine.eventDate);
@@ -97,6 +103,11 @@ const VaccinePage = () => {
         reminderValue: reminderEnabled ? reminderValue : 0,
         reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.DAY,
       });
+
+      if (eventStatus !== null && eventStatus !== initialEventStatus) {
+        await updateEventStatus(parseInt(eventId, 10), eventStatus);
+        setInitialEventStatus(eventStatus);
+      }
       
       // Обновляем отображаемые дату и время после сохранения
       const { date, time } = formatEventDateTime(eventDateRaw);
@@ -162,6 +173,8 @@ const VaccinePage = () => {
     return <LoadingState message="Загрузка данных о вакцинации..." />;
   }
 
+  const isPastProcedure = eventStatus !== null && eventStatus !== EVENT_STATUSES.UPCOMING;
+
   return (
     <div>
       <section className="section container">
@@ -195,6 +208,16 @@ const VaccinePage = () => {
             }}
             type="datetime"
           />
+          {isPastProcedure && (
+            <EventCard
+              label="Статус"
+              value={eventStatus}
+              isEditing={isEditing}
+              onChange={setEventStatus}
+              type="select"
+              options={PAST_EVENT_STATUS_OPTIONS}
+            />
+          )}
           <EventCard
             label="Препарат"
             value={cardsData.medicine}

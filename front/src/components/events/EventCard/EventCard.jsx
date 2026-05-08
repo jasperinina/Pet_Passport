@@ -92,6 +92,11 @@ const EventCard = memo(({ label, value, isEditing, onChange, type = "text", opti
   }
 
   if (type === "select" && options) {
+    const selectId =
+      label === "Статус" ? "event-status-input" :
+      label === "Периодичность" ? "period-unit-input" :
+      "event-select-input";
+
     return (
       <div className={styles["event-card"]}>
         <h2 className={styles["event-card__label"]}>{label}</h2>
@@ -99,11 +104,11 @@ const EventCard = memo(({ label, value, isEditing, onChange, type = "text", opti
           {isEditing ? (
             <div className={styles["event-card__content"]}>
               <div className={`${styles["event-card__input"]} select`}>
-                <label className="visually-hidden" htmlFor="period-unit-input">{label}</label>
+                <label className="visually-hidden" htmlFor={selectId}>{label}</label>
                 <select
                   className="select__field"
-                  name="period-unit-input"
-                  id="period-unit-input"
+                  name={selectId}
+                  id={selectId}
                   value={value}
                   onChange={(e) => onChange(parseInt(e.target.value, 10))}
                 >

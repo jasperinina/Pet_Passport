@@ -11,6 +11,7 @@ const ProcedureCard = ({
   time,
   fullDate,
   typeName,
+  status,
   reminderEnabled,
   isNotificationImageHidden,
   isRecommendation = false,
@@ -75,6 +76,11 @@ const ProcedureCard = ({
           <div className={styles["procedure-card__type-inner"]}>
             {typeName}
           </div>
+          {!isRecommendation && status && (
+            <div className={`${styles["procedure-card__status"]} ${styles[`procedure-card__status--${status.variant}`]}`}>
+              {status.label}
+            </div>
+          )}
         </div>
       </header>
       <div className={styles["procedure-card__body"]}>

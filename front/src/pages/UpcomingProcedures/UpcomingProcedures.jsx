@@ -44,7 +44,7 @@ const UpcomingProcedures = () => {
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Предстоящие процедуры</h2>
-          <div className="section__actions">
+          <div className="section__actions section__actions--row">
             <button
               className="button button--filled hidden-mobile"
               type="button"

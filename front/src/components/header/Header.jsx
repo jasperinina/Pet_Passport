@@ -27,7 +27,7 @@ const Header = ({
     navigate(-1);
   };
 
-  const isHomePage = location.pathname === "/" || "/pets";
+  const isHomePage = location.pathname === "/" || location.pathname === "/pets";
   const selectedPetId = petId || localStorage.getItem("selectedPetId");
   const selectedPetName = petName || localStorage.getItem("selectedPet") || "Выберите питомца";
 

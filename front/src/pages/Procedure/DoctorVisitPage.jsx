@@ -11,8 +11,9 @@ import {
   getDoctorVisit,
   updateDoctorVisit,
   deleteDoctorVisit,
+  updateEventStatus,
 } from "../../api/events";
-import { PERIOD_UNITS } from "../../constants/eventConstants";
+import { EVENT_STATUSES, PAST_EVENT_STATUS_OPTIONS, PERIOD_UNITS } from "../../constants/eventConstants";
 import { formatEventDateTime, formatDateForInput, formatTimeForInput, combineDateTimeToISO } from "../../utils/dateUtils";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
@@ -26,6 +27,8 @@ const DoctorVisitPage = () => {
 
   const [visitTitle, setVisitTitle] = useState("");
   const [eventDateRaw, setEventDateRaw] = useState(null);
+  const [eventStatus, setEventStatus] = useState(null);
+  const [initialEventStatus, setInitialEventStatus] = useState(null);
 
   const [cardsData, setCardsData] = useState({
     date: "",
@@ -55,8 +58,12 @@ const DoctorVisitPage = () => {
 
         const visit = await getDoctorVisit(parseInt(eventId, 10));
 
+        const status = visit.status ?? visit.Status ?? null;
+
         setVisitTitle(visit.title || "Прием");
         setEventDateRaw(visit.eventDate);
+        setEventStatus(status);
+        setInitialEventStatus(status);
 
         const { date, time } = formatEventDateTime(visit.eventDate);
         const dateInput = formatDateForInput(visit.eventDate);
@@ -117,6 +124,11 @@ const DoctorVisitPage = () => {
         reminderValue: reminderEnabled ? reminderValue : 0,
         reminderUnit: reminderEnabled ? reminderUnit : PERIOD_UNITS.DAY,
       });
+
+      if (eventStatus !== null && eventStatus !== initialEventStatus) {
+        await updateEventStatus(parseInt(eventId, 10), eventStatus);
+        setInitialEventStatus(eventStatus);
+      }
       
       // Обновляем отображаемые дату и время после сохранения
       const { date, time } = formatEventDateTime(eventDateRaw);
@@ -189,6 +201,8 @@ const DoctorVisitPage = () => {
     return <LoadingState message="Загрузка данных о приеме..." />;
   }
 
+  const isPastProcedure = eventStatus !== null && eventStatus !== EVENT_STATUSES.UPCOMING;
+
   return (
     <div>
       <section className="section container">
@@ -222,6 +236,16 @@ const DoctorVisitPage = () => {
             }}
             type="datetime"
           />
+          {isPastProcedure && (
+            <EventCard
+              label="Статус"
+              value={eventStatus}
+              isEditing={isEditing}
+              onChange={setEventStatus}
+              type="select"
+              options={PAST_EVENT_STATUS_OPTIONS}
+            />
+          )}
           <EventCard
             label="Клиника"
             value={cardsData.clinic}
