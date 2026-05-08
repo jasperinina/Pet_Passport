@@ -4,10 +4,13 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Pets.module.scss";
 
 import Header from "../../components/header/Header";
+import MobileButton from "../../components/mobile_button/MobileButton";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import AddPetModal from "../../components/ui/modals/AddPetModal/AddPetModal";
 import { getOwnerPets, getStoredOwnerId, isUnauthorizedError } from "../../api/auth";
 import { deletePet } from "../../api/pets";
+import PenIcon from "../../assets/icons/pen.svg?react";
+import PlusIcon from "../../assets/icons/plus.svg?react";
 
 const Pets = () => {
   const navigate = useNavigate();
@@ -283,67 +286,45 @@ const Pets = () => {
         </div>
         <div className={`${styles["pets__mobile-buttons"]} visible-mobile`}>
           {editing ? (
-            <button
-              className={`${styles["pets__mobile-button"]} ${styles["pets__mobile-button--edit"]}`}
-              type="button"
+            <MobileButton
+              color="gray"
+              ariaLabel="Отменить редактирование"
+              icon={(
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <g fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="9"/>
+                    <path d="M18 18L6 6"/>
+                  </g>
+                </svg>
+              )}
               onClick={() => setEditing(false)}
-            >
-              <svg
-                width="24" height="24" viewBox="0 0 24 24"
-              >
-                <g fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="9"/>
-                  <path d="M18 18L6 6"/>
-                </g>
-              </svg>
-            </button>
+            />
           ) : (
-            <button
-              className={`${styles["pets__mobile-button"]} ${styles["pets__mobile-button--edit"]}`}
-              type="button"
+            <MobileButton
+              color="gray"
+              icon={<PenIcon />}
+              ariaLabel="Редактировать питомцев"
               onClick={() => setEditing(true)}
-            >
-              <svg
-                width="20" height="20" viewBox="0 0 20 20"
-                fill="none"
-              >
-                <path d="M12.6539 2.64923C12.9758 2.32691 13.4978 2.32717 13.8199 2.64923C14.1421 2.9714 14.1421 3.49308 13.8199 3.81525L4.05334 13.5818C3.89256 13.7426 3.68131 13.824 3.47034 13.824C3.25941 13.824 3.0485 13.743 2.88733 13.5818C2.56522 13.2597 2.56518 12.738 2.88733 12.4158L12.6539 2.64923Z" fill="#8B90A6" stroke="#8B90A6" strokeWidth="0.4"/>
-                <path d="M2.66382 12.8261C2.75959 12.3803 3.19984 12.0975 3.64331 12.1923C4.08859 12.288 4.37269 12.7263 4.2771 13.1718L3.31128 17.6728C3.22831 18.0604 2.88612 18.325 2.50562 18.3251C2.47676 18.3251 2.44753 18.3233 2.4187 18.3203L2.33179 18.3066C1.88655 18.2109 1.60248 17.7726 1.698 17.3271L2.66382 12.8261Z" fill="#8B90A6" stroke="#8B90A6" strokeWidth="0.4"/>
-                <path d="M16.1893 6.18488C16.5112 5.86256 17.0332 5.86282 17.3553 6.18488C17.6775 6.50704 17.6775 7.02872 17.3553 7.35089L7.58972 17.1175C7.4285 17.2787 7.21653 17.3597 7.00574 17.3597C6.79486 17.3597 6.58388 17.2786 6.42273 17.1175C6.10057 16.7953 6.10058 16.2736 6.42273 15.9515L16.1893 6.18488Z" fill="#8B90A6" stroke="#8B90A6" strokeWidth="0.4"/>
-                <path d="M6.83264 15.7277C7.27769 15.6334 7.71672 15.9158 7.81213 16.3615C7.90727 16.8068 7.6238 17.2453 7.17834 17.341L2.67737 18.3068L2.67639 18.3058C2.61813 18.3185 2.56063 18.3254 2.50452 18.3254C2.12371 18.3254 1.78122 18.0604 1.69788 17.673C1.60262 17.2277 1.88614 16.7892 2.33167 16.6935L6.83264 15.7277Z" fill="#8B90A6" stroke="#8B90A6" strokeWidth="0.4"/>
-                <path d="M10.8865 4.41705C11.2084 4.09486 11.7306 4.09481 12.0525 4.41705L15.5876 7.95221C15.9097 8.27421 15.9093 8.79504 15.5876 9.11725L15.5886 9.11823C15.4276 9.27967 15.2154 9.36041 15.0046 9.36041C14.7939 9.36039 14.5826 9.27958 14.4216 9.11823L10.8865 5.58307C10.5643 5.2609 10.5643 4.73922 10.8865 4.41705Z" fill="#8B90A6" stroke="#8B90A6" strokeWidth="0.4"/>
-                <path d="M15.0043 1.68451C15.8971 1.68451 16.7338 2.02696 17.3558 2.64935C17.9779 3.27134 18.3197 4.10698 18.3197 4.99994C18.3197 5.89313 17.9782 6.72945 17.3558 7.3515L17.3549 7.35052C17.1944 7.51132 16.9836 7.59264 16.7728 7.59271C16.5621 7.59271 16.3501 7.51265 16.1888 7.3515C15.8667 7.02932 15.867 6.50693 16.1888 6.18451C16.4979 5.87548 16.6693 5.4556 16.6693 4.99994C16.6693 4.54431 16.4979 4.12438 16.1888 3.81537C15.8795 3.50618 15.4598 3.3349 15.0043 3.3349C14.5489 3.33494 14.1296 3.50636 13.8207 3.81537C13.4989 4.13757 12.9765 4.13831 12.6537 3.81635V3.81537C12.3315 3.49315 12.3317 2.97175 12.6537 2.64935C13.2757 2.02701 14.1111 1.68455 15.0043 1.68451Z" fill="#8B90A6" stroke="#8B90A6" strokeWidth="0.4"/>
-              </svg>
-            </button>
+            />
           )}
           {editing ? (
-            <button
-              className={`${styles["pets__mobile-button"]} ${styles["pets__mobile-button--add"]}`}
-              type="button"
+            <MobileButton
+              color="dark"
+              ariaLabel="Готово"
+              icon={(
+                <svg width="24" height="24" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z"/>
+                </svg>
+              )}
               onClick={() => setEditing(false)}
-            >
-              <svg
-                width="24" height="24" viewBox="0 0 24 24"
-              >
-                <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19L21 7l-1.41-1.41z"/>
-              </svg>
-            </button>
+            />
           ) : (
-            <button
-              className={`${styles["pets__mobile-button"]} ${styles["pets__mobile-button--add"]}`}
-              type="button"
+            <MobileButton
+              color="dark"
+              icon={<PlusIcon />}
+              ariaLabel="Добавить питомца"
               onClick={() => setIsAddPetModalOpen(true)}
-            >
-              <svg
-                width="20" height="20" viewBox="0 0 20 20"
-                fill="none"
-              >
-                <path
-                  d="M9.43073 1.99336C9.56752 1.88139 9.73475 1.81272 9.91065 1.79517L9.99973 1.79034L10.0888 1.79517C10.2941 1.81562 10.4871 1.90635 10.6343 2.05343C10.8027 2.22183 10.8981 2.45057 10.8981 2.68873L10.8988 9.1031L17.3132 9.10102L17.4023 9.10586C17.6078 9.1263 17.8012 9.2175 17.9485 9.36481C18.1167 9.53318 18.2116 9.76139 18.2116 9.99941C18.2115 10.2374 18.1167 10.4656 17.9485 10.634C17.7801 10.8024 17.5513 10.8978 17.3132 10.8978H10.8981L10.8995 17.3115C10.8995 17.4292 10.8761 17.5459 10.8311 17.6547C10.7861 17.7635 10.7197 17.8627 10.6364 17.9461C10.5531 18.0294 10.4539 18.0957 10.345 18.1408C10.236 18.1859 10.119 18.2099 10.0011 18.2099H9.99973C9.79216 18.2092 9.59191 18.1367 9.4328 18.0061L9.36789 17.9468L9.30782 17.8812C9.1775 17.7222 9.10554 17.5222 9.1048 17.3149V17.3135L9.10342 10.8985L2.68905 10.8978H2.66971L2.65107 10.8957C2.42564 10.8783 2.21425 10.7765 2.06066 10.6105L2.0068 10.5456C1.88765 10.3897 1.82243 10.1986 1.82243 10.0008C1.82243 9.77478 1.90719 9.55695 2.06066 9.39105L2.12143 9.33166C2.24681 9.21953 2.40107 9.14416 2.56682 9.11553L2.65107 9.10586L2.66971 9.10379H2.68905L9.10204 9.1031L9.10135 2.68873L9.10618 2.59965C9.12663 2.39417 9.21783 2.20073 9.36513 2.05343L9.43073 1.99336Z"
-                  fill="white" stroke="white"
-                />
-              </svg>
-            </button>
+            />
           )}
         </div>
       </section>

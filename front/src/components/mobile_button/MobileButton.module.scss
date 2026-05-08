@@ -1,0 +1,38 @@
+@use '../../styles/helpers/' as *;
+
+.mobile-button {
+  @include square(48);
+  @include flex-center;
+
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 50%;
+  transition-duration: var(--transition-duration);
+  cursor: pointer;
+
+  & svg {
+    @include square(20);
+  }
+
+  &--fixed {
+    display: none;
+    position: fixed;
+    right: rem(20);
+    bottom: calc(#{rem(88)} + env(safe-area-inset-bottom));
+    z-index: 20;
+
+    @include mobile {
+      display: flex;
+    }
+  }
+
+  &--dark {
+    color: var(--color-light);
+    background-color: var(--color-dark);
+  }
+
+  &--gray {
+    color: var(--color-gray);
+    background-color: var(--color-gray-alt);
+  }
+}

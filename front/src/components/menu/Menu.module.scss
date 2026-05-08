@@ -3,13 +3,13 @@
 .menu {
   @include tablet {
     position: fixed;
-    bottom: rem(20);
-    left: rem(20);
-    right: rem(20);
-    padding: rem(16);
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: rem(5);
     background-color: var(--color-light);
-    border-radius: var(--border-radius);
-    box-shadow: 0 rem(0) rem(10) 0 var(--color-gray);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    box-shadow: 0 rem(-5) rem(30) 0 rgba(54, 24, 125, 0.2);
     z-index: 100;
   }
 
@@ -20,11 +20,8 @@
 
     @include tablet {
       display: grid;
-      grid-template-columns: auto rem(1) auto;
-    }
-
-    @include mobile-s {
-      column-gap: rem(16);
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: rem(5);
     }
   }
 
@@ -35,25 +32,15 @@
     @include hover {
       opacity: 0.7;
     }
-  }
 
-  &__link {
-    @include fluid-text(16, 12);
-
-    display: flex;
-    column-gap: rem(8);
-    color: var(--color-dark);
-    text-align: left;
-  }
-
-  &__text {
-    width: auto;
-  }
-
-  &__separator {
-    display: block;
-    width: rem(1);
-    height: rem(24);
-    background-color: var(--color-gray-alt);
+    @include tablet {
+      display: flex;
+      justify-content: center;
+      padding: rem(10) rem(16);
+      width: 100%;
+      height: 100%;
+      background-color: var(--color-light-gray);
+      border-radius: var(--border-radius-small-alt);
+    }
   }
 }

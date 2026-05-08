@@ -6,10 +6,13 @@ import Procedures from "../../components/ui/Procedures/Procedures";
 import LoadingState from "../../components/events/LoadingState/LoadingState";
 import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
 
+import PlusIcon from "../../assets/icons/plus.svg?react";
+
 import { getEvents } from "../../api/events";
 import NotificationService from "../../services/notificationService";
 import { ERROR_MESSAGES } from "../../constants/config";
 import { EVENT_STATUSES } from "../../constants/eventConstants";
+import MobileButton from "../../components/mobile_button/MobileButton";
 
 const UpcomingProcedures = () => {
   const navigate = useNavigate();
@@ -68,9 +71,9 @@ const UpcomingProcedures = () => {
       <section className="section container">
         <header className="section__header section__header--filled">
           <h2 className="section__title h1">Предстоящие процедуры</h2>
-          <div className="section__actions section__actions--rows">
+          <div className="section__actions">
             <button
-              className="button button--filled"
+              className="button button--filled hidden-mobile"
               type="button"
               onClick={() => setIsAddProcedureModalOpen(true)}
             >
@@ -91,6 +94,13 @@ const UpcomingProcedures = () => {
           search={search}
           message="Нет предстоящих процедур"
         />
+      <MobileButton
+        color="dark"
+        fixed
+        icon={<PlusIcon />}
+        ariaLabel="Добавить процедуру"
+        onClick={() => setIsAddProcedureModalOpen(true)}
+      />
       </section>
 
       <ModalOverlay

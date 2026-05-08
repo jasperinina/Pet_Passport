@@ -8,6 +8,7 @@ import { sendFeedback } from "../../../api/feedback";
 import { notifyError, notifySuccess } from "../../../services/notificationService";
 
 import { ERROR_MESSAGES, FILE_UPLOAD } from "../../../constants/config";
+import PrivacyPolicyCheckbox from "../../privacy_policy_checkbox/PrivacyPolicyCheckbox";
 
 const FeedbackForm = ({
   type,
@@ -176,19 +177,10 @@ const FeedbackForm = ({
             </div>
           )}
         </div>
-        <div className={styles["feedback-form__privacy-policy"]}>
-          <input
-            className={styles["feedback-form__privacy-policy-checkbox"]}
-            type="checkbox"
-            checked={acceptedPolicy}
-            onChange={(e) => setAcceptedPolicy(e.target.checked)}
-            disabled={loading}
-            required
-          />
-          <div className={styles["feedback-form__privacy-policy-text"]}>
-            Я соглашаюсь с обработкой <a href={privacyPolicyUrl} target="_blank">персональных данных</a>
-          </div>
-        </div>
+        <PrivacyPolicyCheckbox
+          url={privacyPolicyUrl}
+          loading={loading}
+        />
       </div>
       <footer className={styles["feedback-form__footer"]}>
         <button

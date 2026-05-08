@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -11,6 +13,8 @@ import policyText from "../../docs/privacy-policy.md?raw";
 import { parseSections } from "../../utils/markdownUtils";
 
 const PrivacyPolicy = () => {
+  const navigate = useNavigate();
+
   const tgBotUrl = import.meta.env.VITE_TG_BOT_URL || "";
   const gitHubUrl = import.meta.env.VITE_GITHUB_URL || "";
   const webUrl = "/";
@@ -27,12 +31,13 @@ const PrivacyPolicy = () => {
       />
       <header className={`${styles["privacy-policy__header"]} container`}>
         <div className={styles["privacy-policy__tabs"]}>
-          <a
+          <button
             className={styles["privacy-policy__tabs-item"]}
-            href="/landing"
+            type="button"
+            onClick={() => navigate(-1)}
           >
             Главная
-          </a>
+          </button>
           <div className={`${styles["privacy-policy__tabs-item"]} ${styles["privacy-policy__tabs-item--selected"]}`}>
             Политика конфиденциальности
           </div>

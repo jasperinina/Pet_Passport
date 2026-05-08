@@ -26,6 +26,7 @@ import PigIcon from "../../assets/icons/pets/pig.svg?react";
 
 import { loginOwner, registerOwner } from "../../api/auth";
 import { notifyError, notifySuccess } from "../../services/notificationService";
+import PrivacyPolicyCheckbox from "../../components/privacy_policy_checkbox/PrivacyPolicyCheckbox";
 
 const petIconRows = [
   [
@@ -108,6 +109,7 @@ const petIconRows = [
 
 const Auth = () => {
   const navigate = useNavigate();
+  const privacyPolicyUrl = "/privacy-policy";
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -354,6 +356,10 @@ const Auth = () => {
                 onChange={handleChange(setSignUpData)}
                 disabled={loading}
                 autoComplete="new-password"
+              />
+              <PrivacyPolicyCheckbox
+                url={privacyPolicyUrl}
+                loading={loading}
               />
               <button
                 className={`${styles["auth__form-button"]} button button--filled`}

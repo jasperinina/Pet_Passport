@@ -22,8 +22,8 @@
       display: grid;
       grid-template-columns: rem(20) auto;
       column-gap: rem(16);
-      row-gap: rem(10);
-      padding-bottom: rem(20);
+      row-gap: rem(16);
+      padding-bottom: rem(5);
     }
 
     &--rows {
@@ -56,12 +56,8 @@
   }
 
   &__type {
-    @include mobile-s {
-      grid-column: 1 / -1;
-    }
-
     &-inner {
-      @include fluid-text(16, 14);
+      @include fluid-text(16, 12);
 
       padding: rem(5) rem(12);
       width: 100%;
@@ -69,6 +65,17 @@
       color: var(--color-dark);
       background-color: var(--color-light-gray);
       border-radius: var(--border-radius-large);
+
+      @include mobile-s {
+        padding: 0;
+        color: var(--color-gray);
+        text-align: left;
+        background-color: transparent;
+      }
+    }
+
+    @include mobile-s {
+      grid-column: 1 / -1;
     }
   }
 }

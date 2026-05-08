@@ -242,32 +242,12 @@
 
   &__mobile-buttons {
     position: fixed;
-    bottom: rem(20);
     right: rem(20);
+    bottom: calc(#{rem(20)} + env(safe-area-inset-bottom));
+    z-index: 20;
     display: flex;
     align-items: center;
     column-gap: rem(10);
-  }
-
-  &__mobile-button {
-    @include square(48);
-    @include flex-center;
-
-    border-radius: 50%;
-
-    & svg {
-      @include square(20);
-    }
-
-    &--edit {
-      color: var(--color-gray);
-      background-color: var(--color-gray-alt);
-    }
-
-    &--add {
-      color: var(--color-light);
-      background-color: var(--color-dark);
-    }
   }
 
   &__button {

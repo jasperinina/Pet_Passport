@@ -16,7 +16,6 @@ const Menu = ({ isTabletHidden = false }) => {
             text="Предстоящие процедуры"
           />
         </li>
-        <span className={`${styles.menu__separator} visible-tablet`}></span>
         <li className={styles.menu__item}>
           <MenuButton
             route="history"
