@@ -5,7 +5,7 @@ import Logo from "../../logo/Logo";
 const Footer = ({ privacyPolicyUrl }) => {
   return (
     <footer className={`${styles.footer}`}>
-      <div className={`${styles.footer__inner} container`}>
+      <div className={`${styles.footer__inner}`}>
         <Logo
           light={true}
           path="/landing"

@@ -1,6 +1,10 @@
+import { useEffect, useRef, useState } from "react";
+
 import styles from "./Header.module.scss";
 
 import Menu from "../menu/Menu";
+import BurgerButton from "../../burger_button/BurgerButton";
+import MenuMobile from "../menu/mobile/MenuMobile";
 
 const Header = ({
   webUrl,
@@ -8,6 +12,9 @@ const Header = ({
   privacyPolicyOpened = false,
   logoPath = "/landing",
 }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef(null);
+
   const menuItems = [
     { text: "Проблема", link: "#problems" },
     { text: "Функции", link: "#features" },
@@ -18,9 +25,27 @@ const Header = ({
     ? menuItems.map(item => ({ ...item, link: `/landing${item.link}` }))
     : menuItems;
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) {
+      return;
+    }
+
+    const handleClickOutside = (event) => {
+      if (!mobileMenuRef.current?.contains(event.target)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("pointerdown", handleClickOutside);
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <header className={styles.header}>
-      <div className={`${styles.header__inner} container`}>
+      <div className={`${styles.header__inner}`}>
         <Menu
           items={modifiedItems}
           logoPath={logoPath}
@@ -45,7 +70,7 @@ const Header = ({
             <div className={styles["header__action-text"]}>GitHub</div>
           </a>
           <a
-            className={`${styles.header__action} button button--filled`}
+            className={`${styles.header__action} button button--filled hidden-tablet`}
             href={webUrl}
           >
             <svg
@@ -67,6 +92,21 @@ const Header = ({
             </svg>
             <div className={styles["header__action-text"]}>Попробовать паспорт</div>
           </a>
+          <div
+            className={styles["header__mobile-menu-anchor"]}
+            ref={mobileMenuRef}
+          >
+            <BurgerButton
+              isOpen={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+            />
+            <MenuMobile
+              isOpen={isMobileMenuOpen}
+              items={modifiedItems}
+              onClose={() => setIsMobileMenuOpen(false)}
+              webUrl={webUrl}
+            />
+          </div>
         </div>
       </div>
     </header>

@@ -27,5 +27,23 @@
     align-items: center;
     column-gap: rem(10);
     cursor: pointer;
+
+    @include tablet {
+      padding: rem(13) rem(16);
+      column-gap: rem(8);
+    }
+  }
+
+  &__mobile-menu-anchor {
+    position: relative;
+    display: flex;
+
+    @include tablet-above {
+      display: none;
+    }
+  }
+
+  @include tablet {
+    margin: rem(20);
   }
 }

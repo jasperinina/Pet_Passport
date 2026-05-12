@@ -6,7 +6,7 @@ const Menu = ({ items, logoPath = "/landing" }) => {
   return (
     <nav className={styles.menu}>
       <Logo path={logoPath} />
-      <ul className={styles.menu__list}>
+      <ul className={`${styles.menu__list} hidden-tablet`}>
         {items.map((item, index) => (
           <li
             className={styles.menu__item}

@@ -68,7 +68,7 @@ const Landing = () => {
         webUrl={webUrl}
       />
       <section className={styles.landing__hero}>
-        <div className={`${styles["landing__section-inner"]} container`}>
+        <div className={`${styles["landing__section-inner"]}`}>
           <PaymentType text="Бесплатно" />
           <div className={styles["landing__hero-body"]}>
             <h1 className={`${styles["landing__hero-title"]} h1`}>
@@ -142,14 +142,14 @@ const Landing = () => {
               <li className={styles.problems__item}>
                 <ProblemCard
                   title="Данные разбросаны"
-                  description={`Вся информация о питомце хранится в разных местах —\nветпаспорт, заметки, память`}
+                  description={`Вся информация о питомце хранится в разных местах — ветпаспорт, заметки, память`}
                   icon={<ProblemCardIcon1 />}
                 />
               </li>
               <li className={styles.problems__item}>
                 <ProblemCard
                   title="Легко забыть процедуры"
-                  description={`Прививки, обработки и приёмы у ветеринара легко\nупустить без напоминаний`}
+                  description={`Прививки, обработки и приёмы у ветеринара легко упустить без напоминаний`}
                   icon={<ProblemCardIcon2 />}
                 />
               </li>
@@ -173,8 +173,12 @@ const Landing = () => {
       </section>
       <section className={`${styles.features} ${styles.landing__section}`} id="features">
         <div className={`${styles["landing__section-inner"]} container`}>
-          <h2 className={`${styles["landing__section-title"]} h2`}>
+          <h2 className={`${styles["landing__section-title"]} h2 hidden-mobile`}>
             Перестаньте забывать важное —<br/>
+            держите всё о питомце <span>в одном месте</span>
+          </h2>
+          <h2 className={`${styles["landing__section-title"]} h2 visible-mobile`}>
+            Перестаньте забывать важное —
             держите всё о питомце <span>в одном месте</span>
           </h2>
           <div className={`${styles.features__body} ${styles["landing__section-body"]}`}>
@@ -232,7 +236,7 @@ const Landing = () => {
             </ol>
             <div className={styles.instruction__actions}>
               <a
-                className={`${styles.landing__action} button button--light`}
+                className={`${styles.landing__action} ${styles.instruction__action} button button--light`}
                 href={webUrl}
               >
                 <svg
@@ -255,7 +259,7 @@ const Landing = () => {
                 <div className={styles["landing__action-text"]}>Перейти на сайт</div>
               </a>
               <a
-                className={`${styles.landing__action} button button--blured`}
+                className={`${styles.landing__action} ${styles.instruction__action} button button--blured`}
                 href={gitHubUrl}
                 target="_blank"
               >

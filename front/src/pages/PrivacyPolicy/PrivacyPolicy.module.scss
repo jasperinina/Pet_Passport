@@ -59,7 +59,7 @@
   }
 
   &__title {
-    @include fluid-text(56, 32);
+    @include fluid-text(56, 24);
 
     line-height: 100%;
   }
@@ -80,7 +80,7 @@
     border-radius: var(--border-radius);
 
     &-title {
-      @include fluid-text(36, 24);
+      @include fluid-text(36, 18);
 
       font-weight: 700;
 
@@ -117,5 +117,9 @@
         }
       }
     }
+  }
+
+  @include tablet {
+    padding: 0;
   }
 }

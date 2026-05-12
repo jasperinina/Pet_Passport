@@ -1,0 +1,61 @@
+@use '../../../../styles/helpers/' as *;
+
+.menu-mobile {
+  position: absolute;
+  top: calc(100% + #{rem(8)});
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  row-gap: rem(16);
+  min-width: rem(260);
+  padding: rem(18);
+  background-color: var(--color-light);
+  border: var(--border);
+  border-radius: var(--border-radius-small-alt);
+  box-shadow: 0 rem(12) rem(30) rgba(0, 0, 0, 0.12);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(rem(-12));
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s ease;
+
+  &--open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    visibility: visible;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    row-gap: rem(6);
+  }
+
+  &__link {
+    display: block;
+    padding: rem(10) rem(12);
+    color: var(--color-dark);
+    text-decoration: none;
+    border-radius: var(--border-radius-small-alt);
+
+    @include hover {
+      background-color: var(--color-light-gray);
+      opacity: 1;
+    }
+  }
+
+  &__action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: rem(8);
+    padding: rem(13) rem(16);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+}

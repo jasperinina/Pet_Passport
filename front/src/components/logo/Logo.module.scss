@@ -7,6 +7,10 @@
   min-width: rem(156);
   color: var(--color-dark);
 
+  @include mobile {
+    min-width: auto;
+  }
+
   @include hover {
     opacity: 0.7;
   }

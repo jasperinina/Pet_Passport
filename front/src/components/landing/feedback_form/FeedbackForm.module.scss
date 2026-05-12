@@ -30,6 +30,12 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     column-gap: rem(10);
+
+    @include mobile {
+      display: flex;
+      flex-direction: column;
+      row-gap: rem(10);
+    }
   }
 
   &__fields {

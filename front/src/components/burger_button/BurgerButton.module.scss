@@ -1,0 +1,46 @@
+@use '../../styles/helpers/' as *;
+
+.burger-button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: rem(6);
+  padding: rem(15) rem(17);
+  background-color: var(--color-light-gray);
+  border-radius: var(--border-radius-small-alt);
+
+  &__line {
+    height: rem(2);
+    width: rem(16);
+    border-radius: rem(2);
+    background-color: var(--color-gray);
+    transform-origin: center;
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease,
+      width 0.2s ease;
+
+    &--short {
+      width: 62.5%;
+    }
+  }
+
+  &--open {
+    .burger-button__line {
+      width: rem(16);
+
+      &:nth-child(1) {
+        transform: translateY(rem(8)) rotate(45deg);
+      }
+
+      &:nth-child(2) {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+
+      &:nth-child(3) {
+        transform: translateY(rem(-8)) rotate(-45deg);
+      }
+    }
+  }
+}

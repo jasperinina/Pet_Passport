@@ -1,6 +1,7 @@
 @use '../../../styles/helpers/' as *;
 
 .problem-card {
+  width: 100%;
   background-color: var(--color-light);
   border-radius: var(--border-radius);
 
