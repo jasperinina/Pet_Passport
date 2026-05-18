@@ -177,9 +177,14 @@
       @include square(70);
 
       padding: rem(15);
-      color: var(--color-gray-alt);
       background-color: var(--color-light-gray);
       border-radius: var(--border-radius-small-alt);
+    }
+
+    &-icon {
+      width: 100%;
+      height: 100%;
+      color: var(--color-gray-alt);
     }
 
     &-info {

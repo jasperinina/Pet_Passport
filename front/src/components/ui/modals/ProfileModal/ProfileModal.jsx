@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { deleteAccount, getAccount, logoutOwner } from "../../../../api/auth";
 import { notifyError } from "../../../../services/notificationService";
+import { clearSelectedPet } from "../../../../utils/selectedPetStorage";
 
 const ProfileModal = ({
   isOpen,
@@ -44,11 +45,6 @@ const ProfileModal = ({
       isMounted = false;
     };
   }, [isOpen]);
-
-  const clearSelectedPet = () => {
-    localStorage.removeItem("selectedPetId");
-    localStorage.removeItem("selectedPet");
-  };
 
   const handleLogout = async () => {
     if (actionLoading) return;

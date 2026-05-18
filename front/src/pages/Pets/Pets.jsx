@@ -11,6 +11,8 @@ import { getOwnerPets, getStoredOwnerId, isUnauthorizedError } from "../../api/a
 import { deletePet } from "../../api/pets";
 import PenIcon from "../../assets/icons/pen.svg?react";
 import PlusIcon from "../../assets/icons/plus.svg?react";
+import { getPetSpeciesIcon } from "../../utils/petIcons";
+import { clearSelectedPet, getSelectedPet, setSelectedPet } from "../../utils/selectedPetStorage";
 
 const Pets = () => {
   const navigate = useNavigate();
@@ -26,8 +28,10 @@ const Pets = () => {
 
   const [editing, setEditing] = useState(false);
 
-  const selectedPetId = localStorage.getItem("selectedPetId");
-  const selectedPetName = localStorage.getItem("selectedPet");
+  const selectedPet = getSelectedPet();
+  const selectedPetId = selectedPet.id;
+  const selectedPetName = selectedPet.name;
+  const selectedPetSpecies = selectedPet.species;
 
   const loadPets = useCallback(async () => {
     if (!ownerId) {
@@ -40,7 +44,17 @@ const Pets = () => {
 
     try {
       const petsData = await getOwnerPets(ownerId);
-      setPets(Array.isArray(petsData) ? petsData : []);
+      const nextPets = Array.isArray(petsData) ? petsData : [];
+      const savedPetId = getSelectedPet().id;
+
+      if (
+        savedPetId &&
+        !nextPets.some((pet) => String(pet.id ?? pet.Id) === String(savedPetId))
+      ) {
+        clearSelectedPet();
+      }
+
+      setPets(nextPets);
     } catch (err) {
       if (isUnauthorizedError(err)) {
         navigate("/", { replace: true });
@@ -76,6 +90,11 @@ const Pets = () => {
 
     try {
       await deletePet(petId);
+
+      if (String(selectedPetId) === String(petId)) {
+        clearSelectedPet();
+      }
+
       setPets((prevPets) =>
         prevPets.filter((item) => (item.id ?? item.Id) !== petId)
       );
@@ -97,6 +116,7 @@ const Pets = () => {
         <Header
           petName={selectedPetName}
           petId={selectedPetId}
+          petSpecies={selectedPetSpecies}
           hideMenu
           className=""
           innerClassName={styles.pets__header}
@@ -167,7 +187,10 @@ const Pets = () => {
                 {pets.map((pet, index) => {
                   const petId = pet.id ?? pet.Id;
                   const petName = pet.name ?? pet.Name;
+                  const petSpecies = pet.species ?? pet.Species;
                   const isDeleting = deletingPetId === petId;
+
+                  const PetIcon = getPetSpeciesIcon(petSpecies);
 
                   return (
                     <li
@@ -176,31 +199,20 @@ const Pets = () => {
                       onClick={() => {
                         if (!isDeleting) {
                           navigate(`/?id=${petId}`);
-
-                          localStorage.setItem("selectedPetId", petId);
-                          localStorage.setItem("selectedPet", petName);
+                          setSelectedPet(pet);
                         }
                       }}
                     >
                       <div className={styles["pets__item-body"]}>
-                        <svg
-                          className={styles["pets__item-image"]}
-                          width="16" height="16" viewBox="0 0 16 16"
-                          fill="none"
-                        >
-                          <g clipPath="url(#clip0_86_4448)">
-                            <path d="M15.9686 4.66681C15.8661 5.32657 15.5128 5.90691 14.9738 6.30093C14.5987 6.5752 14.1718 6.72883 13.7397 6.76997C13.8355 7.02415 13.9235 7.27995 14.0024 7.53619C14.1038 7.86603 13.9187 8.21572 13.5888 8.31717C13.2679 8.41863 12.9084 8.23653 12.8078 7.90365C12.6573 7.41439 12.471 6.92629 12.2542 6.45056C11.9651 6.28509 11.7047 6.05919 11.4937 5.77568C11.3955 5.65701 10.8937 5.02975 10.5753 4.23392C10.4471 3.9135 10.603 3.54982 10.9234 3.42165C11.2439 3.29339 11.6075 3.44933 11.7357 3.76978C12.0037 4.43982 12.4811 5.00875 12.4898 5.02072C12.8965 5.57703 13.6799 5.69876 14.2363 5.29204C14.7868 4.9068 14.9153 4.07963 14.5076 3.54554C13.9998 2.81669 12.2633 1.22385 11.5617 1.25237C11.419 1.25234 10.9848 1.25234 10.5502 1.87945C10.1339 2.48013 9.39332 2.73299 8.70731 2.50856C8.4646 2.42914 8.22665 2.38549 7.99978 2.37861C7.77291 2.38546 7.53495 2.42914 7.29228 2.50856C6.60627 2.73293 5.86568 2.48013 5.44941 1.87945C5.01483 1.25234 4.58059 1.25234 4.4379 1.25234C3.73265 1.22513 1.9972 2.82035 1.49194 3.54554C1.29491 3.81502 1.21462 4.14509 1.26589 4.47497C1.31713 4.80485 1.49375 5.09502 1.76327 5.29204C2.31961 5.69872 3.10304 5.57703 3.50978 5.02069C3.519 5.00809 3.99585 4.43985 4.26387 3.76978C4.39203 3.44933 4.75572 3.29342 5.07613 3.42165C5.39658 3.54982 5.55242 3.9135 5.42426 4.23392C5.10591 5.02981 4.60399 5.65711 4.50582 5.77571C4.29486 6.05916 4.0345 6.28506 3.74536 6.4505C3.52853 6.92626 3.34221 7.41439 3.19171 7.90368C3.09113 8.23653 2.7316 8.41869 2.41072 8.31721C2.08084 8.21572 1.89572 7.86607 1.9972 7.53622C2.07603 7.27998 2.16408 7.02418 2.25984 6.77001C1.16553 6.6869 0.178139 5.76934 0.0309148 4.66681C-0.0715986 4.00705 0.0889672 3.34688 0.482992 2.80788C0.780816 2.40048 1.39377 1.72916 2.09171 1.1477C3.00387 0.387803 3.79323 0.0025263 4.43787 0.0025263C5.24342 0.0025263 5.94839 0.405394 6.47658 1.16754C6.57553 1.31033 6.74719 1.37188 6.90363 1.3207C7.26775 1.20157 7.64618 1.13558 7.99972 1.12736C8.35325 1.13558 8.73168 1.20157 9.09584 1.32073C9.25228 1.37185 9.42391 1.31036 9.52289 1.16757C10.0511 0.405425 10.7561 0.00255755 11.5616 0.00255755C12.7662 -0.0799594 14.841 1.85499 15.5165 2.80795C15.9106 3.34688 16.0711 4.00705 15.9686 4.66681ZM12.3595 9.05608C12.346 9.05414 12.373 9.05711 12.3595 9.05608V9.05608ZM14.3725 11.942C13.6437 14.7003 10.9101 16.0196 8.06392 15.9997H8.06177C5.21673 16.0204 2.48105 14.6996 1.75321 11.942C1.65301 11.5642 1.60764 10.7373 2.07318 10.034C2.31902 9.66257 2.84583 9.18774 3.76627 9.05608C4.79484 8.9769 5.81304 9.09357 6.77737 9.39602C7.30487 9.15497 8.78242 9.16731 9.28759 9.41564C10.2699 9.09888 11.3093 8.97528 12.3595 9.05608C14.0953 9.28401 14.6541 10.811 14.3725 11.942ZM13.0103 10.7238C12.8588 10.4948 12.6074 10.3563 12.2424 10.3006C11.3184 10.2323 10.4047 10.3512 9.54579 10.6469C9.29424 10.985 8.95686 11.2519 8.66398 11.4417C8.72772 11.967 9.17604 12.3754 9.71823 12.3754C10.0634 12.3754 10.3431 12.6551 10.3431 13.0003C10.3431 13.3454 10.0634 13.6252 9.71823 13.6252C9.05319 13.6252 8.45323 13.3425 8.03102 12.8915C7.60882 13.3425 7.00886 13.6252 6.34382 13.6252C5.99869 13.6252 5.71893 13.3454 5.71893 13.0003C5.71893 12.6551 5.99869 12.3754 6.34382 12.3754C6.87897 12.3754 7.32277 11.9775 7.39548 11.4621C7.09378 11.2625 6.74537 10.9753 6.49232 10.6174C5.65909 10.3434 4.77609 10.2347 3.88337 10.3006C3.51828 10.3563 3.26695 10.4948 3.11541 10.7238C2.88517 11.0716 2.93628 11.5273 2.96125 11.6215C3.48088 13.5803 5.38792 14.7498 8.06286 14.75C10.7378 14.7498 12.6448 13.5803 13.1645 11.6215C13.1895 11.5273 13.2406 11.0716 13.0103 10.7238ZM3.76627 9.05608C3.75271 9.05711 3.77973 9.05414 3.76627 9.05608V9.05608ZM7.99978 1.12733C7.99009 1.12711 8.00943 1.12711 7.99978 1.12733V1.12733Z" fill="#8B90A6"/>
-                            <path d="M10.8407 6.96912C10.8787 7.45041 10.48 7.84906 9.99872 7.81113C8.97084 7.68405 9.08769 6.21281 10.1255 6.2539C10.5041 6.28377 10.8109 6.59049 10.8407 6.96912ZM5.19049 6.96912C5.15253 7.45041 5.55118 7.84906 6.0325 7.81113C7.06039 7.68405 6.94353 6.21281 5.90571 6.2539C5.52709 6.28377 5.22033 6.59049 5.19049 6.96912Z" fill="#8B90A6"/>
-                          </g>
-                            <defs>
-                              <clipPath id="clip0_86_4448">
-                                <rect width="16" height="16" fill="white"/>
-                              </clipPath>
-                            </defs>
-                        </svg>
+                        <div className={styles["pets__item-image"]}>
+                          <PetIcon
+                            className={styles["pets__item-icon"]}
+                            aria-hidden="true"
+                          />
+                        </div>
                         <div className={styles["pets__item-info"]}>
-                          <div className={styles["pets__item-name"]}>{pet.name}</div>
-                          <div className={styles["pets__item-breed"]}>{pet.breed}</div>
+                          <div className={styles["pets__item-name"]}>{petName}</div>
+                          <div className={styles["pets__item-breed"]}>{pet.breed ?? pet.Breed}</div>
                         </div>
                       </div>
                       <div className={styles["pets__item-action"]}>

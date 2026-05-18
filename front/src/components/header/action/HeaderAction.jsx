@@ -1,3 +1,5 @@
+import React from 'react';
+
 import styles from "./HeaderAction.module.scss";
 
 const HeaderAction = ({ icon, text, onClick, hasSecondIcon = false }) => {
@@ -7,12 +9,12 @@ const HeaderAction = ({ icon, text, onClick, hasSecondIcon = false }) => {
       type="button"
       onClick={onClick}
     >
-      <img
-        className={styles["header-action__icon"]}
-        src={icon}
-        alt=""
-        width="16" height="16"
-      />
+      {icon && React.createElement(icon, {
+        className: styles["header-action__icon"],
+        "aria-hidden": true,
+        width: "16",
+        height: "16"
+      })}
       <div className={`${styles["header-action__text"]} hidden-mobile`}>{text}</div>
       {hasSecondIcon && (
         <svg

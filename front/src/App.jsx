@@ -13,6 +13,7 @@ import { hasStoredAuth } from "./api/auth";
 import { useNotification } from "./context/NotificationContext";
 import NotificationService from "./services/notificationService";
 import { logger } from "./utils/logger";
+import { clearSelectedPet, getSelectedPet, setSelectedPet } from "./utils/selectedPetStorage";
 
 const Landing = lazy(() => import("./pages/Landing/Landing"));
 const Pets = lazy(() => import("./pages/Pets/Pets"));
@@ -48,7 +49,12 @@ function App() {
     try {
       const petData = await getPet(parseInt(petId, 10));
       setPet(petData);
+      setSelectedPet(petData);
     } catch (err) {
+      if (String(getSelectedPet().id) === String(petId)) {
+        clearSelectedPet();
+      }
+
       logger.error("Ошибка загрузки питомца:", err);
     }
   }, [location.search]);
@@ -81,7 +87,11 @@ function App() {
 
       {/* Header теперь сам навигирует через useNavigate */}
       {isAuthenticated && !isPetsPage && !isLandingPage && !isPrivacyPolicyPage && !isRootWithoutPetId && (
-        <Header petName={pet?.name} petId={pet?.id ?? pet?.Id} />
+        <Header
+          petName={pet?.name}
+          petId={pet?.id ?? pet?.Id}
+          petSpecies={pet?.species ?? pet?.Species}
+        />
       )}
 
       <main>

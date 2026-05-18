@@ -15,9 +15,17 @@ const buildPetCreateFormData = (petData) => {
   const formData = new FormData();
 
   appendIfPresent(formData, 'name', petData.name);
+  appendIfPresent(formData, 'species', petData.species);
+  appendIfPresent(formData, 'gender', petData.gender);
   appendIfPresent(formData, 'breed', petData.breed);
+  appendIfPresent(formData, 'color', petData.color);
+  appendIfPresent(formData, 'microchipNumber', petData.microchipNumber);
   appendIfPresent(formData, 'weightKg', petData.weightKg);
   appendIfPresent(formData, 'birthDate', petData.birthDate);
+  appendIfPresent(formData, 'isNeutered', petData.isNeutered);
+  appendIfPresent(formData, 'allergies', petData.allergies);
+  appendIfPresent(formData, 'chronicConditions', petData.chronicConditions);
+  appendIfPresent(formData, 'bloodType', petData.bloodType);
 
   petData.photos?.forEach((photo) => {
     formData.append('photos', photo);
