@@ -8,13 +8,15 @@ import Menu from "../menu/Menu";
 import ModalOverlay from "../modal_overlay/ModalOverlay";
 import HeaderAction from "./action/HeaderAction";
 import ProfileModal from "../ui/modals/ProfileModal/ProfileModal";
+import { getPetSpeciesIcon } from "../../utils/petIcons";
+import { getSelectedPet } from "../../utils/selectedPetStorage";
 
-import CatIcon from "../../assets/icons/pets/cat.svg";
-import ProfileIcon from "../../assets/icons/profile.svg";
+import ProfileIcon from "../../assets/icons/profile.svg?react";
 
 const Header = ({
   petName,
   petId,
+  petSpecies,
   hideMenu = false,
   className = "section container",
   innerClassName = styles.header__inner
@@ -28,8 +30,11 @@ const Header = ({
   };
 
   const isHomePage = location.pathname === "/" || location.pathname === "/pets";
-  const selectedPetId = petId || localStorage.getItem("selectedPetId");
-  const selectedPetName = petName || localStorage.getItem("selectedPet") || "Выберите питомца";
+  const storedPet = getSelectedPet();
+  const selectedPetId = petId || storedPet.id;
+  const selectedPetName = petName || storedPet.name || "Выберите питомца";
+  const selectedPetSpecies = petSpecies ?? storedPet.species;
+  const selectedPetIcon = getPetSpeciesIcon(selectedPetSpecies);
 
   return (
     <>
@@ -62,7 +67,7 @@ const Header = ({
             <span className={`${styles.header__separator} hidden-mobile`}></span>
             <div className={styles["header__actions"]}>
               <HeaderAction
-                icon={CatIcon}
+                icon={selectedPetIcon}
                 text={selectedPetName}
                 onClick={() => selectedPetId && navigate(`/?id=${selectedPetId}`)}
                 hasSecondIcon

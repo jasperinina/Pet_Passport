@@ -28,6 +28,10 @@
     column-gap: rem(10);
     cursor: pointer;
 
+    &-icon {
+      @include square(24);
+    }
+
     @include tablet {
       padding: rem(13) rem(16);
       column-gap: rem(8);

@@ -5,7 +5,6 @@ import PetCard from "../../components/ui/PetCard/PetCard";
 import Procedures from "../../components/ui/Procedures/Procedures";
 import ModalOverlay from "../../components/modal_overlay/ModalOverlay";
 import AddProcedureModal from "../../components/ui/modals/AddProcedureModal/AddProcedureModal";
-import EditPetModal from "../../components/ui/modals/EditPetModal/EditPetModal";
 
 import { getPet } from "../../api/pets";
 import { getEvents } from "../../api/events";
@@ -22,7 +21,6 @@ const Home = () => {
   const [pet, setPet] = useState(null);
   const [loading, setLoading] = useState(true);
   const [upcomingEvents, setUpcomingEvents] = useState([]);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddProcedureModalOpen, setIsAddProcedureModalOpen] = useState(false);
 
   const getPetIdFromUrl = useCallback(() => {
@@ -105,7 +103,7 @@ const Home = () => {
       <section className="section container">
         <PetCard
           setIsAddProcedureModalOpen={setIsAddProcedureModalOpen}
-          setIsEditModalOpen={setIsEditModalOpen}
+          onPetUpdated={handleUpdateSuccess}
           pet={pet}
         />
       </section>
@@ -158,20 +156,6 @@ const Home = () => {
             isClosing={isClosing}
             petId={pet?.id}
             onSuccess={handleProcedureAdded}
-          />
-        )}
-      </ModalOverlay>
-      <ModalOverlay
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-      >
-        {({ isOpen, isClosing, onClose }) => (
-          <EditPetModal
-            isOpen={isOpen}
-            onClose={onClose}
-            isClosing={isClosing}
-            pet={pet}
-            onSuccess={handleUpdateSuccess}
           />
         )}
       </ModalOverlay>

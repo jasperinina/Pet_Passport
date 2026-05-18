@@ -2,13 +2,22 @@ import { useState, useEffect, useRef } from "react";
 
 import { createPet } from "../../../../api/pets";
 import { getStoredOwnerId } from "../../../../api/auth";
+import { PET_GENDER_OPTIONS, PET_SPECIES_OPTIONS } from "../../../../constants/petOptions";
 import PetPhotoPicker from "../../PetPhotoPicker/PetPhotoPicker";
 
 const EMPTY_FORM_DATA = {
   name: "",
+  species: "",
+  gender: "",
   breed: "",
+  color: "",
+  microchipNumber: "",
   weightKg: "",
   birthDate: "",
+  isNeutered: "",
+  bloodType: "",
+  allergies: "",
+  chronicConditions: "",
 };
 
 const AddPetModal = ({
@@ -96,9 +105,17 @@ const AddPetModal = ({
     try {
       const payload = {
         name,
+        species: formData.species === "" ? null : Number(formData.species),
+        gender: formData.gender === "" ? null : Number(formData.gender),
         breed: breed || null,
+        color: formData.color.trim() || null,
+        microchipNumber: formData.microchipNumber.trim() || null,
         weightKg: weight,
         birthDate: formData.birthDate || null,
+        isNeutered: formData.isNeutered === "" ? null : formData.isNeutered === "true",
+        bloodType: formData.bloodType.trim() || null,
+        allergies: formData.allergies.trim() || null,
+        chronicConditions: formData.chronicConditions.trim() || null,
         ownerId: resolvedOwnerId,
         photos: selectedPhotos.map((photo) => photo.file),
       };
@@ -106,10 +123,8 @@ const AddPetModal = ({
       const createdPetId = await createPet(payload);
       const createdPet = {
         id: createdPetId,
-        name,
-        breed,
-        weightKg: weight,
-        birthDate: formData.birthDate,
+        ...payload,
+        birthDate: payload.birthDate || "",
         photos: [],
       };
 
@@ -149,7 +164,7 @@ const AddPetModal = ({
                 className="form__item-label h3"
                 htmlFor="add-pet-name-input"
               >
-                Имя
+                Имя *
               </label>
               <input
                 className="form__item-input input"
@@ -160,6 +175,7 @@ const AddPetModal = ({
                 value={formData.name}
                 onChange={handleChange}
                 disabled={loading}
+                required
                 autoComplete="off"
               />
             </li>
@@ -177,6 +193,77 @@ const AddPetModal = ({
                 type="text"
                 placeholder="Введите породу"
                 value={formData.breed}
+                onChange={handleChange}
+                disabled={loading}
+                autoComplete="off"
+              />
+            </li>
+            <div className="form__two-columns">
+              <li className="form__item">
+                <label
+                  className="form__item-label h3"
+                  htmlFor="add-pet-species-select"
+                >
+                  Вид
+                </label>
+                <div className="select form__item-input">
+                  <select
+                    className="select__field"
+                    id="add-pet-species-select"
+                    name="species"
+                    value={formData.species}
+                    onChange={handleChange}
+                    disabled={loading}
+                  >
+                    <option value="">Не указано</option>
+                    {PET_SPECIES_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </li>
+              <li className="form__item">
+                <label
+                  className="form__item-label h3"
+                  htmlFor="add-pet-gender-select"
+                >
+                  Пол
+                </label>
+                <div className="select form__item-input">
+                  <select
+                    className="select__field"
+                    id="add-pet-gender-select"
+                    name="gender"
+                    value={formData.gender}
+                    onChange={handleChange}
+                    disabled={loading}
+                  >
+                    <option value="">Не указано</option>
+                    {PET_GENDER_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </li>
+            </div>
+            <li className="form__item">
+              <label
+                className="form__item-label h3"
+                htmlFor="add-pet-color-input"
+              >
+                Окрас
+              </label>
+              <input
+                className="form__item-input input"
+                id="add-pet-color-input"
+                name="color"
+                type="text"
+                placeholder="Введите окрас"
+                value={formData.color}
                 onChange={handleChange}
                 disabled={loading}
                 autoComplete="off"
@@ -215,6 +302,104 @@ const AddPetModal = ({
                 name="birthDate"
                 type="date"
                 value={formData.birthDate}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </li>
+            <div className="form__two-columns">
+              <li className="form__item">
+                <label
+                  className="form__item-label h3"
+                  htmlFor="add-pet-microchip-input"
+                >
+                  Номер микрочипа
+                </label>
+                <input
+                  className="form__item-input input"
+                  id="add-pet-microchip-input"
+                  name="microchipNumber"
+                  type="text"
+                  placeholder="Введите номер"
+                  value={formData.microchipNumber}
+                  onChange={handleChange}
+                  disabled={loading}
+                  autoComplete="off"
+                />
+              </li>
+              <li className="form__item">
+                <label
+                  className="form__item-label h3"
+                  htmlFor="add-pet-neutered-select"
+                >
+                  Стерилизован / кастрирован
+                </label>
+                <div className="select form__item-input">
+                  <select
+                    className="select__field"
+                    id="add-pet-neutered-select"
+                    name="isNeutered"
+                    value={formData.isNeutered}
+                    onChange={handleChange}
+                    disabled={loading}
+                  >
+                    <option value="">Не указано</option>
+                    <option value="true">Да</option>
+                    <option value="false">Нет</option>
+                  </select>
+                </div>
+              </li>
+            </div>
+            <li className="form__item">
+              <label
+                className="form__item-label h3"
+                htmlFor="add-pet-blood-type-input"
+              >
+                Группа крови
+              </label>
+              <input
+                className="form__item-input input"
+                id="add-pet-blood-type-input"
+                name="bloodType"
+                type="text"
+                placeholder="Введите группу крови"
+                value={formData.bloodType}
+                onChange={handleChange}
+                disabled={loading}
+                autoComplete="off"
+              />
+            </li>
+            <li className="form__item">
+              <label
+                className="form__item-label h3"
+                htmlFor="add-pet-allergies-textarea"
+              >
+                Аллергии
+              </label>
+              <textarea
+                className="form__item-input textarea"
+                id="add-pet-allergies-textarea"
+                name="allergies"
+                rows="3"
+                placeholder="Введите аллергии"
+                value={formData.allergies}
+                onChange={handleChange}
+                disabled={loading}
+              />
+            </li>
+            <li className="form__item">
+              <label
+                className="form__item-label h3"
+                htmlFor="add-pet-chronic-textarea"
+              >
+                Хронические заболевания
+              </label>
+              <textarea
+                className="form__item-input textarea"
+                id="add-pet-chronic-textarea"
+                name="chronicConditions"
+                rows="3"
+                placeholder="Введите заболевания"
+                value={formData.chronicConditions}
                 onChange={handleChange}
                 disabled={loading}
               />

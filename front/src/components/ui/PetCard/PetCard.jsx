@@ -6,13 +6,15 @@ import styles from "./PetCard.module.scss";
 import PetPhotos from "../PetPhotos/PetPhotos";
 import ModalOverlay from "../../modal_overlay/ModalOverlay";
 import ExportPdfModal from "../modals/ExportPdfModal/ExportPdfModal";
+import PetPassportModal from "../modals/PetPassportModal/PetPassportModal";
 
-const PetCard = ({setIsAddProcedureModalOpen, setIsEditModalOpen, pet}) => {
+const PetCard = ({setIsAddProcedureModalOpen, onPetUpdated, pet}) => {
   const navigate = useNavigate();
   const location = useLocation();
   const search = location.search || "";
 
   const [isExportPdfOpen, setIsExportPdfOpen] = useState(false);
+  const [isPassportOpen, setIsPassportOpen] = useState(false);
 
   const getAgeWord = (age) => {
     const lastDigit = age % 10;
@@ -66,12 +68,12 @@ const PetCard = ({setIsAddProcedureModalOpen, setIsEditModalOpen, pet}) => {
           <div className={styles["pet-card__body"]}>
             <div className={styles["pet-card__data"]}>
               <div className={styles["pet-card__data-label"]}>Порода</div>
-              <h2 className={styles["pet-card__data-text"]}>{pet.breed}</h2>
+              <h2 className={styles["pet-card__data-text"]}>{pet.breed || "Не указана"}</h2>
             </div>
             <div className={styles["pet-card__row"]}>
               <div className={styles["pet-card__data"]}>
                 <div className={styles["pet-card__data-label"]}>Вес</div>
-                <h2 className={styles["pet-card__data-text"]}>{pet.weightKg} кг</h2>
+                <h2 className={styles["pet-card__data-text"]}>{pet.weightKg ? `${pet.weightKg} кг` : "Не указан"}</h2>
               </div>
               <div className={styles["pet-card__data"]}>
                 <div className={styles["pet-card__data-label"]}>Дата рождения</div>
@@ -95,11 +97,11 @@ const PetCard = ({setIsAddProcedureModalOpen, setIsEditModalOpen, pet}) => {
               Рекомендуемые процедуры
             </button>
             <button
-              className="button button--transparent"
+              className="button button--outlined"
               type="button"
-              onClick={() => setIsEditModalOpen(true)}
+              onClick={() => setIsPassportOpen(true)}
             >
-              Изменить данные
+              Посмотреть паспорт
             </button>
             <button
               className="button button--outlined"
@@ -120,6 +122,17 @@ const PetCard = ({setIsAddProcedureModalOpen, setIsEditModalOpen, pet}) => {
             onClose={onClose}
             petId={pet.id}
             petName={pet.name}
+          />
+        )}
+      </ModalOverlay>
+      <ModalOverlay isOpen={isPassportOpen} onClose={() => setIsPassportOpen(false)}>
+        {({ isOpen, isClosing, onClose }) => (
+          <PetPassportModal
+            isOpen={isOpen}
+            isClosing={isClosing}
+            onClose={onClose}
+            pet={pet}
+            onSuccess={onPetUpdated}
           />
         )}
       </ModalOverlay>
