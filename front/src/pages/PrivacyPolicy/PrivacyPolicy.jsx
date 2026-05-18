@@ -64,7 +64,7 @@ const PrivacyPolicy = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const gitHubUrl = import.meta.env.VITE_GITHUB_URL || "";
+  const ruStoreUrl = import.meta.env.VITE_RUSTORE_URL || "";
   const webUrl = "/";
   const privacyPolicyUrl = "/privacy-policy";
   const source = new URLSearchParams(location.search).get("from");
@@ -137,7 +137,7 @@ const PrivacyPolicy = () => {
     <div className={styles["privacy-policy"]}>
       <Header
         webUrl={webUrl}
-        gitHubUrl={gitHubUrl}
+        ruStoreUrl={ruStoreUrl}
         logoPath={logoPath}
         privacyPolicyOpened
       />
