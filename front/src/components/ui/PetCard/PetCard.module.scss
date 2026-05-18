@@ -76,11 +76,5 @@
         width: 100%;
       }
     }
-
-    & button {
-      &:last-child {
-        grid-column: 1 / -1;
-      }
-    }
   }
 }

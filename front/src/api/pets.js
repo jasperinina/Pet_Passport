@@ -2,6 +2,8 @@ import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../constants/config.js';
 import { notifyError, notifySuccess } from '../services/notificationService.js';
 import { apiClient } from './apiClient.js';
 import { USE_MOCK_API, mockGetPet } from './mockApi.js';
+import API_BASE_URL from './config.js';
+import { getAccessToken } from './tokenStorage.js';
 
 const appendIfPresent = (formData, key, value) => {
   if (value !== undefined && value !== null && value !== '') {
@@ -201,6 +203,32 @@ export async function updatePetPhotos(petId, options = {}) {
         break;
     }
   }
+}
+
+export async function downloadPetPassportPdf(petId, sections = {}, petName = 'pet') {
+  const { includeVaccines = false, includeTreatments = false, includeVisits = false } = sections;
+
+  const params = new URLSearchParams({ includeVaccines, includeTreatments, includeVisits });
+  const token = getAccessToken();
+
+  const response = await fetch(
+    `${API_BASE_URL}/api/v2/pets/${petId}/passport/pdf?${params}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  if (!response.ok) {
+    throw new Error('PDF generation failed');
+  }
+
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `passport-${petName}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 export async function deletePetPhoto(petId, photoId) {
