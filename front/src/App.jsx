@@ -72,6 +72,12 @@ function App() {
     };
   }, [loadPet]);
 
+  useEffect(() => {
+    if (typeof window.ym === 'function') {
+      window.ym(109290343, 'hit', window.location.href);
+    }
+  }, [location]);
+
   const isPetsPage = location.pathname === "/pets";
   const isLandingPage = location.pathname === "/landing";
   const isPrivacyPolicyPage = location.pathname === "/privacy-policy";
